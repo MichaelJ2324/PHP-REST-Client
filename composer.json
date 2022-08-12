@@ -20,9 +20,6 @@
   ],
   "require": {
     "php": ">=7.2",
-    "guzzlehttp/guzzle": ">=6.3.3",
-    "psr/log": "1.*",
-    "psr/simple-cache": "1.0.1",
     "ext-json": "*"
   },
   "require-dev": {
@@ -34,33 +31,9 @@
       "MRussell\\REST\\": "src/"
     }
   },
-  "autoload-dev": {
-    "psr-4": {
-      "MRussell\\REST\\Tests\\": "tests/"
-    }
-  },
   "config": {
     "allow-plugins": {
       "symfony/flex": true
     }
-  },
-  "scripts": {
-    "test": [
-      "phpunit"
-    ],
-    "test:coverage": [
-      "@putenv XDEBUG_MODE=coverage",
-      "phpunit --coverage-clover=\"coverage/clover.xml\""
-    ],
-    "test:coverage-html": [
-      "@putenv XDEBUG_MODE=coverage",
-      "phpunit --coverage-html=\"coverage\""
-    ],
-    "quality": [
-      "phpcs --standard=./ruleset.xml src/"
-    ],
-    "docs": [
-      "php phpDocumentor.phar -d ./src -t ./doc/"
-    ]
   }
 }
