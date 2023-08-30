@@ -244,7 +244,7 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController {
             'client_id' => $this->credentials['client_id'],
             'client_secret' => $this->credentials['client_secret'],
             'grant_type' => self::OAUTH_REFRESH_GRANT,
-            'refresh_token' => $this->token['refresh_token'],
+            'refresh_token' => $this->getTokenProp('refresh_token'),
         ]);
     }
 
