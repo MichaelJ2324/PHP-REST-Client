@@ -22,16 +22,11 @@ trait JsonHandlerTrait {
      * @param $associative
      * @return mixed
      */
-    public function getResponseContent(Response $response,$associative = true)
+    public function getResponseContent(Response $response,bool $associative = true)
     {
         if (!$this->respContent) {
             $this->respContent = $response->getBody()->getContents();
             $response->getBody()->rewind();
-            $contentType = $response->getHeader('Content-Type');
-            $contentType = is_array($contentType)?"":$contentType;
-            if (strpos($contentType,"json") == FALSE){
-                $this->respContent = html_entity_decode($this->respContent,ENT_QUOTES|ENT_HTML5,'UTF-8');
-            }
         }
         $body = null;
         try {
