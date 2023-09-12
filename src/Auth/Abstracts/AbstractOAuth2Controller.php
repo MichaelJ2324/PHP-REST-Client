@@ -104,11 +104,11 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController {
      */
     protected function configureToken($token) {
         if (is_array($token)) {
-            if (isset($token['expires_in'])) {
+            if (isset($token['expires_in']) && !isset($token['expiration'])) {
                 $token['expiration'] = time() + ($token['expires_in'] - 30);
             }
         } elseif (is_object($token)) {
-            if (isset($token->expires_in)) {
+            if (isset($token->expires_in) && !isset($token->expiration)) {
                 $token->expiration = time() + ($token->expires_in - 30);
             }
         }
