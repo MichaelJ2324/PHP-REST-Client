@@ -100,6 +100,9 @@ class AbstractOAuth2ControllerTest extends TestCase {
         $this->assertEquals(true, ($newToken['expiration'] >= time() + 3570));
         $this->assertEquals(true, $Auth->isAuthenticated());
         $this->assertEquals($this->token['access_token'],$Auth->getTokenProp('access_token'));
+        $expiration = $Auth->getTokenProp('expiration');
+        $this->assertEquals($Auth, $Auth->setToken($Auth->getToken()));
+        $this->assertEquals($expiration, $Auth->getTokenProp('expiration'));
 
         $newToken = $this->token;
         $newToken['expires_in'] = -1;
