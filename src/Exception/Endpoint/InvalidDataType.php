@@ -2,7 +2,7 @@
 
 namespace MRussell\REST\Exception\Endpoint;
 
-
-class InvalidDataType extends EndpointException {
+class InvalidDataType extends EndpointException
+{
     protected $message = 'Invalid data type passed to Endpoint [%s]';
 }

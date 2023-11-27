@@ -12,7 +12,8 @@ trait GetAttributesTrait
      * @return mixed
      * @implements GetInterface
      */
-    public function get($key) {
+    public function get($key)
+    {
         return $this->_attributes[$key] ?? null;
     }
 }

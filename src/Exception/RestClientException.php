@@ -2,12 +2,14 @@
 
 namespace MRussell\REST\Exception;
 
-class RestClientException extends \Exception {
+class RestClientException extends \Exception
+{
     protected $message = 'An Unknown Exception occurred in the REST Client Framework';
 
-    public function __construct($args = array()) {
+    public function __construct($args = array())
+    {
         if (!empty($args)) {
-            if (is_string($args) ) {
+            if (is_string($args)) {
                 $args = [$args];
             }
             $this->message = vsprintf($this->message, $args);

@@ -24,27 +24,28 @@ use MRussell\REST\Endpoint\Traits\JsonHandlerTrait;
  * Class AbstractEndpoint
  * @package MRussell\REST\Endpoint\Abstracts
  */
-abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterface {
-    use EventsTrait,
-        ClientAwareTrait,
-        JsonHandlerTrait;
+abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterface
+{
+    use EventsTrait;
+    use ClientAwareTrait;
+    use JsonHandlerTrait;
     use PropertiesTrait {
         setProperties as rawSetProperties;
     }
-    
-    const PROPERTY_URL = 'url';
-    const PROPERTY_HTTP_METHOD = 'httpMethod';
-    const PROPERTY_AUTH = 'auth';
 
-    const EVENT_CONFIGURE_METHOD = 'configure_method';
-    const EVENT_CONFIGURE_URL = 'configure_url';
-    const EVENT_CONFIGURE_PAYLOAD = 'configure_payload';
-    const EVENT_AFTER_CONFIGURED_REQUEST = 'after_configure_req';
-    const EVENT_AFTER_RESPONSE = 'after_response';
+    public const PROPERTY_URL = 'url';
+    public const PROPERTY_HTTP_METHOD = 'httpMethod';
+    public const PROPERTY_AUTH = 'auth';
 
-    const AUTH_NOAUTH = 0;
-    const AUTH_EITHER = 1;
-    const AUTH_REQUIRED = 2;
+    public const EVENT_CONFIGURE_METHOD = 'configure_method';
+    public const EVENT_CONFIGURE_URL = 'configure_url';
+    public const EVENT_CONFIGURE_PAYLOAD = 'configure_payload';
+    public const EVENT_AFTER_CONFIGURED_REQUEST = 'after_configure_req';
+    public const EVENT_AFTER_RESPONSE = 'after_response';
+
+    public const AUTH_NOAUTH = 0;
+    public const AUTH_EITHER = 1;
+    public const AUTH_REQUIRED = 2;
 
     protected static $_DEFAULT_PROPERTIES = array(
         self::PROPERTY_URL => '',
@@ -100,7 +101,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     protected $response;
 
-    public function __construct(array $urlArgs = array(), array $properties = array()) {
+    public function __construct(array $urlArgs = array(), array $properties = array())
+    {
         $this->eventStack = new Stack();
         $this->eventStack->setEndpoint($this);
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
@@ -117,7 +119,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setUrlArgs(array $args): EndpointInterface {
+    public function setUrlArgs(array $args): EndpointInterface
+    {
         $this->urlArgs = $args;
         return $this;
     }
@@ -125,14 +128,16 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getUrlArgs(): array {
+    public function getUrlArgs(): array
+    {
         return $this->urlArgs;
     }
 
     /**
      * @inheritdoc
      */
-    public function setBaseUrl($url): EndpointInterface {
+    public function setBaseUrl($url): EndpointInterface
+    {
         $this->baseUrl = $url;
         return $this;
     }
@@ -140,8 +145,9 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getBaseUrl(): string {
-        if (empty($this->baseUrl) && $this->client){
+    public function getBaseUrl(): string
+    {
+        if (empty($this->baseUrl) && $this->client) {
             return $this->getClient()->getAPIUrl();
         }
         return $this->baseUrl;
@@ -150,7 +156,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getEndPointUrl($full = false): string {
+    public function getEndPointUrl($full = false): string
+    {
         $url = static::$_ENDPOINT_URL;
         if (isset($this->_properties[self::PROPERTY_URL]) && $this->_properties[self::PROPERTY_URL] !== '') {
             $url = $this->_properties[self::PROPERTY_URL];
@@ -164,7 +171,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setData($data) {
+    public function setData($data)
+    {
         $this->data = $data;
         return $this;
     }
@@ -172,7 +180,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 
@@ -185,7 +194,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @return Request
      * @codeCoverageIgnore
      */
-    protected function getRequest(): Request {
+    protected function getRequest(): Request
+    {
         return $this->request;
     }
 
@@ -193,7 +203,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @param Response $response
      * @return $this|EndpointInterface
      */
-    protected function setResponse(Response $response) {
+    protected function setResponse(Response $response)
+    {
         $this->response = $response;
         $this->respContent = null;
         $this->triggerEvent(self::EVENT_AFTER_RESPONSE, $response);
@@ -203,7 +214,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getResponse() {
+    public function getResponse()
+    {
         return $this->response;
     }
 
@@ -214,14 +226,15 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     public function getResponseBody(bool $associative = true)
     {
         $response = $this->getResponse();
-        return $response?$this->getResponseContent($response,$associative):null;
+        return $response ? $this->getResponseContent($response, $associative) : null;
     }
 
     /**
      * @return Client
      */
-    public function getHttpClient(): Client {
-        return !$this->client? new Client() : $this->getClient()->getHttpClient();
+    public function getHttpClient(): Client
+    {
+        return !$this->client ? new Client() : $this->getClient()->getHttpClient();
     }
 
     /**
@@ -231,7 +244,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @return $this
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function execute(array $options = []): EndpointInterface {
+    public function execute(array $options = []): EndpointInterface
+    {
         $this->setResponse($this->getHttpClient()->send($this->buildRequest(), $options));
         return $this;
     }
@@ -241,7 +255,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @param null $data - short form data for Endpoint, which is configure by configureData method
      * @return $this
      */
-    public function asyncExecute(array $options = []): EndpointInterface {
+    public function asyncExecute(array $options = []): EndpointInterface
+    {
         $request = $this->buildRequest();
         $this->promise = $this->getHttpClient()->sendAsync($request, $options);
         $endpoint = $this;
@@ -272,7 +287,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function useAuth(): int {
+    public function useAuth(): int
+    {
         $auth = self::AUTH_EITHER;
         if (isset($this->_properties[self::PROPERTY_AUTH])) {
             $auth = intval($this->_properties[self::PROPERTY_AUTH]);
@@ -283,7 +299,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @return string
      */
-    public function getMethod(): string {
+    public function getMethod(): string
+    {
         $this->triggerEvent(self::EVENT_CONFIGURE_METHOD);
         if (
             isset($this->_properties[self::PROPERTY_HTTP_METHOD]) &&
@@ -298,7 +315,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * Verifies URL and Data are setup, then sets them on the Request Object
      * @return Request
      */
-    public function buildRequest(): Request {
+    public function buildRequest(): Request
+    {
         $method = $this->getMethod();
         $url = $this->configureURL($this->getUrlArgs());
         if ($this->verifyUrl($url)) {
@@ -315,7 +333,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * Configures Data on the Endpoint to be set on the Request.
      * @return string|array|DataInterface|null|Stream
      */
-    protected function configurePayload() {
+    protected function configurePayload()
+    {
         $data = $this->getData() ?? null;
         $this->triggerEvent(self::EVENT_CONFIGURE_PAYLOAD, $data);
         return $data;
@@ -326,11 +345,12 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @param $data
      * @return Request
      */
-    protected function configureRequest(Request $request, $data): Request {
-        if ($data !== null){
+    protected function configureRequest(Request $request, $data): Request
+    {
+        if ($data !== null) {
             switch ($request->getMethod()) {
                 case "GET":
-                    if (!empty($data)){
+                    if (!empty($data)) {
                         $value = $data;
                         if (\is_array($value)) {
                             $value = \http_build_query($value, '', '&', \PHP_QUERY_RFC3986);
@@ -364,7 +384,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @param array $urlArgs
      * @return string
      */
-    protected function configureURL(array $urlArgs): string {
+    protected function configureURL(array $urlArgs): string
+    {
         $url = $this->getEndPointUrl();
         $this->triggerEvent(self::EVENT_CONFIGURE_URL, $urlArgs);
         if ($this->hasUrlArgs()) {
@@ -415,7 +436,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @return bool
      * @throws InvalidUrl
      */
-    private function verifyUrl(string $url): bool {
+    private function verifyUrl(string $url): bool
+    {
         if (strpos($url, static::$_URL_VAR_CHARACTER) !== false) {
             throw new InvalidUrl(array(get_class($this), $url));
         }
@@ -426,7 +448,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * Checks if Endpoint URL requires Arguments
      * @return bool
      */
-    protected function hasUrlArgs(): bool {
+    protected function hasUrlArgs(): bool
+    {
         $url = $this->getEndPointUrl();
         $variables = $this->extractUrlVariables($url);
         return !empty($variables);
@@ -437,11 +460,11 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @param $url
      * @return array
      */
-    protected function extractUrlVariables($url): array {
+    protected function extractUrlVariables($url): array
+    {
         $variables = array();
         $pattern = "/(\\" . static::$_URL_VAR_CHARACTER . ".*?[^\\/]*)/";
-        if (preg_match($pattern, $url, $matches)) {
-            array_shift($matches);
+        if (preg_match_all($pattern, $url, $matches)) {
             foreach ($matches as $match) {
                 $variables[] = $match[0];
             }
@@ -465,7 +488,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setProperties(array $properties) {
+    public function setProperties(array $properties)
+    {
         if (!isset($properties[self::PROPERTY_HTTP_METHOD])) {
             $properties[self::PROPERTY_HTTP_METHOD] = '';
         }

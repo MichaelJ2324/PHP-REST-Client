@@ -7,10 +7,12 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use MRussell\REST\Client\AbstractClient;
 
-class ClientOverridenConstructor extends AbstractClient {
+class ClientOverridenConstructor extends AbstractClient
+{
     public $mockResponses;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->mockResponses = new MockHandler([]);
     }
 }

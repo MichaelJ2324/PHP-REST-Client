@@ -2,7 +2,7 @@
 
 namespace MRussell\REST\Tests\Stubs\Endpoint;
 
-use \MRussell\REST\Endpoint\SmartEndpoint;
+use MRussell\REST\Endpoint\SmartEndpoint;
 use MRussell\REST\Endpoint\Traits\FileUploadsTrait;
 
 class FileUploadEndpoint extends SmartEndpoint

@@ -2,7 +2,6 @@
 
 namespace MRussell\REST\Endpoint\Traits;
 
-
 use MRussell\REST\Endpoint\Interfaces\ArrayableInterface;
 
 trait ArrayObjectAttributesTrait
@@ -18,7 +17,8 @@ trait ArrayObjectAttributesTrait
      * @param string The key data to retrieve
      * @access public
      */
-    public function &__get($key) {
+    public function &__get($key)
+    {
         return $this->_attributes[$key];
     }
 
@@ -27,7 +27,8 @@ trait ArrayObjectAttributesTrait
      * @param string $key - The data key to assign the value to
      * @param mixed $value - The value to set
      */
-    public function __set($key, $value) {
+    public function __set($key, $value)
+    {
         $this->_attributes[$key] = $value;
     }
 
@@ -36,7 +37,8 @@ trait ArrayObjectAttributesTrait
      * @param string $key - A data key to check for
      * @return boolean
      */
-    public function __isset($key) {
+    public function __isset($key)
+    {
         return isset($this->_attributes[$key]);
     }
 
@@ -44,7 +46,8 @@ trait ArrayObjectAttributesTrait
      * Unsets data by key
      * @param string $key - The key to unset
      */
-    public function __unset($key) {
+    public function __unset($key)
+    {
         unset($this->_attributes[$key]);
     }
 
@@ -55,7 +58,8 @@ trait ArrayObjectAttributesTrait
      * @param mixed $value - The value to set
      * @abstracting ArrayAccess
      */
-    public function offsetSet($offset, $value): void {
+    public function offsetSet($offset, $value): void
+    {
         if (is_null($offset)) {
             $this->_attributes[] = $value;
         } else {
@@ -69,7 +73,8 @@ trait ArrayObjectAttributesTrait
      * @return boolean
      * @abstracting ArrayAccess
      */
-    public function offsetExists($offset): bool {
+    public function offsetExists($offset): bool
+    {
         return isset($this->_attributes[$offset]);
     }
 
@@ -78,7 +83,8 @@ trait ArrayObjectAttributesTrait
      * @param string $offset - The offset to unset
      * @abstracting ArrayAccess
      */
-    public function offsetUnset($offset): void {
+    public function offsetUnset($offset): void
+    {
         if ($this->offsetExists($offset)) {
             unset($this->_attributes[$offset]);
         }
@@ -90,7 +96,9 @@ trait ArrayObjectAttributesTrait
      * @return mixed
      * @abstracting ArrayAccess
      */
-    public function offsetGet($offset) {
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
         return $this->offsetExists($offset) ? $this->_attributes[$offset] : null;
     }
 
@@ -98,7 +106,8 @@ trait ArrayObjectAttributesTrait
      * Return the array attributes
      * @implements ArrayableInterface
      */
-    public function toArray(): array {
+    public function toArray(): array
+    {
         return $this->_attributes;
     }
 }

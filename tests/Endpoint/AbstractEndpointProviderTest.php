@@ -16,21 +16,25 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass MRussell\REST\Endpoint\Provider\AbstractEndpointProvider
  * @group AbstractEndpointProviderTest
  */
-class AbstractEndpointProviderTest extends TestCase {
-
-    public static function setUpBeforeClass(): void {
+class AbstractEndpointProviderTest extends TestCase
+{
+    public static function setUpBeforeClass(): void
+    {
         //Add Setup for static properties here
     }
 
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         //Add Tear Down for static properties here
     }
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
@@ -38,7 +42,8 @@ class AbstractEndpointProviderTest extends TestCase {
      * @covers MRussell\REST\Endpoint\Provider\DefaultEndpointProvider::__construct
      * @covers ::registerEndpoint
      */
-    public function testConstructor() {
+    public function testConstructor()
+    {
         $Provider = new EndpointProvider();
         $Class = new \ReflectionClass('MRussell\REST\Tests\Stubs\Endpoint\EndpointProvider');
         $property = $Class->getProperty('registry');
@@ -56,7 +61,8 @@ class AbstractEndpointProviderTest extends TestCase {
      * @covers ::registerEndpoint
      * @return EndpointProviderInterface
      */
-    public function testRegisterEndpoint() {
+    public function testRegisterEndpoint()
+    {
         $Provider = new EndpointProvider();
         $this->assertEquals($Provider, $Provider->registerEndpoint('auth', 'MRussell\REST\Tests\Stubs\Endpoint\AuthEndpoint'));
         $this->assertEquals($Provider, $Provider->registerEndpoint('foo', 'MRussell\REST\Endpoint\Endpoint', array(
@@ -72,7 +78,8 @@ class AbstractEndpointProviderTest extends TestCase {
      * @covers ::registerEndpoint
      * @throws MRussell\REST\Exception\Endpoint\InvalidRegistration
      */
-    public function testInvalidRegistration(EndpointProviderInterface $Provider) {
+    public function testInvalidRegistration(EndpointProviderInterface $Provider)
+    {
         $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidRegistration::class);
         $this->expectExceptionMessage("Endpoint Object [baz] must extend MRussell\REST\Endpoint\Interfaces\EndpointInterface");
         $Provider->registerEndpoint("baz", "baz");
@@ -85,7 +92,8 @@ class AbstractEndpointProviderTest extends TestCase {
      * @covers ::buildEndpoint
      * @param EndpointProviderInterface $Provider
      */
-    public function testGetEndpoint(EndpointProviderInterface $Provider) {
+    public function testGetEndpoint(EndpointProviderInterface $Provider)
+    {
         $this->assertEquals(false, $Provider->hasEndpoint('test'));
         $this->assertEquals(true, $Provider->hasEndpoint('foo'));
         $this->assertEquals(true, $Provider->hasEndpoint('auth'));
@@ -107,7 +115,8 @@ class AbstractEndpointProviderTest extends TestCase {
      * @covers ::getEndpoint
      * @throws MRussell\REST\Exception\Endpoint\UnknownEndpoint
      */
-    public function testUnknownEndpoint(EndpointProviderInterface $Provider) {
+    public function testUnknownEndpoint(EndpointProviderInterface $Provider)
+    {
         $this->expectException(\MRussell\REST\Exception\Endpoint\UnknownEndpoint::class);
         $this->expectExceptionMessage("An Unknown Endpoint [test] was requested.");
         $Provider->getEndpoint('test');

@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
  */
 class StackTest extends TestCase
 {
-
     /**
      * @covers ::getEndpoint
      * @covers ::setEndpoint
@@ -22,8 +21,8 @@ class StackTest extends TestCase
     {
         $stack = new Stack();
         $ep = new BasicEndpoint();
-        $this->assertEquals($stack,$stack->setEndpoint($ep));
-        $this->assertEquals($ep,$stack->getEndpoint());
+        $this->assertEquals($stack, $stack->setEndpoint($ep));
+        $this->assertEquals($ep, $stack->getEndpoint());
         return $stack;
     }
 
@@ -40,8 +39,8 @@ class StackTest extends TestCase
         $data = [
             'foo' => 'bar'
         ];
-        $id = $stack->register('foobar',function(&$iData,EndpointInterface $endpoint) use ($ep){
-            $this->assertEquals($ep,$endpoint);
+        $id = $stack->register('foobar', function (&$iData, EndpointInterface $endpoint) use ($ep) {
+            $this->assertEquals($ep, $endpoint);
             $iData['bar'] = 'foo';
             return $iData;
         });
@@ -51,27 +50,27 @@ class StackTest extends TestCase
         $eventsProp = $reflected->getProperty('events');
         $eventsProp->setAccessible(true);
 
-        $this->assertArrayHasKey('foobar',$eventsProp->getValue($stack));
-        $this->assertEquals($stack,$stack->trigger('foobar',$data));
-        $this->assertEquals('foo',$data['bar']);
+        $this->assertArrayHasKey('foobar', $eventsProp->getValue($stack));
+        $this->assertEquals($stack, $stack->trigger('foobar', $data));
+        $this->assertEquals('foo', $data['bar']);
 
-        $id2 = $stack->register('foobar',function(&$iData,EndpointInterface $endpoint) use ($ep){
-            $this->assertEquals($ep,$endpoint);
+        $id2 = $stack->register('foobar', function (&$iData, EndpointInterface $endpoint) use ($ep) {
+            $this->assertEquals($ep, $endpoint);
             unset($iData['foo']);
             return $iData;
-        },'test');
-        $this->assertEquals('test',$id2);
-        $this->assertEquals(2,count($eventsProp->getValue($stack)['foobar']));
+        }, 'test');
+        $this->assertEquals('test', $id2);
+        $this->assertEquals(2, count($eventsProp->getValue($stack)['foobar']));
 
-        $this->assertEquals($stack,$stack->trigger('foobar',$data));
+        $this->assertEquals($stack, $stack->trigger('foobar', $data));
         $this->assertEquals([
             'bar' => 'foo'
-        ],$data);
+        ], $data);
 
-        $this->assertEquals(true,$stack->remove('foobar',$id));
-        $this->assertArrayHasKey('foobar',$eventsProp->getValue($stack));
-        $this->assertEquals(true,$stack->remove('foobar',$id2));
-        $this->assertArrayNotHasKey('foobar',$eventsProp->getValue($stack));
-        $this->assertEquals(false,$stack->remove('foobar',$id2));
+        $this->assertEquals(true, $stack->remove('foobar', $id));
+        $this->assertArrayHasKey('foobar', $eventsProp->getValue($stack));
+        $this->assertEquals(true, $stack->remove('foobar', $id2));
+        $this->assertArrayNotHasKey('foobar', $eventsProp->getValue($stack));
+        $this->assertEquals(false, $stack->remove('foobar', $id2));
     }
 }

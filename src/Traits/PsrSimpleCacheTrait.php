@@ -16,8 +16,9 @@ trait PsrSimpleCacheTrait
      * Get the Simple Cache object
      * @return CacheInterface
      */
-    public function getCache(): CacheInterface {
-        if (empty($this->cache)){
+    public function getCache(): CacheInterface
+    {
+        if (empty($this->cache)) {
             $this->cache = MemoryCache::getInstance();
         }
         return $this->cache;
@@ -28,7 +29,8 @@ trait PsrSimpleCacheTrait
      * @param CacheInterface $cache
      * @return $this
      */
-    public function setCache(CacheInterface $cache) {
+    public function setCache(CacheInterface $cache)
+    {
         $this->cache = $cache;
         return $this;
     }

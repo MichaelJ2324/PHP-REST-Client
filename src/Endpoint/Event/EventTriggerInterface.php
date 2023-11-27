@@ -2,7 +2,8 @@
 
 namespace MRussell\REST\Endpoint\Event;
 
-interface EventTriggerInterface {
+interface EventTriggerInterface
+{
     /**
      * Trigger a specific event to run
      * @param string $event

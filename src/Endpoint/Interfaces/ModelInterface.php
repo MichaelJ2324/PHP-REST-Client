@@ -2,9 +2,8 @@
 
 namespace MRussell\REST\Endpoint\Interfaces;
 
-
-interface ModelInterface extends EndpointInterface, ClearableInterface, GetInterface, SetInterface {
-
+interface ModelInterface extends EndpointInterface, ClearableInterface, GetInterface, SetInterface
+{
     /**
      * Get or Set the Model ID Key used by the Model
      * @param null $id
@@ -31,5 +30,5 @@ interface ModelInterface extends EndpointInterface, ClearableInterface, GetInter
      * Delete the current Model using a DELETE Request
      * @return mixed
      */
-    public function delete():self;
+    public function delete(): self;
 }

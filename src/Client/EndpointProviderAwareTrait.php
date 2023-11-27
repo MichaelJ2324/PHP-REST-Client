@@ -15,7 +15,8 @@ trait EndpointProviderAwareTrait
      * @inheritdoc
      * @implements EndpointProviderAwareInterface
      */
-    public function setEndpointProvider(EndpointProviderInterface $EndpointProvider) {
+    public function setEndpointProvider(EndpointProviderInterface $EndpointProvider)
+    {
         $this->EndpointProvider = $EndpointProvider;
         return $this;
     }
@@ -24,7 +25,8 @@ trait EndpointProviderAwareTrait
      * @inheritdoc
      * @implements EndpointProviderAwareInterface
      */
-    public function getEndpointProvider() {
+    public function getEndpointProvider()
+    {
         return $this->EndpointProvider;
     }
 }

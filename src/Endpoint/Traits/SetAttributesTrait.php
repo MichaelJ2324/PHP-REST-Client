@@ -15,8 +15,8 @@ trait SetAttributesTrait
      */
     public function set($key, $value = null)
     {
-        if (is_array($key) || $key instanceof \stdClass){
-            foreach($key as $k => $value){
+        if (is_array($key) || $key instanceof \stdClass) {
+            foreach($key as $k => $value) {
                 $this->_attributes[$k] = $value;
             }
         } else {

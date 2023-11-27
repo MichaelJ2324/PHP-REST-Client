@@ -32,7 +32,7 @@ trait PsrLoggerTrait
      */
     public function getLogger()
     {
-        if (!isset($this->logger)){
+        if (!isset($this->logger)) {
             $this->setLogger(new NullLogger());
         }
         return $this->logger;

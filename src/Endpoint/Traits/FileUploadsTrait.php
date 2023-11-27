@@ -29,13 +29,14 @@ trait FileUploadsTrait
      * @param Request $request
      * @return Request
      */
-    protected function configureFileUploadRequest(Request $request,array $filesData = []): Request {
+    protected function configureFileUploadRequest(Request $request, array $filesData = []): Request
+    {
         $uri = $request->getUri();
         $request = $request->withUri($uri->withQuery(\http_build_query($this->configureFileUploadQueryParams(), '', '&', \PHP_QUERY_RFC3986)));
         $multiPartOptions = [];
-        if (!empty($filesData)){
-            foreach($filesData as $key => $fileData){
-                if (is_string($key) && is_string($fileData)){
+        if (!empty($filesData)) {
+            foreach($filesData as $key => $fileData) {
+                if (is_string($key) && is_string($fileData)) {
                     $fileData = [
                         'name' => $key,
                         'path' => $fileData
@@ -46,14 +47,14 @@ trait FileUploadsTrait
         }
         $data = new MultipartStream($multiPartOptions);
         $request = $request->withBody($data);
-        return $request->withHeader('Content-Type','multipart/form-data; boundary=' . $data->getBoundary());
+        return $request->withHeader('Content-Type', 'multipart/form-data; boundary=' . $data->getBoundary());
     }
 
     /**
      * Method to override to
      * @return array
      */
-    protected abstract function configureFileUploadQueryParams(): array;
+    abstract protected function configureFileUploadQueryParams(): array;
 
     /**
      * Array containing preformatted multipart options for file upload, or containing at least 'path'
@@ -62,17 +63,17 @@ trait FileUploadsTrait
      */
     protected function buildMultiPartFileData(array $fileData)
     {
-        if (!empty($fileData['name']) && (isset($fileData['path']) || isset($fileData['contents']))){
+        if (!empty($fileData['name']) && (isset($fileData['path']) || isset($fileData['contents']))) {
             $data = [];
-            if (isset($fileData['path']) && file_exists($fileData['path'])){
-                if (isset($fileData['contents'])){
+            if (isset($fileData['path']) && file_exists($fileData['path'])) {
+                if (isset($fileData['contents'])) {
                     unset($fileData['contents']);
                 }
-                $data['contents'] = Utils::streamFor(fopen($fileData['path'],'r',true));
+                $data['contents'] = Utils::streamFor(fopen($fileData['path'], 'r', true));
                 unset($fileData['path']);
             }
-            return array_merge($data,$fileData);
+            return array_merge($data, $fileData);
         }
-        throw new InvalidFileData([print_r($fileData,true)]);
+        throw new InvalidFileData([print_r($fileData, true)]);
     }
 }

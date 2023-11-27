@@ -6,5 +6,4 @@ use MRussell\REST\Auth\Abstracts\AbstractBasicController;
 
 class BasicAuthController extends AbstractBasicController
 {
-
 }

@@ -9,7 +9,8 @@ use GuzzleHttp\Middleware;
 use MRussell\REST\Client\AbstractClient;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 
-class Client extends AbstractClient {
+class Client extends AbstractClient
+{
     /**
      * @var MockHandler
      */
@@ -22,14 +23,15 @@ class Client extends AbstractClient {
 
     public $apiURL = 'http://phpunit.tests/';
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->mockResponses = new MockHandler([]);
         parent::__construct();
     }
 
     public function current(EndpointInterface $endpoint = null)
     {
-        if ($endpoint){
+        if ($endpoint) {
             $this->setCurrentEndpoint($endpoint);
         }
         return parent::current();
@@ -38,7 +40,7 @@ class Client extends AbstractClient {
     public function initHttpHandlerStack()
     {
         $handler = HandlerStack::create($this->mockResponses);
-        $handler->push(Middleware::history($this->container),'history');
+        $handler->push(Middleware::history($this->container), 'history');
         $this->setHandlerStack($handler);
     }
 
@@ -46,7 +48,7 @@ class Client extends AbstractClient {
     {
         parent::configureAuth();
         $this->getHandlerStack()->remove('history');
-        $this->getHandlerStack()->after('configureAuth',Middleware::history($this->container),'history');
+        $this->getHandlerStack()->after('configureAuth', Middleware::history($this->container), 'history');
         return $this;
     }
 }

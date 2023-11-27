@@ -18,19 +18,22 @@ use Psr\Log\Test\TestLogger;
  * @group AbstractOAuth2ControllerTest
  * @group Auth
  */
-class AbstractOAuth2ControllerTest extends TestCase {
+class AbstractOAuth2ControllerTest extends TestCase
+{
     /**
      * @var Client
      */
     protected static $client;
 
 
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         //Add Setup for static properties here
         self::$client = new Client();
     }
 
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         //Add Tear Down for static properties here
     }
 
@@ -45,11 +48,13 @@ class AbstractOAuth2ControllerTest extends TestCase {
         'client_secret' => 's3cr3t'
     );
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
@@ -62,15 +67,16 @@ class AbstractOAuth2ControllerTest extends TestCase {
     public function testSetGrantType()
     {
         $Auth = new OAuth2Controller();
-        $this->assertEquals(OAuth2Controller::OAUTH_CLIENT_CREDENTIALS_GRANT,$Auth->getGrantType());
-        $this->assertEquals($Auth,$Auth->setGrantType(OAuth2Controller::OAUTH_AUTHORIZATION_CODE_GRANT));
-        $this->assertEquals(OAuth2Controller::OAUTH_AUTHORIZATION_CODE_GRANT,$Auth->getGrantType());
+        $this->assertEquals(OAuth2Controller::OAUTH_CLIENT_CREDENTIALS_GRANT, $Auth->getGrantType());
+        $this->assertEquals($Auth, $Auth->setGrantType(OAuth2Controller::OAUTH_AUTHORIZATION_CODE_GRANT));
+        $this->assertEquals(OAuth2Controller::OAUTH_AUTHORIZATION_CODE_GRANT, $Auth->getGrantType());
     }
 
     /**
      * @covers ::oauthHeader
      */
-    public function testOAuthHeader() {
+    public function testOAuthHeader()
+    {
         $this->assertEquals('Authorization', OAuth2Controller::oauthHeader());
         $this->assertEquals('Test', OAuth2Controller::oauthHeader('Test'));
         $this->assertEquals('Test', OAuth2Controller::oauthHeader());
@@ -89,7 +95,8 @@ class AbstractOAuth2ControllerTest extends TestCase {
      * @covers ::isAuthenticated
      * @covers ::isTokenExpired
      */
-    public function testSetToken() {
+    public function testSetToken()
+    {
         $Auth = new OAuth2Controller();
         $Class = new \ReflectionClass('MRussell\REST\Auth\OAuth2Controller');
         $isTokenExpired = $Class->getMethod('isTokenExpired');
@@ -99,7 +106,7 @@ class AbstractOAuth2ControllerTest extends TestCase {
         $this->assertNotEmpty($newToken['expiration']);
         $this->assertEquals(true, ($newToken['expiration'] >= time() + 3570));
         $this->assertEquals(true, $Auth->isAuthenticated());
-        $this->assertEquals($this->token['access_token'],$Auth->getTokenProp('access_token'));
+        $this->assertEquals($this->token['access_token'], $Auth->getTokenProp('access_token'));
         $expiration = $Auth->getTokenProp('expiration');
         $this->assertEquals($Auth, $Auth->setToken($Auth->getToken()));
         $this->assertEquals($expiration, $Auth->getTokenProp('expiration'));
@@ -109,8 +116,8 @@ class AbstractOAuth2ControllerTest extends TestCase {
         $objToken = json_decode(json_encode($newToken));
         $this->assertEquals($Auth, $Auth->setToken($objToken));
         $this->assertNotEmpty($objToken->expiration);
-        $this->assertEquals($newToken['access_token'],$Auth->getTokenProp('access_token'));
-        $this->assertEquals($objToken,$Auth->getCache()->get($Auth->getCacheKey()));
+        $this->assertEquals($newToken['access_token'], $Auth->getTokenProp('access_token'));
+        $this->assertEquals($objToken, $Auth->getCache()->get($Auth->getCacheKey()));
         $this->assertEquals(false, $Auth->isAuthenticated());
         $this->assertEquals(true, $isTokenExpired->invoke($Auth));
 
@@ -119,7 +126,7 @@ class AbstractOAuth2ControllerTest extends TestCase {
         $this->assertEquals($Auth, $Auth->setToken($newToken));
         $newToken = $Auth->getToken();
         $this->assertEquals(false, isset($newToken['expiration']));
-        $this->assertEquals(null,$Auth->getTokenProp('expiration'));
+        $this->assertEquals(null, $Auth->getTokenProp('expiration'));
         $this->assertEquals(-1, $isTokenExpired->invoke($Auth));
     }
 
@@ -127,7 +134,8 @@ class AbstractOAuth2ControllerTest extends TestCase {
      * @covers ::setToken
      * @throws \MRussell\REST\Exception\Auth\InvalidToken
      */
-    public function testInvalidToken() {
+    public function testInvalidToken()
+    {
         $Auth = new OAuth2Controller();
         $this->expectException(\MRussell\REST\Exception\Auth\InvalidToken::class);
         $Auth->setToken([]);
@@ -140,7 +148,8 @@ class AbstractOAuth2ControllerTest extends TestCase {
      * @covers ::getTokenProp
      * @covers ::getAuthHeaderValue
      */
-    public function testConfigure() {
+    public function testConfigure()
+    {
         $Auth = new OAuth2Controller();
         $Request = new Request("POST", "");
         $Auth->configureRequest($Request);
@@ -158,7 +167,8 @@ class AbstractOAuth2ControllerTest extends TestCase {
      * @covers ::parseResponseToToken
      * @throws \MRussell\REST\Exception\Auth\InvalidToken
      */
-    public function testRefresh() {
+    public function testRefresh()
+    {
         $Auth = new OAuth2Controller();
         $Logger = new TestLogger();
         $Auth->setLogger($Logger);
@@ -166,24 +176,24 @@ class AbstractOAuth2ControllerTest extends TestCase {
         $this->assertEquals(false, $Auth->refresh());
         $Auth->setToken($this->token);
         $this->assertEquals(false, $Auth->refresh());
-        $this->assertEquals(true,$Logger->hasDebugThatContains("Unknown Auth Action [refresh] requested on Controller"));
+        $this->assertEquals(true, $Logger->hasDebugThatContains("Unknown Auth Action [refresh] requested on Controller"));
 
         $RefreshEndpoint = new RefreshEndpoint();
         self::$client->mockResponses->append(new Response(200));
         $RefreshEndpoint->setClient(self::$client);
         $Auth->setActionEndpoint(OAuth2Controller::ACTION_OAUTH_REFRESH, $RefreshEndpoint);
         $this->assertEquals(false, $Auth->refresh());
-        $this->assertEquals(true,$Logger->hasErrorThatContains("An Invalid Token was attempted to be set on the Auth Controller"));
+        $this->assertEquals(true, $Logger->hasErrorThatContains("An Invalid Token was attempted to be set on the Auth Controller"));
 
-        self::$client->mockResponses->append(new Response(200,[],json_encode($this->token)));
+        self::$client->mockResponses->append(new Response(200, [], json_encode($this->token)));
         $Auth->setToken($this->token);
         $this->assertEquals(true, $Auth->refresh());
         $Logger->reset();
-        self::$client->mockResponses->append(new Response(200,[],"}".json_encode($this->token)."{"));
+        self::$client->mockResponses->append(new Response(200, [], "}".json_encode($this->token)."{"));
         $Auth->setToken($this->token);
         $this->assertEquals(false, $Auth->refresh());
-        $this->assertEquals(true,$Logger->hasErrorThatContains("An Invalid Token was attempted to be set on the Auth Controller"));
-        $this->assertEquals(true,$Logger->hasCriticalThatContains("REST] OAuth Token Parse Exception"));
+        $this->assertEquals(true, $Logger->hasErrorThatContains("An Invalid Token was attempted to be set on the Auth Controller"));
+        $this->assertEquals(true, $Logger->hasCriticalThatContains("REST] OAuth Token Parse Exception"));
     }
 
     /**
@@ -191,7 +201,8 @@ class AbstractOAuth2ControllerTest extends TestCase {
      * @covers ::configureRefreshEndpoint
      * @covers ::configureAuthenticationEndpoint
      */
-    public function testConfigureData() {
+    public function testConfigureData()
+    {
         $Auth = new OAuth2Controller();
         $Auth->setCredentials($this->credentials);
         $Auth->setToken($this->token);
@@ -226,9 +237,9 @@ class AbstractOAuth2ControllerTest extends TestCase {
         $Auth->setCredentials($this->credentials);
         $Auth->setToken($this->token);
         $Auth->setGrantType(OAuth2Controller::OAUTH_AUTHORIZATION_CODE_GRANT);
-        $this->assertEquals($Auth,$Auth->reset());
+        $this->assertEquals($Auth, $Auth->reset());
         $this->assertEmpty($Auth->getCredentials());
         $this->assertEmpty($Auth->getToken());
-        $this->assertEquals(OAuth2Controller::OAUTH_CLIENT_CREDENTIALS_GRANT,$Auth->getGrantType());
+        $this->assertEquals(OAuth2Controller::OAUTH_CLIENT_CREDENTIALS_GRANT, $Auth->getGrantType());
     }
 }

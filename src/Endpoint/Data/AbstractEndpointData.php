@@ -11,9 +11,10 @@ use MRussell\REST\Endpoint\Traits\PropertiesTrait;
 use MRussell\REST\Endpoint\Traits\SetAttributesTrait;
 use MRussell\REST\Exception\Endpoint\InvalidData;
 
-abstract class AbstractEndpointData implements DataInterface {
-    use GetAttributesTrait,
-        ClearAttributesTrait;
+abstract class AbstractEndpointData implements DataInterface
+{
+    use GetAttributesTrait;
+    use ClearAttributesTrait;
     use ArrayObjectAttributesTrait;
     use SetAttributesTrait {
         set as private setAttributes;
@@ -28,8 +29,8 @@ abstract class AbstractEndpointData implements DataInterface {
      */
     protected $isNull = true;
 
-    const DATA_PROPERTY_REQUIRED = 'required';
-    const DATA_PROPERTY_DEFAULTS = 'defaults';
+    public const DATA_PROPERTY_REQUIRED = 'required';
+    public const DATA_PROPERTY_DEFAULTS = 'defaults';
 
     protected static $_DEFAULT_PROPERTIES = array(
         self::DATA_PROPERTY_REQUIRED => [],
@@ -37,20 +38,22 @@ abstract class AbstractEndpointData implements DataInterface {
     );
 
     //Overloads
-    public function __construct(array $data = null,array $properties = []) {
+    public function __construct(array $data = null, array $properties = [])
+    {
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
-        if (!empty($properties)){
+        if (!empty($properties)) {
             foreach ($properties as $key => $value) {
-                $this->setProperty($key,$value);
+                $this->setProperty($key, $value);
             }
         }
         $this->configureDefaultData();
-        if (!empty($data)){
+        if (!empty($data)) {
             $this->set($data);
         }
     }
 
-    public function __set($key, $value) {
+    public function __set($key, $value)
+    {
         $this->isNull = false;
         $this->_attributes[$key] = $value;
     }
@@ -62,7 +65,8 @@ abstract class AbstractEndpointData implements DataInterface {
      * @param mixed $value - The value to set
      * @abstracting ArrayAccess
      */
-    public function offsetSet($offset, $value): void {
+    public function offsetSet($offset, $value): void
+    {
         $this->isNull = false;
         if (is_null($offset)) {
             $this->_attributes[] = $value;
@@ -76,12 +80,12 @@ abstract class AbstractEndpointData implements DataInterface {
      * @param $value
      * @return $this
      */
-    public function set($key,$value = null)
+    public function set($key, $value = null)
     {
-        if ((is_array($key) && !empty($key)) || !is_array($key)){
+        if ((is_array($key) && !empty($key)) || !is_array($key)) {
             $this->isNull = false;
         }
-        return $this->setAttributes($key,$value);
+        return $this->setAttributes($key, $value);
     }
 
     /**
@@ -104,7 +108,8 @@ abstract class AbstractEndpointData implements DataInterface {
      * @return AbstractEndpointData
      * @implements ResettableInterface
      */
-    public function reset(): DataInterface {
+    public function reset(): DataInterface
+    {
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
         $this->null();
         return $this->configureDefaultData();
@@ -124,7 +129,8 @@ abstract class AbstractEndpointData implements DataInterface {
     /**
      * @return bool
      */
-    public function isNull(): bool {
+    public function isNull(): bool
+    {
         return $this->isNull && empty($this->_attributes);
     }
 
@@ -132,7 +138,8 @@ abstract class AbstractEndpointData implements DataInterface {
      * Configures Data with defaults based on properties array
      * @return $this
      */
-    protected function configureDefaultData(): self {
+    protected function configureDefaultData(): self
+    {
         if (isset($this->_properties[self::DATA_PROPERTY_DEFAULTS])
             && is_array($this->_properties[self::DATA_PROPERTY_DEFAULTS])
             && !empty($this->_properties[self::DATA_PROPERTY_DEFAULTS])) {
@@ -149,7 +156,7 @@ abstract class AbstractEndpointData implements DataInterface {
      */
     public function toArray(bool $verify = false): array
     {
-        if ($verify){
+        if ($verify) {
             $this->verifyRequiredData();
         }
         return $this->_attributes;
@@ -160,7 +167,8 @@ abstract class AbstractEndpointData implements DataInterface {
      * @return bool
      * @throws InvalidData
      */
-    protected function verifyRequiredData(): bool {
+    protected function verifyRequiredData(): bool
+    {
         $errors = [
             'missing' => [],
             'invalid' => []

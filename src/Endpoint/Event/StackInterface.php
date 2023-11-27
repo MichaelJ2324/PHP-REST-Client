@@ -4,7 +4,8 @@ namespace MRussell\REST\Endpoint\Event;
 
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 
-interface StackInterface {
+interface StackInterface
+{
     /**
      * Set the Endpoint for the Event Stack
      * @param EndpointInterface $endpoint
