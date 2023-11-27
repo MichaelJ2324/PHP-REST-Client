@@ -2,9 +2,8 @@
 
 namespace MRussell\REST\Endpoint\Interfaces;
 
-
-interface CollectionInterface extends EndpointInterface, ClearableInterface, GetInterface, ArrayableInterface {
-
+interface CollectionInterface extends EndpointInterface, ClearableInterface, GetInterface, ArrayableInterface
+{
     /**
      * Retrieve the Endpoint Collection
      * @return $this
@@ -38,5 +37,5 @@ interface CollectionInterface extends EndpointInterface, ClearableInterface, Get
      * @param array $options = []
      * @return $this
      */
-    public function set(array $models,array $options = []);
+    public function set(array $models, array $options = []);
 }

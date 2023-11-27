@@ -5,8 +5,8 @@ namespace MRussell\REST\Client;
 use GuzzleHttp\Client;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 
-interface ClientInterface {
-
+interface ClientInterface
+{
     /**
      * @return Client
      */

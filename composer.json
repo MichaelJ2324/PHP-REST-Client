@@ -19,7 +19,7 @@
     "api"
   ],
   "require": {
-    "php": ">=7.2",
+    "php": ">=7.4",
     "guzzlehttp/guzzle": ">=6.3.3",
     "psr/log": "1.*",
     "psr/simple-cache": "1.*",
@@ -27,11 +27,12 @@
   },
   "require-dev": {
     "phpunit/phpunit": "9.*",
-    "squizlabs/php_codesniffer": "3.*"
+    "friendsofphp/php-cs-fixer": "^v3"
   },
   "autoload": {
     "psr-4": {
-      "MRussell\\REST\\": "src/"
+      "MRussell\\REST\\": "src/",
+      "MRussell\\REST\\Tests\\": "tests/"
     }
   },
   "autoload-dev": {
@@ -56,11 +57,17 @@
       "@putenv XDEBUG_MODE=coverage",
       "phpunit --coverage-html=\"coverage\""
     ],
-    "quality": [
-      "phpcs --standard=./ruleset.xml src/"
+    "quality:check": [
+      "php vendor/bin/php-cs-fixer fix . --rules=@PSR12 --dry-run"
+    ],
+    "quality:fix": [
+      "php vendor/bin/php-cs-fixer fix . --rules=@PSR12"
+    ],
+    "quality:diff": [
+      "php vendor/bin/php-cs-fixer fix . --rules=@PSR12 --dry-run --diff"
     ],
     "docs": [
-      "php phpDocumentor.phar -d ./src -t ./doc/"
+      "php ./tools/phpDocumentor -d ./src -t ./docs/"
     ]
   }
 }

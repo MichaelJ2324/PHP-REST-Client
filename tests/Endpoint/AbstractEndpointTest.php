@@ -24,19 +24,22 @@ use Sugarcrm\REST\Endpoint\Ping;
  * @coversDefaultClass MRussell\REST\Endpoint\Abstracts\AbstractEndpoint
  * @group AbstractEndpointTest
  */
-class AbstractEndpointTest extends TestCase {
+class AbstractEndpointTest extends TestCase
+{
     /**
      * @var Client
      */
     protected static $client;
 
 
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         //Add Setup for static properties here
         self::$client = new Client();
     }
 
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         //Add Tear Down for static properties here
     }
 
@@ -49,11 +52,13 @@ class AbstractEndpointTest extends TestCase {
         'url' => '$foo/$bar/$:test'
     );
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
@@ -69,7 +74,8 @@ class AbstractEndpointTest extends TestCase {
      * @covers ::getBaseUrl
      * @covers ::getEndpointUrl
      */
-    public function testConstructor() {
+    public function testConstructor()
+    {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals([
             'url' => '',
@@ -80,7 +86,7 @@ class AbstractEndpointTest extends TestCase {
         $this->assertEmpty($Endpoint->getData());
         $this->assertEmpty($Endpoint->getBaseUrl());
         $this->assertEquals('', $Endpoint->getEndPointUrl());
-        
+
         $Endpoint = new BasicEndpoint($this->options);
         $this->assertEquals(array(
             'url' => '',
@@ -108,7 +114,8 @@ class AbstractEndpointTest extends TestCase {
      * @covers ::setUrlArgs
      * @covers ::getUrlArgs
      */
-    public function testSetOptions() {
+    public function testSetOptions()
+    {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals(array(), $Endpoint->getUrlArgs());
         $this->assertEquals($Endpoint, $Endpoint->setUrlArgs($this->options));
@@ -123,7 +130,8 @@ class AbstractEndpointTest extends TestCase {
      * @covers ::setProperty
      * @covers ::getProperty
      */
-    public function testSetProperties() {
+    public function testSetProperties()
+    {
         $Endpoint = new BasicEndpoint();
         $Endpoint->setProperties([]);
         $this->assertEquals(null, $Endpoint->getProperty('foobar'));
@@ -150,7 +158,8 @@ class AbstractEndpointTest extends TestCase {
      * @covers ::getBaseUrl
      * @covers ::getEndpointUrl
      */
-    public function testSetBaseUrl() {
+    public function testSetBaseUrl()
+    {
         $Endpoint = new BasicEndpoint();
         $Endpoint->setProperties($this->properties);
         $props = $this->properties;
@@ -169,7 +178,8 @@ class AbstractEndpointTest extends TestCase {
      * @covers ::setData
      * @covers ::getData
      */
-    public function testSetData() {
+    public function testSetData()
+    {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals($Endpoint, $Endpoint->setData('test'));
         $this->assertEquals('test', $Endpoint->getData());
@@ -186,7 +196,8 @@ class AbstractEndpointTest extends TestCase {
      * @depends testSetProperties
      * @covers ::useAuth
      */
-    public function testUseAuth() {
+    public function testUseAuth()
+    {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals(1, $Endpoint->useAuth());
         $this->assertEquals($Endpoint, $Endpoint->setProperty('auth', true));
@@ -203,7 +214,8 @@ class AbstractEndpointTest extends TestCase {
      * @throws \MRussell\REST\Exception\Endpoint\InvalidRequest
      * @covers ::execute
      */
-    public function testInvalidRequest() {
+    public function testInvalidRequest()
+    {
         $Endpoint = new BasicEndpoint();
         $this->expectException(\GuzzleHttp\Exception\RequestException::class);
         $Endpoint->execute();
@@ -217,7 +229,8 @@ class AbstractEndpointTest extends TestCase {
      * @covers ::verifyUrl
      * @covers ::configureJsonRequest
      */
-    public function testExecute() {
+    public function testExecute()
+    {
         self::$client->mockResponses->append(new Response(200));
 
         $Endpoint = new BasicEndpoint();
@@ -227,14 +240,15 @@ class AbstractEndpointTest extends TestCase {
         $this->assertEquals($Endpoint, $Endpoint->execute());
         $request = self::$client->mockResponses->getLastRequest();
         $this->assertEquals('http://localhost/basic', $request->getUri()->__toString());
-        $this->assertEquals('application/json',$request->getHeader('Content-Type')[0]);
-        $this->assertEquals('GET',$request->getMethod());
+        $this->assertEquals('application/json', $request->getHeader('Content-Type')[0]);
+        $this->assertEquals('GET', $request->getMethod());
     }
 
     /**
      * @expectedException MRussell\REST\Exception\Endpoint\InvalidUrl
      */
-    public function testInvalidUrl() {
+    public function testInvalidUrl()
+    {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals($Endpoint, $Endpoint->setBaseUrl('http://localhost'));
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
@@ -248,7 +262,8 @@ class AbstractEndpointTest extends TestCase {
      * @covers ::configureUrl
      *
      */
-    public function testConfigureUrl() {
+    public function testConfigureUrl()
+    {
         $Endpoint = new BasicEndpoint();
         $Class = new \ReflectionClass('MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint');
         $method = $Class->getMethod('configureURL');
@@ -312,11 +327,11 @@ class AbstractEndpointTest extends TestCase {
     {
         $Ping = new PingEndpoint();
         $client = $Ping->getHttpClient();
-        $this->assertInstanceOf(\GuzzleHttp\Client::class,$client);
+        $this->assertInstanceOf(\GuzzleHttp\Client::class, $client);
         $Ping->setClient(static::$client);
-        $this->assertInstanceOf(\GuzzleHttp\Client::class,$Ping->getHttpClient());
-        $this->assertEquals(static::$client,$Ping->getClient());
-        $this->assertNotEquals($client,$Ping->getHttpClient());
+        $this->assertInstanceOf(\GuzzleHttp\Client::class, $Ping->getHttpClient());
+        $this->assertEquals(static::$client, $Ping->getClient());
+        $this->assertNotEquals($client, $Ping->getHttpClient());
     }
 
     /**
@@ -337,31 +352,31 @@ class AbstractEndpointTest extends TestCase {
             'foo' => 'bar'
         ]);
         $request = $Ping->buildRequest();
-        $this->assertInstanceOf(Request::class,$request);
-        $this->assertEquals('http',$request->getUri()->getScheme());
-        $this->assertEquals('GET',$request->getMethod());
-        $this->assertEquals('phpunit.tests',$request->getUri()->getHost());
-        $this->assertEquals('/ping',$request->getUri()->getPath());
-        $this->assertEquals('foo=bar',$request->getUri()->getQuery());
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertEquals('http', $request->getUri()->getScheme());
+        $this->assertEquals('GET', $request->getMethod());
+        $this->assertEquals('phpunit.tests', $request->getUri()->getHost());
+        $this->assertEquals('/ping', $request->getUri()->getPath());
+        $this->assertEquals('foo=bar', $request->getUri()->getQuery());
 
         $Ping = new PingEndpoint();
-        $Ping->setProperty(AbstractEndpoint::PROPERTY_HTTP_METHOD,'POST');
+        $Ping->setProperty(AbstractEndpoint::PROPERTY_HTTP_METHOD, 'POST');
         $Ping->setClient(static::$client);
         $Ping->setData([
             'foo' => 'bar'
         ]);
         $request = $Ping->buildRequest();
-        $this->assertInstanceOf(Request::class,$request);
-        $this->assertEquals('http',$request->getUri()->getScheme());
-        $this->assertEquals('phpunit.tests',$request->getUri()->getHost());
-        $this->assertEquals('/ping',$request->getUri()->getPath());
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertEquals('http', $request->getUri()->getScheme());
+        $this->assertEquals('phpunit.tests', $request->getUri()->getHost());
+        $this->assertEquals('/ping', $request->getUri()->getPath());
         $this->assertEquals(json_encode([
             'foo' => 'bar'
-        ]),$request->getBody()->getContents());
+        ]), $request->getBody()->getContents());
 
         $Ping->reset();
         $this->assertEmpty($Ping->getUrlArgs());
-        $this->assertEquals('GET',$Ping->getMethod());
+        $this->assertEquals('GET', $Ping->getMethod());
     }
 
     /**
@@ -387,7 +402,7 @@ class AbstractEndpointTest extends TestCase {
     {
         $Ping = new PingEndpoint();
         $Ping->setClient(static::$client);
-        $Ping->onEvent(PingEndpoint::EVENT_CONFIGURE_PAYLOAD,function(&$data){
+        $Ping->onEvent(PingEndpoint::EVENT_CONFIGURE_PAYLOAD, function (&$data) {
             $data = new \stdClass();
             $data->foo = 'bar';
         });
@@ -410,16 +425,16 @@ class AbstractEndpointTest extends TestCase {
         $Ping->setClient(static::$client);
         $pong = ['pong' => time()];
         $respBody = json_encode($pong);
-        static::$client->mockResponses->append(new Response(200,[],$respBody));
-        static::$client->mockResponses->append(new Response(200,[],json_encode([])));
+        static::$client->mockResponses->append(new Response(200, [], $respBody));
+        static::$client->mockResponses->append(new Response(200, [], json_encode([])));
         $Ping->execute();
-        $this->assertInstanceOf(Response::class,$Ping->getResponse());
-        $this->assertEquals($pong,$Ping->getResponseContent($Ping->getResponse()));
-        $this->assertEquals($respBody,$Ping->getResponse()->getBody()->getContents());
+        $this->assertInstanceOf(Response::class, $Ping->getResponse());
+        $this->assertEquals($pong, $Ping->getResponseContent($Ping->getResponse()));
+        $this->assertEquals($respBody, $Ping->getResponse()->getBody()->getContents());
         $Ping->execute();
-        $this->assertInstanceOf(Response::class,$Ping->getResponse());
-        $this->assertEquals([],$Ping->getResponseBody());
-        $this->assertEquals("[]",$Ping->getResponse()->getBody()->getContents());
+        $this->assertInstanceOf(Response::class, $Ping->getResponse());
+        $this->assertEquals([], $Ping->getResponseBody());
+        $this->assertEquals("[]", $Ping->getResponse()->getBody()->getContents());
     }
 
 
@@ -434,30 +449,30 @@ class AbstractEndpointTest extends TestCase {
         $Ping->setClient(static::$client);
         $pong = ['pong' => time()];
         $respBody = json_encode($pong);
-        static::$client->mockResponses->append(new Response(200,[],$respBody));
-        static::$client->mockResponses->append(new Response(401,[],json_encode(['error' => 'invalid_data'])));
+        static::$client->mockResponses->append(new Response(200, [], $respBody));
+        static::$client->mockResponses->append(new Response(401, [], json_encode(['error' => 'invalid_data'])));
 
         $self = $this;
         $promises = [];
-        $promises['first'] = $Ping->asyncExecute(['success' => function(Response $resp) use ($self,$respBody){
+        $promises['first'] = $Ping->asyncExecute(['success' => function (Response $resp) use ($self, $respBody) {
             $self->assertInstanceOf(Response::class, $resp);
-            $self->assertEquals($respBody,$resp->getBody()->getContents());
+            $self->assertEquals($respBody, $resp->getBody()->getContents());
         }])->getPromise();
-        $promises['second'] = $Ping->asyncExecute(['error' => function(RequestException $exception) use ($self){
+        $promises['second'] = $Ping->asyncExecute(['error' => function (RequestException $exception) use ($self) {
             $self->assertInstanceOf(RequestException::class, $exception);
-            $self->assertInstanceOf(Response::class,$exception->getResponse());
-            $self->assertEquals(json_encode(['error' => 'invalid_data']),$exception->getResponse()->getBody()->getContents());
+            $self->assertInstanceOf(Response::class, $exception->getResponse());
+            $self->assertEquals(json_encode(['error' => 'invalid_data']), $exception->getResponse()->getBody()->getContents());
         }])->getPromise();
-        $this->assertInstanceOf(Promise::class,$promises['first']);
-        $this->assertInstanceOf(Promise::class,$promises['second']);
+        $this->assertInstanceOf(Promise::class, $promises['first']);
+        $this->assertInstanceOf(Promise::class, $promises['second']);
 
         $response = $promises['first']->wait();
-        $this->assertInstanceOf(Response::class,$response);
-        try{
+        $this->assertInstanceOf(Response::class, $response);
+        try {
             $response = $promises['second']->wait();
-        } catch (\Exception $ex){
+        } catch (\Exception $ex) {
             $self->assertInstanceOf(RequestException::class, $ex);
-            $self->assertInstanceOf(Response::class,$ex->getResponse());
+            $self->assertInstanceOf(Response::class, $ex->getResponse());
         }
     }
 }

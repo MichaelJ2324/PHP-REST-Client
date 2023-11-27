@@ -16,7 +16,8 @@ trait PropertiesTrait
      * @return array
      * @implements PropertiesInterface
      */
-    public function getProperties(): array {
+    public function getProperties(): array
+    {
         return $this->_properties;
     }
 
@@ -26,7 +27,8 @@ trait PropertiesTrait
      * @return $this
      * @implements PropertiesInterface
      */
-    public function setProperties(array $properties) {
+    public function setProperties(array $properties)
+    {
         $this->_properties = $properties;
         return $this;
     }
@@ -38,7 +40,8 @@ trait PropertiesTrait
      * @return $this
      * @implements PropertiesInterface
      */
-    public function setProperty(string $name, $value) {
+    public function setProperty(string $name, $value)
+    {
         $properties = $this->getProperties();
         $properties[$name] = $value;
         return $this->setProperties($properties);
@@ -50,8 +53,9 @@ trait PropertiesTrait
      * @return mixed
      * @implements PropertiesInterface
      */
-    public function getProperty(string $name) {
-        if (isset($this->_properties[$name])){
+    public function getProperty(string $name)
+    {
+        if (isset($this->_properties[$name])) {
             return $this->_properties[$name];
         }
         return null;

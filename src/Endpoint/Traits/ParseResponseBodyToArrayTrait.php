@@ -9,10 +9,11 @@ trait ParseResponseBodyToArrayTrait
      * @param string $prop
      * @return array
      */
-    protected function parseResponseBodyToArray($body,string $prop = ""): array {
+    protected function parseResponseBodyToArray($body, string $prop = ""): array
+    {
         if (empty($prop)) {
             if (is_object($body)) {
-                $body = json_decode(json_encode($body),true);
+                $body = json_decode(json_encode($body), true);
             }
             return is_array($body) ? $body : [];
         } else {

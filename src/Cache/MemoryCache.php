@@ -23,7 +23,7 @@ class MemoryCache implements CacheInterface
      */
     public static function getInstance()
     {
-        if (empty(static::$instance)){
+        if (empty(static::$instance)) {
             // @codeCoverageIgnoreStart
             static::$instance = new static();
             // @codeCoverageIgnoreEnd
@@ -57,7 +57,7 @@ class MemoryCache implements CacheInterface
     public function delete($key)
     {
         $return = false;
-        if ($this->has($key)){
+        if ($this->has($key)) {
             unset($this->cache[$key]);
             $return = true;
         }
@@ -79,12 +79,12 @@ class MemoryCache implements CacheInterface
     public function getMultiple($keys, $default = null)
     {
         $items = $default ?? [];
-        foreach($keys as $key){
-            if ($this->has($key)){
+        foreach($keys as $key) {
+            if ($this->has($key)) {
                 $items[$key] = $this->cache[$key];
             }
         }
-        if (empty($items)){
+        if (empty($items)) {
             $items = $default;
         }
         return $items;
@@ -95,8 +95,8 @@ class MemoryCache implements CacheInterface
      */
     public function setMultiple($values, $ttl = null)
     {
-        foreach($values as $key => $value){
-            $this->set($key,$value,$ttl);
+        foreach($values as $key => $value) {
+            $this->set($key, $value, $ttl);
         }
         return true;
     }
@@ -107,8 +107,8 @@ class MemoryCache implements CacheInterface
     public function deleteMultiple($keys)
     {
         $return = true;
-        foreach($keys as $key){
-            if (!$this->delete($key)){
+        foreach($keys as $key) {
+            if (!$this->delete($key)) {
                 $return = false;
             }
         }

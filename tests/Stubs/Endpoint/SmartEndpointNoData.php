@@ -5,12 +5,13 @@ namespace MRussell\REST\Tests\Stubs\Endpoint;
 use MRussell\REST\Endpoint\Abstracts\AbstractEndpoint;
 use MRussell\REST\Endpoint\Abstracts\AbstractSmartEndpoint;
 
-class SmartEndpointNoData extends AbstractSmartEndpoint {
+class SmartEndpointNoData extends AbstractSmartEndpoint
+{
     protected static $_DATA_CLASS = 'MRussell\REST\Endpoint\Data\EndpointData';
 
     //Override constructor to prevent building out of Data Object right away
     public function __construct(array $urlArgs = array(), array $properties = array())
     {
-        AbstractEndpoint::__construct($urlArgs,$properties);
+        AbstractEndpoint::__construct($urlArgs, $properties);
     }
 }

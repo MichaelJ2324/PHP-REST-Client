@@ -6,7 +6,8 @@ use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 use MRussell\REST\Exception\Endpoint\InvalidRegistration;
 use MRussell\REST\Exception\Endpoint\UnknownEndpoint;
 
-abstract class AbstractEndpointProvider implements EndpointProviderInterface {
+abstract class AbstractEndpointProvider implements EndpointProviderInterface
+{
     /**
      * @var array
      */
@@ -16,7 +17,8 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface {
      * @inheritdoc
      * @throws InvalidRegistration
      */
-    public function registerEndpoint($name, $className, array $properties = array()): EndpointProviderInterface {
+    public function registerEndpoint($name, $className, array $properties = array()): EndpointProviderInterface
+    {
         try {
             $implements = class_implements($className);
             if (is_array($implements) && isset($implements['MRussell\REST\Endpoint\Interfaces\EndpointInterface'])) {
@@ -35,7 +37,8 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface {
     /**
      * @inheritdoc
      */
-    public function hasEndpoint($name, $version = null): bool {
+    public function hasEndpoint($name, $version = null): bool
+    {
         return array_key_exists($name, $this->registry);
     }
 
@@ -43,7 +46,8 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface {
      * @inheritdoc
      * @throws UnknownEndpoint
      */
-    public function getEndpoint($name, $version = null): EndpointInterface {
+    public function getEndpoint($name, $version = null): EndpointInterface
+    {
         if ($this->hasEndpoint($name, $version)) {
             return $this->buildEndpoint($name, $version);
         } else {
@@ -56,7 +60,8 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface {
      * @param null $version
      * @return EndpointInterface
      */
-    protected function buildEndpoint($name, $version = null): EndpointInterface {
+    protected function buildEndpoint($name, $version = null): EndpointInterface
+    {
         $endPointArray = $this->registry[$name];
         $Class = $endPointArray['class'];
         $properties = $endPointArray['properties'];

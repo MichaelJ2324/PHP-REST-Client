@@ -6,7 +6,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
-interface EndpointInterface extends PropertiesInterface, ResettableInterface {
+interface EndpointInterface extends PropertiesInterface, ResettableInterface
+{
     /**
      * Set the urlArgs property to configure the URL variables
      * @param array $args

@@ -14,7 +14,8 @@ trait AuthControllerAwareTrait
     /**
      * @inheritdoc
      */
-    public function setAuth(AuthControllerInterface $Auth) {
+    public function setAuth(AuthControllerInterface $Auth)
+    {
         $this->Auth = $Auth;
         $this->configureAuth();
         return $this;
@@ -28,7 +29,8 @@ trait AuthControllerAwareTrait
     /**
      * @implements AuthControllerAwareInterface
      */
-    public function getAuth(): AuthControllerInterface {
+    public function getAuth(): AuthControllerInterface
+    {
         return $this->Auth;
     }
 }

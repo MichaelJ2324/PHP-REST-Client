@@ -4,8 +4,8 @@ namespace MRussell\REST\Endpoint\Provider;
 
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 
-interface EndpointProviderInterface {
-
+interface EndpointProviderInterface
+{
     /**
      * @param string $name
      * @param string|null $version

@@ -5,15 +5,16 @@ namespace MRussell\REST\Endpoint\Traits;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
-trait JsonHandlerTrait {
-
+trait JsonHandlerTrait
+{
     protected $respContent = null;
 
     /**
      * @param Request $request
      * @return Request
      */
-    protected function configureJsonRequest(Request $request): Request {
+    protected function configureJsonRequest(Request $request): Request
+    {
         return $request->withHeader('Content-Type', 'application/json');
     }
 
@@ -22,7 +23,7 @@ trait JsonHandlerTrait {
      * @param $associative
      * @return mixed
      */
-    public function getResponseContent(Response $response,bool $associative = true)
+    public function getResponseContent(Response $response, bool $associative = true)
     {
         if (!$this->respContent) {
             $this->respContent = $response->getBody()->getContents();

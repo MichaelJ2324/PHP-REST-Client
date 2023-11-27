@@ -12,28 +12,33 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass MRussell\REST\Exception\RestClientException
  * @group RestClientExceptionTest
  */
-class UnknownExceptionTest extends TestCase {
-
-    public static function setUpBeforeClass(): void {
+class UnknownExceptionTest extends TestCase
+{
+    public static function setUpBeforeClass(): void
+    {
         //Add Setup for static properties here
     }
 
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         //Add Tear Down for static properties here
     }
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
     /**
      * @covers ::__construct
      */
-    public function testConstructor() {
+    public function testConstructor()
+    {
         $Exception = new RestClientException();
         $this->assertEquals('An Unknown Exception occurred in the REST Client Framework', $Exception->getMessage());
         $Exception = new EndpointException(array('AuthEndpoint'));

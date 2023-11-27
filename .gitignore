@@ -8,3 +8,4 @@ tools/
 composer.lock
 .phpunit*
 phive.phar.asc
+.php-cs-fixer.cache

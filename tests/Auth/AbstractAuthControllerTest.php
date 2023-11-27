@@ -24,18 +24,21 @@ use Psr\Log\Test\TestLogger;
  * @group AbstractAuthControllerTest
  * @group Auth
  */
-class AbstractAuthControllerTest extends TestCase {
+class AbstractAuthControllerTest extends TestCase
+{
     /**
      * @var Client
      */
     protected static $client;
 
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         //Add Setup for static properties here
         self::$client = new Client();
     }
 
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         //Add Tear Down for static properties here
     }
 
@@ -50,11 +53,13 @@ class AbstractAuthControllerTest extends TestCase {
         'password' => 'bar'
     );
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 
@@ -65,14 +70,15 @@ class AbstractAuthControllerTest extends TestCase {
      * @covers ::setLogger
      * @return AuthController
      */
-    public function testConstructor(): AuthController {
+    public function testConstructor(): AuthController
+    {
         $Auth = new AuthController();
         $this->assertEquals($this->authActions, $Auth->getActions());
         $actions = $this->authActions;
         $actions[] = 'test';
         $this->assertEquals($Auth, $Auth->setActions($actions));
         $this->assertEquals($actions, $Auth->getActions());
-        $this->assertInstanceOf(NullLogger::class,$Auth->getLogger());
+        $this->assertInstanceOf(NullLogger::class, $Auth->getLogger());
         unset($Auth);
 
         $Auth = new AuthController();
@@ -88,7 +94,8 @@ class AbstractAuthControllerTest extends TestCase {
      * @covers ::updateCredentials
      * @return AuthController
      */
-    public function testSetCredentials(AuthController $Auth): AuthController {
+    public function testSetCredentials(AuthController $Auth): AuthController
+    {
         $this->assertEquals($Auth, $Auth->setCredentials($this->credentials));
         $this->assertEquals($this->credentials, $Auth->getCredentials());
         $this->assertEquals($Auth, $Auth->updateCredentials(array('user' => 'foobar')));
@@ -110,7 +117,8 @@ class AbstractAuthControllerTest extends TestCase {
      * @covers ::isAuthenticated
      * @return AuthController
      */
-    public function testGetToken(AuthController $Auth): AuthController {
+    public function testGetToken(AuthController $Auth): AuthController
+    {
         $this->assertEquals('12345', $Auth->getToken());
         $this->assertEquals(true, $Auth->isAuthenticated());
         $Class = new \ReflectionClass('MRussell\REST\Tests\Stubs\Auth\AuthController');
@@ -141,7 +149,8 @@ class AbstractAuthControllerTest extends TestCase {
      * @covers ::setActionEndpoint
      * @return AuthController
      */
-    public function testSetActions(AuthController $Auth): AuthController {
+    public function testSetActions(AuthController $Auth): AuthController
+    {
         $this->assertEquals($this->authActions, $Auth->getActions());
         $this->assertEquals($Auth, $Auth->setActions(array()));
         $this->assertEquals(array(), $Auth->getActions());
@@ -182,7 +191,8 @@ class AbstractAuthControllerTest extends TestCase {
      * @covers ::setCredentials
      * @return AuthController
      */
-    public function testCaching(AuthController $Auth) {
+    public function testCaching(AuthController $Auth)
+    {
         $cache = MemoryCache::getInstance();
         $ReflectedAuth = new \ReflectionClass($Auth);
         $cacheTokenMethod = $ReflectedAuth->getMethod('cacheToken');
@@ -200,16 +210,16 @@ class AbstractAuthControllerTest extends TestCase {
         $token2 = 'abcdefg';
         $this->assertEquals($Auth, $Auth->setToken($token2));
         $this->assertEquals($token2, $cache->get($Auth->getCacheKey()));
-        $this->assertEquals(true,$cacheTokenMethod->invoke($Auth));
+        $this->assertEquals(true, $cacheTokenMethod->invoke($Auth));
         $this->assertEquals($token2, $cache->get($Auth->getCacheKey()));
-        $this->assertEquals(true,$removeCachedTokenMethod->invoke($Auth));
-        $this->assertEquals(null, $cache->get($Auth->getCacheKey(),null));
+        $this->assertEquals(true, $removeCachedTokenMethod->invoke($Auth));
+        $this->assertEquals(null, $cache->get($Auth->getCacheKey(), null));
 
         $cacheKey = $Auth->getCacheKey();
         $Auth->setCredentials(['username' => 'foo']);
-        $this->assertNotEquals($cacheKey,$Auth->getCacheKey());
+        $this->assertNotEquals($cacheKey, $Auth->getCacheKey());
         $cacheKey = $Auth->getCacheKey();
-        $this->assertEquals("AUTH_TOKEN_".sha1(json_encode(['username' => 'foo'])),$cacheKey);
+        $this->assertEquals("AUTH_TOKEN_".sha1(json_encode(['username' => 'foo'])), $cacheKey);
         $Auth->setToken($token1);
         $this->assertEquals($token1, $getCachedTokenMethod->invoke($Auth));
         $this->assertEquals($token1, $cache->get($cacheKey));
@@ -227,7 +237,8 @@ class AbstractAuthControllerTest extends TestCase {
      * @covers ::configureLogoutEndpoint
      * @return AuthController
      */
-    public function testConfigureData(): AuthController {
+    public function testConfigureData(): AuthController
+    {
         $Auth = new AuthController();
         $Auth->setCredentials($this->credentials);
         $AuthEndpoint = new AuthEndpoint();
@@ -251,16 +262,17 @@ class AbstractAuthControllerTest extends TestCase {
      * @covers ::authenticate
      * @covers ::reset
      */
-    public function testAuthenticate(AuthController $Auth): AuthController {
+    public function testAuthenticate(AuthController $Auth): AuthController
+    {
         $Endpoint = new AuthEndpoint();
         self::$client->mockResponses->append(new Response(404));
         $Endpoint->setClient(self::$client);
         $Auth->setActionEndpoint(AbstractAuthController::ACTION_AUTH, $Endpoint);
         $this->assertEquals(false, $Auth->authenticate());
-        self::$client->mockResponses->append(new Response(200,[],"12345"));
+        self::$client->mockResponses->append(new Response(200, [], "12345"));
         $this->assertEquals(true, $Auth->authenticate());
         $this->assertEquals("12345", $Auth->getToken());
-        $this->assertEquals($Auth,$Auth->reset());
+        $this->assertEquals($Auth, $Auth->reset());
         $this->assertEmpty($Auth->getToken());
         $this->assertEmpty($Auth->getCredentials());
         return $Auth;
@@ -272,18 +284,19 @@ class AbstractAuthControllerTest extends TestCase {
      * @covers ::logout
      * @covers ::getLogger
      */
-    public function testLogout(AuthController $Auth): AuthController {
+    public function testLogout(AuthController $Auth): AuthController
+    {
         $Endpoint = new LogoutEndpoint();
         $Logger = new TestLogger();
         self::$client->mockResponses->append(new Response(200));
         $Endpoint->setClient(self::$client);
-        $this->assertInstanceOf(NullLogger::class,$Auth->getLogger());
+        $this->assertInstanceOf(NullLogger::class, $Auth->getLogger());
         $Auth->setLogger($Logger);
         $Auth->setActionEndpoint(AbstractAuthController::ACTION_LOGOUT, $Endpoint);
         $this->assertEquals(true, $Auth->logout());
         self::$client->mockResponses->append(new Response(404));
         $this->assertEquals(false, $Auth->logout());
-        $this->assertEquals(true,$Logger->hasErrorThatContains("[REST] Logout Exception"));
+        $this->assertEquals(true, $Logger->hasErrorThatContains("[REST] Logout Exception"));
         return $Auth;
     }
 
@@ -295,7 +308,7 @@ class AbstractAuthControllerTest extends TestCase {
         $Auth = new AuthController();
         $Logger = new TestLogger();
         $Auth->setLogger($Logger);
-        $this->assertEquals(false,$Auth->logout());
-        $this->assertEquals(true,$Logger->hasDebugThatContains("Unknown Auth Action [logout] requested on Controller"));
+        $this->assertEquals(false, $Auth->logout());
+        $this->assertEquals(true, $Logger->hasDebugThatContains("Unknown Auth Action [logout] requested on Controller"));
     }
 }
