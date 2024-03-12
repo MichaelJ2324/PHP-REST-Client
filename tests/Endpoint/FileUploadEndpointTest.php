@@ -1,6 +1,6 @@
 <?php
 
-namespace MRussell\REST\Tests\Endpoint\Traits;
+namespace MRussell\REST\Tests\Endpoint;
 
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request;
