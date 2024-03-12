@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass MRussell\REST\Exception\RestClientException
  * @group RestClientExceptionTest
  */
-class UnknownExceptionTest extends TestCase
+class RestClientExceptionTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
