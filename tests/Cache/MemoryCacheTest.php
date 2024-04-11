@@ -72,7 +72,7 @@ class MemoryCacheTest extends TestCase
         ], $cache->getMultiple(['foo','bar'], ['bar' => 'foo']));
         $this->assertEquals(true, $cache->deleteMultiple(['foo','baz']));
         $this->assertEquals(false, $cache->deleteMultiple(['foo']));
-        $this->assertEquals(null, $cache->getMultiple(['foo','baz']));
+        $this->assertEquals([], $cache->getMultiple(['foo','baz']));
     }
 
 

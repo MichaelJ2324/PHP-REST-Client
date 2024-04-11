@@ -15,7 +15,7 @@ use MRussell\REST\Tests\Stubs\Endpoint\AuthEndpoint;
 use MRussell\REST\Tests\Stubs\Endpoint\LogoutEndpoint;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Psr\Log\Test\TestLogger;
+use ColinODell\PsrTestLogger\TestLogger;
 
 /**
  * Class AbstractAuthControllerTest

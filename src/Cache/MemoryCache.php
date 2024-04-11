@@ -34,7 +34,7 @@ class MemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return $this->cache[$key] ?? $default;
     }
@@ -45,7 +45,7 @@ class MemoryCache implements CacheInterface
      * @param $ttl - Ignored since its in memory
      * @return bool|void
      */
-    public function set($key, $value, $ttl = null)
+    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
     {
         $this->cache[$key] = $value;
         return true;
@@ -54,7 +54,7 @@ class MemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function delete($key)
+    public function delete(string $key): bool
     {
         $return = false;
         if ($this->has($key)) {
@@ -67,7 +67,7 @@ class MemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function clear()
+    public function clear(): bool
     {
         $this->cache = [];
         return true;
@@ -76,7 +76,7 @@ class MemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $items = $default ?? [];
         foreach($keys as $key) {
@@ -87,13 +87,13 @@ class MemoryCache implements CacheInterface
         if (empty($items)) {
             $items = $default;
         }
-        return $items;
+        return $items ?? [];
     }
 
     /**
      * @inheritDoc
      */
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
     {
         foreach($values as $key => $value) {
             $this->set($key, $value, $ttl);
@@ -104,7 +104,7 @@ class MemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple(iterable $keys): bool
     {
         $return = true;
         foreach($keys as $key) {
@@ -118,7 +118,7 @@ class MemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return isset($this->cache[$key]);
     }
