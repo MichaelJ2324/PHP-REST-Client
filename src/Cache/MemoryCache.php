@@ -87,7 +87,7 @@ class MemoryCache implements CacheInterface
         if (empty($items)) {
             $items = $default;
         }
-        return $items;
+        return $items ?? [];
     }
 
     /**
