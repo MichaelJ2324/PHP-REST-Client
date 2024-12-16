@@ -19,4 +19,6 @@ return RectorConfig::configure()
         SetList::CODE_QUALITY,
         SetList::CODING_STYLE,
         SetList::TYPE_DECLARATION,
-    ]);
+        SetList::PRIVATIZATION,
+    ])
+    ->withImportNames(true, true, false, true);

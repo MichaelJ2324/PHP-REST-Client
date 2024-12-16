@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Endpoint\Abstracts;
 
+use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Data\AbstractEndpointData;
 use MRussell\REST\Endpoint\Data\DataInterface;
@@ -124,7 +125,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     /**
      * @inheritdoc
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidRequest
+     * @throws InvalidRequest
      */
     public function retrieve($id = null): ModelInterface
     {
@@ -148,7 +149,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     /**
      * @inheritdoc
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidRequest
+     * @throws InvalidRequest
      */
     public function save(): ModelInterface
     {

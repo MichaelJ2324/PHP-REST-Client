@@ -2,13 +2,14 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
+use MRussell\REST\Exception\Endpoint\InvalidDataType;
+use MRussell\REST\Tests\Stubs\Endpoint\PingEndpoint;
 use MRussell\REST\Endpoint\Data\DataInterface;
 use MRussell\REST\Endpoint\Data\EndpointData;
 use MRussell\REST\Endpoint\SmartEndpoint;
 use MRussell\REST\Exception\Endpoint\InvalidData;
 use MRussell\REST\Tests\Stubs\Endpoint\SmartEndpointNoData;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 /**
  * Class AbstractSmartEndpointTest
@@ -163,12 +164,12 @@ class AbstractSmartEndpointTest extends TestCase
 
     /**
      * @covers ::setData
-     * @throws MRussell\REST\Exception\Endpoint\InvalidDataType
+     * @throws InvalidDataType
      */
     public function testInvalidDataType(): void
     {
         $Endpoint = new SmartEndpointNoData();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidDataType::class);
+        $this->expectException(InvalidDataType::class);
         $this->expectExceptionMessage("Invalid data type passed to Endpoint [MRussell\REST\Tests\Stubs\Endpoint\SmartEndpointNoData]");
         $Endpoint->setData('test');
     }
@@ -176,7 +177,7 @@ class AbstractSmartEndpointTest extends TestCase
     /**
      * @covers ::setData
      * @covers ::buildDataObject
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidDataType
+     * @throws InvalidDataType
      */
     public function testInvalidDataClass(): void
     {
@@ -187,7 +188,7 @@ class AbstractSmartEndpointTest extends TestCase
 
         $DataClass = $Reflected->getProperty('_DATA_CLASS');
         $DataClass->setAccessible(true);
-        $DataClass->setValue($Endpoint, \MRussell\REST\Tests\Stubs\Endpoint\PingEndpoint::class);
+        $DataClass->setValue($Endpoint, PingEndpoint::class);
 
         $data->setValue($Endpoint, null);
         $this->expectException(InvalidData::class);

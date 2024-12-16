@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Auth\Abstracts;
 
+use Psr\SimpleCache\InvalidArgumentException;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Auth\AuthControllerInterface;
 use GuzzleHttp\Psr7\Request;
@@ -141,7 +142,7 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
 
     /**
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function cacheToken(): bool
     {

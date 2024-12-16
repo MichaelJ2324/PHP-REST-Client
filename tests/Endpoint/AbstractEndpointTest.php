@@ -2,21 +2,21 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
+use MRussell\REST\Exception\Endpoint\InvalidUrl;
+use MRussell\REST\Exception\Endpoint\InvalidRequest;
+use MRussell\REST\Exception\Endpoint\InvalidDataType;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Promise\Utils;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use MRussell\Http\Response\Standard;
 use MRussell\REST\Endpoint\Abstracts\AbstractEndpoint;
-use MRussell\REST\Tests\Stubs\Auth\AuthController;
 use MRussell\REST\Tests\Stubs\Client\Client;
 use MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint;
 use MRussell\REST\Tests\Stubs\Endpoint\EndpointData;
 use MRussell\REST\Tests\Stubs\Endpoint\PingEndpoint;
 use PHPUnit\Framework\TestCase;
-use Sugarcrm\REST\Endpoint\Ping;
 
 /**
  * Class AbstractEndpointTest
@@ -199,13 +199,13 @@ class AbstractEndpointTest extends TestCase
     }
 
     /**
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidRequest
+     * @throws InvalidRequest
      * @covers ::execute
      */
     public function testInvalidRequest(): void
     {
         $Endpoint = new BasicEndpoint();
-        $this->expectException(\GuzzleHttp\Exception\RequestException::class);
+        $this->expectException(RequestException::class);
         $Endpoint->execute();
     }
 
@@ -242,7 +242,7 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
         $this->assertEquals('$foo', $Endpoint->getEndPointUrl());
         $this->assertEquals([], $Endpoint->getUrlArgs());
-        $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidUrl::class);
+        $this->expectException(InvalidUrl::class);
         $Endpoint->execute();
     }
 
@@ -253,7 +253,7 @@ class AbstractEndpointTest extends TestCase
     public function testConfigureUrl(): void
     {
         $Endpoint = new BasicEndpoint();
-        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint::class);
+        $Class = new \ReflectionClass(BasicEndpoint::class);
         $method = $Class->getMethod('configureURL');
         $method->setAccessible(true);
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
@@ -363,7 +363,7 @@ class AbstractEndpointTest extends TestCase
 
     /**
      * @covers ::onEvent
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidDataType
+     * @throws InvalidDataType
      */
     public function testInvalidQueryString(): void
     {
@@ -383,7 +383,7 @@ class AbstractEndpointTest extends TestCase
      * @covers ::setResponse
      * @covers ::getResponseBody
      * @covers ::getResponseContent
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function testGetResponse(): void
     {

@@ -6,9 +6,8 @@ class DefaultEndpointProvider extends AbstractEndpointProvider
 {
     /**
      * List of default endpoints to load
-     * @var array
      */
-    protected static $_DEFAULT_ENDPOINTS = [];
+    protected static array $_DEFAULT_ENDPOINTS = [];
 
     public function __construct()
     {

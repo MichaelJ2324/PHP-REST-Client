@@ -2,8 +2,6 @@
 
 namespace MRussell\REST\Endpoint\Interfaces;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
 interface EndpointInterface extends PropertiesInterface, ResettableInterface

@@ -2,6 +2,8 @@
 
 namespace MRussell\REST\Endpoint\Abstracts;
 
+use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
@@ -57,7 +59,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     protected static $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => self::AUTH_EITHER];
 
-    private ?\GuzzleHttp\Promise\PromiseInterface $promise = null;
+    private ?PromiseInterface $promise = null;
 
     /**
      * The Variable Identifier to parse Endpoint URL
@@ -239,7 +241,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @inheritdoc
      * @param array $options Guzzle Send Options
      * @return $this
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function execute(array $options = []): EndpointInterface
     {

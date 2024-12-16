@@ -16,7 +16,7 @@ class StackTest extends TestCase
      * @covers ::getEndpoint
      * @covers ::setEndpoint
      */
-    public function testGetSetEndpoint(): \MRussell\REST\Endpoint\Event\Stack
+    public function testGetSetEndpoint(): Stack
     {
         $stack = new Stack();
         $ep = new BasicEndpoint();

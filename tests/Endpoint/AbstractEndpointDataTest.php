@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
+use MRussell\REST\Exception\Endpoint\InvalidData;
 use MRussell\REST\Endpoint\Data\EndpointData as StockData;
 use MRussell\REST\Tests\Stubs\Endpoint\EndpointData as StubData;
 use PHPUnit\Framework\TestCase;
@@ -162,7 +163,7 @@ class AbstractEndpointDataTest extends TestCase
     public function testMissingData(): void
     {
         $Data = new StubData();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidData::class);
+        $this->expectException(InvalidData::class);
         $this->expectExceptionMessage("Missing or Invalid data on Endpoint Data. Errors: Missing [foo]");
         $Data->toArray(true);
     }
@@ -174,7 +175,7 @@ class AbstractEndpointDataTest extends TestCase
     public function testInvalidData(): void
     {
         $Data = new StubData();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidData::class);
+        $this->expectException(InvalidData::class);
         $this->expectExceptionMessage("Missing or Invalid data on Endpoint Data. Errors: Invalid [foo]");
         $Data['foo'] = 1234;
         $Data->toArray(true);
@@ -187,7 +188,7 @@ class AbstractEndpointDataTest extends TestCase
     public function testInvalidAndMissingData(): void
     {
         $Data = new StubData();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidData::class);
+        $this->expectException(InvalidData::class);
         $this->expectExceptionMessage("Missing or Invalid data on Endpoint Data. Errors: Invalid [foo]");
         $properties = $Data->getProperties();
         $properties['required']['bar'] = null;

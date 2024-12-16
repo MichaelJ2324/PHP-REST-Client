@@ -5,9 +5,7 @@ namespace MRussell\REST\Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use MRussell\REST\Auth\AuthControllerInterface;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
-use MRussell\REST\Endpoint\Provider\EndpointProviderInterface;
 use MRussell\REST\Exception\Client\EndpointProviderMissing;
 use GuzzleHttp\Psr7\Request;
 
@@ -120,7 +118,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
     {
         $api = $this;
         $this->getHandlerStack()->remove('configureAuth');
-        $this->getHandlerStack()->push(Middleware::mapRequest(function (Request $request) use ($api): \GuzzleHttp\Psr7\Request {
+        $this->getHandlerStack()->push(Middleware::mapRequest(function (Request $request) use ($api): Request {
             $Auth = $api->getAuth();
             if ($Auth) {
                 $EP = $api->current();

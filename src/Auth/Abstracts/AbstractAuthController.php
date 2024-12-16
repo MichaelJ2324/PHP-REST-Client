@@ -4,7 +4,6 @@ namespace MRussell\REST\Auth\Abstracts;
 
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Auth\AuthControllerInterface;
-use MRussell\REST\Cache\MemoryCache;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 use MRussell\REST\Exception\Auth\InvalidAuthenticationAction;
 use MRussell\REST\Traits\PsrSimpleCacheTrait;
