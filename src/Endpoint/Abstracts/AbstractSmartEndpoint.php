@@ -58,7 +58,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
     public function setProperty(string $name, $value)
     {
         parent::setProperty($name, $value);
-        if ($name == self::PROPERTY_DATA && isset($this->data)) {
+        if ($name === self::PROPERTY_DATA && isset($this->data)) {
             $this->configureDataProperties();
         }
         return $this;

@@ -193,13 +193,11 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
      */
     public function isAuthenticated(): bool
     {
-        if (parent::isAuthenticated()) {
-            if (!empty($this->getTokenProp('access_token'))) {
-                $expired = $this->isTokenExpired();
-                //We err on the side of valid vs invalid, as the API will invalidate if we are wrong, which isn't harmful
-                if ($expired === 0 || $expired === -1) {
-                    return true;
-                }
+        if (parent::isAuthenticated() && !empty($this->getTokenProp('access_token'))) {
+            $expired = $this->isTokenExpired();
+            //We err on the side of valid vs invalid, as the API will invalidate if we are wrong, which isn't harmful
+            if ($expired === 0 || $expired === -1) {
+                return true;
             }
         }
         return false;

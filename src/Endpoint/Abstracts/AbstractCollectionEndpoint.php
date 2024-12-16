@@ -265,11 +265,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
             }
             if (!empty($m[$modelIdKey])) {
                 $id = $m[$modelIdKey];
-                if ($merge && isset($this->models[$id])) {
-                    $this->models[$id] = array_merge($this->models[$id], $m);
-                } else {
-                    $this->models[$id] = $m;
-                }
+                $this->models[$id] = $merge && isset($this->models[$id]) ? array_merge($this->models[$id], $m) : $m;
             } else {
                 $this->models[] = $m;
             }
@@ -312,7 +308,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     public function getEndPointUrl($full = false): string
     {
         $epURL = parent::getEndPointUrl();
-        if ($epURL == '') {
+        if ($epURL === '') {
             $model = $this->buildModel();
             if ($model) {
                 $epURL = $model->getEndPointUrl();

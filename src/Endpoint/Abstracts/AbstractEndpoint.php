@@ -222,7 +222,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     public function getHttpClient(): Client
     {
-        return !$this->client ? new Client() : $this->getClient()->getHttpClient();
+        return $this->client ? $this->getClient()->getHttpClient() : new Client();
     }
 
     /**
@@ -390,7 +390,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                     }
                     if (isset($urlArgs[$optionNum]) && ($replace == '' || $replace == null)) {
                         $replace = $urlArgs[$optionNum];
-                        $optionNum = $optionNum + 1;
+                        $optionNum += 1;
                     }
                     if ($optional && $replace == '') {
                         $urlArr = array_slice($urlArr, 0, $key);
