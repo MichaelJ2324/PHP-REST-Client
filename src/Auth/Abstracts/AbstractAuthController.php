@@ -170,10 +170,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
      */
     public function isAuthenticated(): bool
     {
-        if (!empty($this->token)) {
-            return true;
-        }
-        return false;
+        return !empty($this->token);
     }
 
     /**

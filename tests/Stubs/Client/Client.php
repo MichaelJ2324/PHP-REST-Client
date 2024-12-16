@@ -31,7 +31,7 @@ class Client extends AbstractClient
 
     public function current(EndpointInterface $endpoint = null)
     {
-        if ($endpoint) {
+        if ($endpoint instanceof \MRussell\REST\Endpoint\Interfaces\EndpointInterface) {
             $this->setCurrentEndpoint($endpoint);
         }
         return parent::current();
