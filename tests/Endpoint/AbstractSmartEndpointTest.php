@@ -39,12 +39,12 @@ class AbstractSmartEndpointTest extends TestCase
         ],
     ];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -184,9 +184,11 @@ class AbstractSmartEndpointTest extends TestCase
         $Reflected = new \ReflectionClass($Endpoint);
         $data = $Reflected->getProperty('data');
         $data->setAccessible(true);
+
         $DataClass = $Reflected->getProperty('_DATA_CLASS');
         $DataClass->setAccessible(true);
         $DataClass->setValue($Endpoint, \MRussell\REST\Tests\Stubs\Endpoint\PingEndpoint::class);
+
         $data->setValue($Endpoint, null);
         $this->expectException(InvalidData::class);
         $this->expectExceptionMessage("Missing or Invalid data on Endpoint Data. Errors: MRussell\REST\Tests\Stubs\Endpoint\PingEndpoint does not implement MRussell\\REST\\Endpoint\\Data\\DataInterface");

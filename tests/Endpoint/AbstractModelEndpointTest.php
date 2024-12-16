@@ -34,12 +34,12 @@ class AbstractModelEndpointTest extends TestCase
         static::$client = null;
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         ModelEndpoint::modelIdKey('id');
         parent::tearDown();
@@ -231,6 +231,7 @@ class AbstractModelEndpointTest extends TestCase
         $Model = new ModelEndpoint();
 
         $Model->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode(['id' => '1234'])));
         $Model->set('foo', 'bar');
@@ -281,6 +282,7 @@ class AbstractModelEndpointTest extends TestCase
     {
         $Model = new ModelEndpoint();
         $Model->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode([['id' => 1234]])));
         $Model->set('id', '1234');
@@ -302,6 +304,7 @@ class AbstractModelEndpointTest extends TestCase
     {
         $Model = new ModelEndpoint();
         $Model->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode([
             'id' => '1234',
@@ -344,6 +347,7 @@ class AbstractModelEndpointTest extends TestCase
     {
         $Model = new ModelEndpointWithActions();
         $Model->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode(['account' => [
             'id' => '1234',

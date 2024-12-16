@@ -39,8 +39,10 @@ trait FileUploadsTrait
                     'path' => $fileData,
                 ];
             }
+
             $multiPartOptions[] = $this->buildMultiPartFileData($fileData);
         }
+
         $data = new MultipartStream($multiPartOptions);
         $request = $request->withBody($data);
         return $request->withHeader('Content-Type', 'multipart/form-data; boundary=' . $data->getBoundary());
@@ -63,11 +65,14 @@ trait FileUploadsTrait
                 if (isset($fileData['contents'])) {
                     unset($fileData['contents']);
                 }
+
                 $data['contents'] = Utils::streamFor(fopen($fileData['path'], 'r', true));
                 unset($fileData['path']);
             }
+
             return array_merge($data, $fileData);
         }
+
         throw new InvalidFileData([print_r($fileData, true)]);
     }
 }

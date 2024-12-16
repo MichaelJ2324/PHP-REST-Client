@@ -21,6 +21,7 @@ class AbstractCollectionEndpointTest extends TestCase
     protected static $_REFLECTED_CLASS = 'MRussell\REST\Tests\Stubs\Endpoint\CollectionEndpoint';
 
     protected $collection = ['abc123' => ['id' => 'abc123', 'name' => 'foo', 'foo' => 'bar'], 'efg234' => ['id' => 'efg234', 'name' => 'test', 'foo' => '']];
+
     /**
      * @var Client
      */
@@ -37,12 +38,12 @@ class AbstractCollectionEndpointTest extends TestCase
         //Add Tear Down for static properties here
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -111,6 +112,7 @@ class AbstractCollectionEndpointTest extends TestCase
 
         $Collection = new \MRussell\REST\Endpoint\CollectionEndpoint();
         $Collection->set($this->collection);
+
         $Model = $Collection->get('abc123');
         $this->assertEquals(true, is_object($Model));
         $this->assertEquals(['id' => 'abc123', 'name' => 'foo', 'foo' => 'bar'], $Model->toArray());
@@ -173,6 +175,7 @@ class AbstractCollectionEndpointTest extends TestCase
         self::$client->mockResponses->append(new Response(200));
         $Collection->setClient(self::$client);
         $Collection->fetch();
+
         $props = $Collection->getProperties();
         $this->assertEquals('GET', $props['httpMethod']);
     }
@@ -189,9 +192,11 @@ class AbstractCollectionEndpointTest extends TestCase
         $Collection = new CollectionEndpoint();
         $Collection->setBaseUrl('localhost');
         $Collection->setProperty('url', 'foo');
+
         self::$client->mockResponses->append(new Response(200));
         $Collection->setClient(self::$client);
         $Collection->fetch();
+
         $Response = $Collection->getResponse();
         $this->assertEquals($Response->getStatusCode(), 200);
 
@@ -273,6 +278,7 @@ class AbstractCollectionEndpointTest extends TestCase
     {
         $Collection = new CollectionEndpointWithoutModel();
         $Collection->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode(['accounts' => array_values($this->collection)])));
         $Collection->setProperty('response_prop', 'accounts');
@@ -305,6 +311,7 @@ class AbstractCollectionEndpointTest extends TestCase
     {
         $Collection = new CollectionEndpointWithoutModel();
         $Collection->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode(['accounts' => array_values($this->collection)])));
         $Collection->setProperty('response_prop', 'accounts');

@@ -47,6 +47,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
                 'defaults' => [],
             ];
         }
+
         parent::setProperties($properties);
         $this->configureDataProperties();
         return $this;
@@ -61,6 +62,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
         if ($name === self::PROPERTY_DATA && isset($this->data)) {
             $this->configureDataProperties();
         }
+
         return $this;
     }
 
@@ -79,6 +81,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
         } else {
             throw new InvalidDataType(get_class($this));
         }
+
         return $this;
     }
 
@@ -91,6 +94,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
         if (!$this->data) {
             $this->data = $this->buildDataObject();
         }
+
         return parent::getData();
     }
 
@@ -104,6 +108,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
         if (!empty($dataProps)) {
             $this->getData()->setProperties($dataProps);
         }
+
         return $this;
     }
 
@@ -120,6 +125,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
                 $parsedData = $data->isNull() ? null : $parsedData;
             }
         }
+
         return parent::configureRequest($request, $parsedData);
     }
 
@@ -144,6 +150,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
         if (is_array($implements) && isset($implements[\MRussell\REST\Endpoint\Data\DataInterface::class])) {
             return new static::$_DATA_CLASS([], $this->getProperty(self::PROPERTY_DATA) ?? []);
         }
+
         throw new InvalidData(static::$_DATA_CLASS . " does not implement MRussell\\REST\\Endpoint\\Data\\DataInterface");
     }
 }

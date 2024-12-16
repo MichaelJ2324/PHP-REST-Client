@@ -33,6 +33,7 @@ trait PsrLoggerTrait
         if (!isset($this->logger)) {
             $this->setLogger(new NullLogger());
         }
+
         return $this->logger;
     }
 }

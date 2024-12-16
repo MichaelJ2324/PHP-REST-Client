@@ -23,6 +23,7 @@ class MemoryCache implements CacheInterface
             static::$instance = new static();
             // @codeCoverageIgnoreEnd
         }
+
         return static::$instance;
     }
 
@@ -56,6 +57,7 @@ class MemoryCache implements CacheInterface
             unset($this->cache[$key]);
             $return = true;
         }
+
         return $return;
     }
 
@@ -79,9 +81,11 @@ class MemoryCache implements CacheInterface
                 $items[$key] = $this->cache[$key];
             }
         }
+
         if (empty($items)) {
             $items = $default;
         }
+
         return $items ?? [];
     }
 
@@ -93,6 +97,7 @@ class MemoryCache implements CacheInterface
         foreach ($values as $key => $value) {
             $this->set($key, $value, $ttl);
         }
+
         return true;
     }
 
@@ -107,6 +112,7 @@ class MemoryCache implements CacheInterface
                 $return = false;
             }
         }
+
         return $return;
     }
 

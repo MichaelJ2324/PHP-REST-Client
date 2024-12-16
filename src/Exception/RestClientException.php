@@ -12,8 +12,10 @@ class RestClientException extends \Exception
             if (is_string($args)) {
                 $args = [$args];
             }
+
             $this->message = vsprintf($this->message, $args);
         }
+
         parent::__construct($this->message);
     }
 }

@@ -47,12 +47,12 @@ class AbstractAuthControllerTest extends TestCase
 
     protected $credentials = ['user' => 'foo', 'password' => 'bar'];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -179,8 +179,10 @@ class AbstractAuthControllerTest extends TestCase
         $ReflectedAuth = new \ReflectionClass($Auth);
         $cacheTokenMethod = $ReflectedAuth->getMethod('cacheToken');
         $cacheTokenMethod->setAccessible(true);
+
         $getCachedTokenMethod = $ReflectedAuth->getMethod('getCachedToken');
         $getCachedTokenMethod->setAccessible(true);
+
         $removeCachedTokenMethod = $ReflectedAuth->getMethod('removeCachedToken');
         $removeCachedTokenMethod->setAccessible(true);
 
@@ -222,10 +224,13 @@ class AbstractAuthControllerTest extends TestCase
     {
         $Auth = new AuthController();
         $Auth->setCredentials($this->credentials);
+
         $AuthEndpoint = new AuthEndpoint();
         $AuthEndpoint->setBaseUrl('localhost');
+
         $LogoutEndpoint = new LogoutEndpoint();
         $LogoutEndpoint->setBaseUrl('localhost');
+
         $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Auth\AuthController::class);
         $method = $Class->getMethod('configureEndpoint');
         $method->setAccessible(true);

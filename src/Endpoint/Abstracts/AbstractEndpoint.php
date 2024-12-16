@@ -34,17 +34,25 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     }
 
     public const PROPERTY_URL = 'url';
+
     public const PROPERTY_HTTP_METHOD = 'httpMethod';
+
     public const PROPERTY_AUTH = 'auth';
 
     public const EVENT_CONFIGURE_METHOD = 'configure_method';
+
     public const EVENT_CONFIGURE_URL = 'configure_url';
+
     public const EVENT_CONFIGURE_PAYLOAD = 'configure_payload';
+
     public const EVENT_AFTER_CONFIGURED_REQUEST = 'after_configure_req';
+
     public const EVENT_AFTER_RESPONSE = 'after_response';
 
     public const AUTH_NOAUTH = 0;
+
     public const AUTH_EITHER = 1;
+
     public const AUTH_REQUIRED = 2;
 
     protected static $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => self::AUTH_EITHER];
@@ -105,6 +113,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         if (!empty($urlArgs)) {
             $this->setUrlArgs($urlArgs);
         }
+
         foreach ($properties as $key => $value) {
             $this->setProperty($key, $value);
         }
@@ -144,6 +153,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         if (empty($this->baseUrl) && $this->client) {
             return $this->getClient()->getAPIUrl();
         }
+
         return $this->baseUrl;
     }
 
@@ -156,9 +166,11 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         if (isset($this->_properties[self::PROPERTY_URL]) && $this->_properties[self::PROPERTY_URL] !== '') {
             $url = $this->_properties[self::PROPERTY_URL];
         }
+
         if ($full) {
-            $url = rtrim($this->getBaseUrl(), '/') . "/$url";
+            $url = rtrim($this->getBaseUrl(), '/') . ('/' . $url);
         }
+
         return $url;
     }
 
@@ -281,6 +293,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         if (isset($this->_properties[self::PROPERTY_AUTH])) {
             $auth = intval($this->_properties[self::PROPERTY_AUTH]);
         }
+
         return $auth;
     }
 
@@ -293,6 +306,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         ) {
             return $this->_properties[self::PROPERTY_HTTP_METHOD];
         }
+
         return "GET";
     }
 
@@ -306,6 +320,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         if ($this->verifyUrl($url)) {
             $url = rtrim($this->getBaseUrl(), "/") . "/" . $url;
         }
+
         $data = $this->configurePayload();
         $request = new Request($method, $url);
         $request = $this->configureJsonRequest($request);
@@ -337,20 +352,25 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                         if (\is_array($value)) {
                             $value = \http_build_query($value, '', '&', \PHP_QUERY_RFC3986);
                         }
+
                         if (!\is_string($value)) {
                             throw new InvalidArgumentException('query must be a string or array');
                         }
+
                         $uri = $request->getUri()->withQuery($value);
                         $request = $request->withUri($uri);
                     }
+
                     break;
                 default:
                     if (is_array($data)) {
                         $data = json_encode($data);
                     }
+
                     $request = $request->withBody(Utils::streamFor($data));
             }
         }
+
         $args = ['request' => $request, 'data' => $data];
         $this->triggerEvent(self::EVENT_AFTER_CONFIGURED_REQUEST, $args);
         return $args['request'];
@@ -377,6 +397,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                     break;
                 }
             }
+
             foreach ($urlArr as $key => $urlPart) {
                 $replace = null;
                 if (strpos($urlPart, static::$_URL_VAR_CHARACTER) !== false) {
@@ -384,26 +405,32 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                         $optional = true;
                         $replace = '';
                     }
+
                     $opt = str_replace([static::$_URL_VAR_CHARACTER, ':'], '', $urlPart);
                     if (isset($urlArgs[$opt])) {
                         $replace = $urlArgs[$opt];
                     }
+
                     if (isset($urlArgs[$optionNum]) && ($replace == '' || $replace == null)) {
                         $replace = $urlArgs[$optionNum];
                         $optionNum += 1;
                     }
+
                     if ($optional && $replace == '') {
                         $urlArr = array_slice($urlArr, 0, $key);
                         break;
                     }
+
                     if ($replace !== null) {
                         $urlArr[$key] = $replace;
                     }
                 }
             }
+
             $url = implode("/", $urlArr);
             $url = rtrim($url, "/");
         }
+
         return $url;
     }
 
@@ -416,6 +443,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         if (strpos($url, static::$_URL_VAR_CHARACTER) !== false) {
             throw new InvalidUrl([get_class($this), $url]);
         }
+
         return true;
     }
 
@@ -442,6 +470,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                 $variables[] = $match[0];
             }
         }
+
         return $variables;
     }
 
@@ -466,14 +495,17 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         if (!isset($properties[self::PROPERTY_HTTP_METHOD])) {
             $properties[self::PROPERTY_HTTP_METHOD] = '';
         }
+
         if (!isset($properties[self::PROPERTY_URL])) {
             $properties[self::PROPERTY_URL] = '';
         }
+
         if (!isset($properties[self::PROPERTY_AUTH])) {
             $properties[self::PROPERTY_AUTH] = self::AUTH_EITHER;
         } else {
             $properties[self::PROPERTY_AUTH] = intval($properties[self::PROPERTY_AUTH]);
         }
+
         return $this->rawSetProperties($properties);
     }
 }

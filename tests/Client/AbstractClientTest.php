@@ -40,13 +40,13 @@ class AbstractClientTest extends TestCase
 
     protected $version = '1.0';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->Client = new Client();
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -87,6 +87,7 @@ class AbstractClientTest extends TestCase
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
+
         $value = $stack->getValue($handlerStack);
         $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
@@ -112,6 +113,7 @@ class AbstractClientTest extends TestCase
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
+
         $value = $stack->getValue($handlerStack);
         $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
@@ -124,6 +126,7 @@ class AbstractClientTest extends TestCase
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
+
         $value = $stack->getValue($handlerStack);
         $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
@@ -145,6 +148,7 @@ class AbstractClientTest extends TestCase
         $Ping = new PingEndpoint();
         $Ping->setClient($this->Client);
         $Ping->setProperty(AbstractEndpoint::PROPERTY_AUTH, AbstractEndpoint::AUTH_NOAUTH);
+
         $this->Client->current($Ping);
         $Ping->execute();
         $this->assertEmpty(current($this->Client->container)['request']->getHeader('token'));

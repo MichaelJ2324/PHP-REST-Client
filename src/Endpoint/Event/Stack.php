@@ -48,8 +48,10 @@ class Stack implements StackInterface
             foreach ($this->events[$event] as $callable) {
                 $this->runEventHandler($callable, $data);
             }
+
             unset(self::$IN_EVENT[$event]);
         }
+
         return $this;
     }
 
@@ -70,9 +72,11 @@ class Stack implements StackInterface
         if (!isset($this->events[$event])) {
             $this->events[$event] = [];
         }
+
         if (empty($id)) {
             $id = count($this->events);
         }
+
         $this->events[$event][$id] = $func;
         return $id;
     }
@@ -87,8 +91,10 @@ class Stack implements StackInterface
             if (empty($this->events[$event])) {
                 unset($this->events[$event]);
             }
+
             return true;
         }
+
         return false;
     }
 }

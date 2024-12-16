@@ -34,10 +34,11 @@ class Client extends AbstractClient
         if ($endpoint instanceof \MRussell\REST\Endpoint\Interfaces\EndpointInterface) {
             $this->setCurrentEndpoint($endpoint);
         }
+
         return parent::current();
     }
 
-    public function initHttpHandlerStack()
+    protected function initHttpHandlerStack()
     {
         $handler = HandlerStack::create($this->mockResponses);
         $handler->push(Middleware::history($this->container), 'history');
