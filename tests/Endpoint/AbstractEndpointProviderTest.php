@@ -42,7 +42,7 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers MRussell\REST\Endpoint\Provider\DefaultEndpointProvider::__construct
      * @covers ::registerEndpoint
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $Provider = new EndpointProvider();
         $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\EndpointProvider::class);
@@ -62,7 +62,7 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers ::registerEndpoint
      * @return EndpointProviderInterface
      */
-    public function testRegisterEndpoint()
+    public function testRegisterEndpoint(): \MRussell\REST\Tests\Stubs\Endpoint\EndpointProvider
     {
         $Provider = new EndpointProvider();
         $this->assertEquals($Provider, $Provider->registerEndpoint('auth', \MRussell\REST\Tests\Stubs\Endpoint\AuthEndpoint::class));
@@ -75,7 +75,7 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers ::registerEndpoint
      * @throws MRussell\REST\Exception\Endpoint\InvalidRegistration
      */
-    public function testInvalidRegistration(EndpointProviderInterface $Provider)
+    public function testInvalidRegistration(EndpointProviderInterface $Provider): void
     {
         $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidRegistration::class);
         $this->expectExceptionMessage("Endpoint Object [baz] must extend MRussell\REST\Endpoint\Interfaces\EndpointInterface");
@@ -88,7 +88,7 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers ::getEndpoint
      * @covers ::buildEndpoint
      */
-    public function testGetEndpoint(EndpointProviderInterface $Provider)
+    public function testGetEndpoint(EndpointProviderInterface $Provider): void
     {
         $this->assertEquals(false, $Provider->hasEndpoint('test'));
         $this->assertEquals(true, $Provider->hasEndpoint('foo'));
@@ -106,7 +106,7 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers ::getEndpoint
      * @throws MRussell\REST\Exception\Endpoint\UnknownEndpoint
      */
-    public function testUnknownEndpoint(EndpointProviderInterface $Provider)
+    public function testUnknownEndpoint(EndpointProviderInterface $Provider): void
     {
         $this->expectException(\MRussell\REST\Exception\Endpoint\UnknownEndpoint::class);
         $this->expectExceptionMessage("An Unknown Endpoint [test] was requested.");

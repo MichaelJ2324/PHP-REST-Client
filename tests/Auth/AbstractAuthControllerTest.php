@@ -153,9 +153,8 @@ class AbstractAuthControllerTest extends TestCase
 
     /**
      * @depends testSetActions
-     * @return void
      */
-    public function testInvalidActionException(AuthController $Auth)
+    public function testInvalidActionException(AuthController $Auth): void
     {
         $this->expectExceptionMessage("Unknown Auth Action [test] requested on Controller: MRussell\REST\Auth\Abstracts\AbstractAuthController");
         $this->expectException(InvalidAuthenticationAction::class);
@@ -171,9 +170,8 @@ class AbstractAuthControllerTest extends TestCase
      * @covers ::getCachedToken
      * @covers ::removeCachedToken
      * @covers ::setCredentials
-     * @return AuthController
      */
-    public function testCaching(AuthController $Auth)
+    public function testCaching(AuthController $Auth): void
     {
         $cache = MemoryCache::getInstance();
         $ReflectedAuth = new \ReflectionClass($Auth);
@@ -284,10 +282,7 @@ class AbstractAuthControllerTest extends TestCase
         return $Auth;
     }
 
-    /**
-     * @return void
-     */
-    public function testNoLogoutAction()
+    public function testNoLogoutAction(): void
     {
         $Auth = new AuthController();
         $Logger = new TestLogger();

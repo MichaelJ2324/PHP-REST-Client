@@ -53,7 +53,7 @@ class AbstractSmartEndpointTest extends TestCase
      * @covers ::__construct
      * @covers ::configureDataProperties
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $Endpoint = new SmartEndpointNoData();
         $this->assertNotEmpty($Endpoint->getData());
@@ -78,7 +78,7 @@ class AbstractSmartEndpointTest extends TestCase
      * @covers ::configureDataProperties
      * @covers ::setProperty
      */
-    public function testSetProperties()
+    public function testSetProperties(): void
     {
         $Endpoint = new SmartEndpoint();
         $Endpoint->setProperties([]);
@@ -137,7 +137,7 @@ class AbstractSmartEndpointTest extends TestCase
      * @covers ::getData
      * @covers ::configurePayload
      */
-    public function testSetData()
+    public function testSetData(): void
     {
         $Endpoint = new SmartEndpointNoData();
         $this->assertEquals($Endpoint, $Endpoint->setData(null));
@@ -165,7 +165,7 @@ class AbstractSmartEndpointTest extends TestCase
      * @covers ::setData
      * @throws MRussell\REST\Exception\Endpoint\InvalidDataType
      */
-    public function testInvalidDataType()
+    public function testInvalidDataType(): void
     {
         $Endpoint = new SmartEndpointNoData();
         $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidDataType::class);
@@ -178,7 +178,7 @@ class AbstractSmartEndpointTest extends TestCase
      * @covers ::buildDataObject
      * @throws \MRussell\REST\Exception\Endpoint\InvalidDataType
      */
-    public function testInvalidDataClass()
+    public function testInvalidDataClass(): void
     {
         $Endpoint = new SmartEndpointNoData();
         $Reflected = new \ReflectionClass($Endpoint);
@@ -198,9 +198,8 @@ class AbstractSmartEndpointTest extends TestCase
     /**
      * @covers ::reset
      * @covers ::buildDataObject
-     * @return void
      */
-    public function testReset()
+    public function testReset(): void
     {
         $Endpoint = new SmartEndpoint();
         $this->assertInstanceOf(DataInterface::class, $Endpoint->getData());

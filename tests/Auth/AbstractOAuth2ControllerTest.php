@@ -55,9 +55,8 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::__construct
      * @covers ::getGrantType
      * @covers ::setGrantType
-     * @return void
      */
-    public function testSetGrantType()
+    public function testSetGrantType(): void
     {
         $Auth = new OAuth2Controller();
         $this->assertEquals(OAuth2Controller::OAUTH_CLIENT_CREDENTIALS_GRANT, $Auth->getGrantType());
@@ -68,7 +67,7 @@ class AbstractOAuth2ControllerTest extends TestCase
     /**
      * @covers ::oauthHeader
      */
-    public function testOAuthHeader()
+    public function testOAuthHeader(): void
     {
         $this->assertEquals('Authorization', OAuth2Controller::oauthHeader());
         $this->assertEquals('Test', OAuth2Controller::oauthHeader('Test'));
@@ -88,7 +87,7 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::isAuthenticated
      * @covers ::isTokenExpired
      */
-    public function testSetToken()
+    public function testSetToken(): void
     {
         $Auth = new OAuth2Controller();
         $Class = new \ReflectionClass(\MRussell\REST\Auth\OAuth2Controller::class);
@@ -127,7 +126,7 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::setToken
      * @throws \MRussell\REST\Exception\Auth\InvalidToken
      */
-    public function testInvalidToken()
+    public function testInvalidToken(): void
     {
         $Auth = new OAuth2Controller();
         $this->expectException(\MRussell\REST\Exception\Auth\InvalidToken::class);
@@ -141,7 +140,7 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::getTokenProp
      * @covers ::getAuthHeaderValue
      */
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $Auth = new OAuth2Controller();
         $Request = new Request("POST", "");
@@ -160,7 +159,7 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::parseResponseToToken
      * @throws \MRussell\REST\Exception\Auth\InvalidToken
      */
-    public function testRefresh()
+    public function testRefresh(): void
     {
         $Auth = new OAuth2Controller();
         $Logger = new TestLogger();
@@ -194,7 +193,7 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::configureRefreshEndpoint
      * @covers ::configureAuthenticationEndpoint
      */
-    public function testConfigureData()
+    public function testConfigureData(): \MRussell\REST\Auth\OAuth2Controller
     {
         $Auth = new OAuth2Controller();
         $Auth->setCredentials($this->credentials);
@@ -225,9 +224,8 @@ class AbstractOAuth2ControllerTest extends TestCase
 
     /**
      * @covers ::reset
-     * @return void
      */
-    public function testReset()
+    public function testReset(): void
     {
         $Auth = new OAuth2Controller();
         $Auth->setCredentials($this->credentials);

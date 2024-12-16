@@ -6,12 +6,9 @@ use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 
 class Stack implements StackInterface
 {
-    private static $IN_EVENT = [];
+    private static array $IN_EVENT = [];
 
-    /**
-     * @var array
-     */
-    private $events = [];
+    private array $events = [];
 
     /**
      * @var string
@@ -57,9 +54,8 @@ class Stack implements StackInterface
 
     /**
      * @param $data
-     * @return void
      */
-    private function runEventHandler(callable $handler, &$data = null)
+    private function runEventHandler(callable $handler, &$data = null): void
     {
         $handler($data, $this->getEndpoint());
     }

@@ -57,10 +57,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     protected static $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => self::AUTH_EITHER];
 
-    /**
-     * @var Promise
-     */
-    private $promise;
+    private ?\GuzzleHttp\Promise\PromiseInterface $promise = null;
 
     /**
      * The Variable Identifier to parse Endpoint URL
@@ -261,13 +258,13 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         $this->promise = $this->getHttpClient()->sendAsync($request, $options);
         $endpoint = $this;
         $this->promise->then(
-            function (Response $res) use ($endpoint, $options) {
+            function (Response $res) use ($endpoint, $options): void {
                 $endpoint->setResponse($res);
                 if (isset($options['success']) && is_callable($options['success'])) {
                     $options['success']($res);
                 }
             },
-            function (RequestException $e) use ($options) {
+            function (RequestException $e) use ($options): void {
                 if (isset($options['error']) && is_callable($options['error'])) {
                     $options['error']($e);
                 }

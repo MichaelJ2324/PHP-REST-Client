@@ -63,7 +63,7 @@ class AbstractCollectionEndpointTest extends TestCase
      * @covers ::at
      * @covers ::length
      */
-    public function testDataAccess()
+    public function testDataAccess(): void
     {
         $Collection = new CollectionEndpointWithoutModel();
         $Collection[] = ['foo' => 'bar', 'abc' => 123];
@@ -121,7 +121,7 @@ class AbstractCollectionEndpointTest extends TestCase
     /**
      * @covers ::setModelEndpoint
      */
-    public function testSetModelEndpoint()
+    public function testSetModelEndpoint(): void
     {
         $Collection = new CollectionEndpointWithoutModel();
         $Collection->setModelEndpoint(new ModelEndpoint());
@@ -135,7 +135,7 @@ class AbstractCollectionEndpointTest extends TestCase
      * @covers ::setModelEndpoint
      * @expectedException MRussell\REST\Exception\Endpoint\UnknownEndpoint
      */
-    public function testUnknownEndpoint()
+    public function testUnknownEndpoint(): void
     {
         $Collection = new CollectionEndpointWithoutModel();
         $this->expectException(\MRussell\REST\Exception\Endpoint\UnknownEndpoint::class);
@@ -149,7 +149,7 @@ class AbstractCollectionEndpointTest extends TestCase
      * @covers ::setProperty
      * @covers ::setBaseUrl
      */
-    public function testGetEndpointUrl()
+    public function testGetEndpointUrl(): void
     {
         $Collection = new CollectionEndpointWithoutModel();
         $Collection->setClient(static::$client);
@@ -169,7 +169,7 @@ class AbstractCollectionEndpointTest extends TestCase
     /**
      * @covers ::fetch
      */
-    public function testFetch()
+    public function testFetch(): void
     {
         $Collection = new CollectionEndpoint();
         self::$client->mockResponses->append(new Response(200));
@@ -187,7 +187,7 @@ class AbstractCollectionEndpointTest extends TestCase
      * @covers ::getCollectionResponseProp
      * @covers ::syncFromApi
      */
-    public function testGetResponse()
+    public function testGetResponse(): void
     {
         $Collection = new CollectionEndpoint();
         $Collection->setBaseUrl('localhost');
@@ -274,7 +274,7 @@ class AbstractCollectionEndpointTest extends TestCase
      * @covers ::getResponseContent
      * @covers ::getCollectionResponseProp
      */
-    public function testParseResponse()
+    public function testParseResponse(): void
     {
         $Collection = new CollectionEndpointWithoutModel();
         $Collection->setClient(static::$client);
@@ -305,9 +305,8 @@ class AbstractCollectionEndpointTest extends TestCase
      * @covers ::next
      * @covers ::rewind
      * @covers ::valid
-     * @return void
      */
-    public function testIteratorInterface()
+    public function testIteratorInterface(): void
     {
         $Collection = new CollectionEndpointWithoutModel();
         $Collection->setClient(static::$client);
@@ -328,10 +327,9 @@ class AbstractCollectionEndpointTest extends TestCase
     /**
      * @covers ::set
      * @covers ::reset
-     * @return void
      * @depends testDataAccess
      */
-    public function testModelsSet()
+    public function testModelsSet(): void
     {
         $Collection = new CollectionEndpoint();
         $this->assertEquals($Collection, $Collection->set($this->collection));

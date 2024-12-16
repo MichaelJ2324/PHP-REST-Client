@@ -45,7 +45,7 @@ class Client extends AbstractClient
         $this->setHandlerStack($handler);
     }
 
-    protected function configureAuth()
+    protected function configureAuth(): self
     {
         parent::configureAuth();
         $this->getHandlerStack()->remove('history');

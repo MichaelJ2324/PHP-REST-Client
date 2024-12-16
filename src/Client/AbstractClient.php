@@ -120,7 +120,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
     {
         $api = $this;
         $this->getHandlerStack()->remove('configureAuth');
-        $this->getHandlerStack()->push(Middleware::mapRequest(function (Request $request) use ($api) {
+        $this->getHandlerStack()->push(Middleware::mapRequest(function (Request $request) use ($api): \GuzzleHttp\Psr7\Request {
             $Auth = $api->getAuth();
             if ($Auth) {
                 $EP = $api->current();
@@ -205,7 +205,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
     /**
      * @inheritdoc
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, $arguments)
     {
         $provider = $this->getEndpointProvider();
         if ($provider) {

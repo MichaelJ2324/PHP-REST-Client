@@ -48,7 +48,7 @@ class AbstractModelEndpointTest extends TestCase
     /**
      * @covers ::modelIdKey
      */
-    public function testModelIdKey()
+    public function testModelIdKey(): void
     {
         $this->assertEquals('id', ModelEndpoint::modelIdKey());
         $this->assertEquals('key', ModelEndpoint::modelIdKey('key'));
@@ -65,7 +65,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::__construct
      * @depends testModelIdKey
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $Model = new ModelEndpoint();
         $Class = new \ReflectionClass($Model);
@@ -78,7 +78,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::__call
      * @covers ::configureAction
      */
-    public function testCall()
+    public function testCall(): void
     {
         $Model = new ModelEndpointWithActions();
         $Class = new \ReflectionClass($Model);
@@ -98,7 +98,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::__call
      * @expectedException MRussell\REST\Exception\Endpoint\UnknownModelAction
      */
-    public function testCallException()
+    public function testCallException(): void
     {
         $Model = new ModelEndpointWithActions();
         $this->expectException(\MRussell\REST\Exception\Endpoint\UnknownModelAction::class);
@@ -122,7 +122,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::clear
      * @covers ::set
      */
-    public function testDataAccess()
+    public function testDataAccess(): void
     {
         $Model = new ModelEndpoint();
         $this->assertEquals($Model, $Model->set('foo', 'bar'));
@@ -158,7 +158,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::setCurrentAction
      * @covers ::getCurrentAction
      */
-    public function testCurrentAction()
+    public function testCurrentAction(): void
     {
         $Model = new ModelEndpoint();
         $this->assertEquals($Model, $Model->setCurrentAction(ModelEndpoint::MODEL_ACTION_CREATE));
@@ -178,7 +178,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::configureURL
      * @depends testModelIdKey
      */
-    public function testRetrieve()
+    public function testRetrieve(): void
     {
         $Model = new ModelEndpoint();
         $Model->setClient(static::$client);
@@ -211,7 +211,7 @@ class AbstractModelEndpointTest extends TestCase
      * @expectedException MRussell\REST\Exception\Endpoint\MissingModelId
      * @expectedExceptionMessageRegExp /Model ID missing for current action/
      */
-    public function testMissingModelId()
+    public function testMissingModelId(): void
     {
         $Model = new ModelEndpoint();
         $this->expectException(\MRussell\REST\Exception\Endpoint\MissingModelId::class);
@@ -226,7 +226,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::configurePayload
      * @depends testModelIdKey
      */
-    public function testSave()
+    public function testSave(): void
     {
         $Model = new ModelEndpoint();
 
@@ -278,7 +278,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::configureAction
      * @depends testModelIdKey
      */
-    public function testDelete()
+    public function testDelete(): void
     {
         $Model = new ModelEndpoint();
         $Model->setClient(static::$client);
@@ -300,7 +300,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::parseResponseBodyToArray
      * @depends testModelIdKey
      */
-    public function testGetResponse()
+    public function testGetResponse(): void
     {
         $Model = new ModelEndpoint();
         $Model->setClient(static::$client);
@@ -343,7 +343,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::getModelResponseProp
      * @covers ::getResponseBody
      */
-    public function testParseResponse()
+    public function testParseResponse(): void
     {
         $Model = new ModelEndpointWithActions();
         $Model->setClient(static::$client);

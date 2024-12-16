@@ -9,6 +9,9 @@ use MRussell\REST\Client\AbstractClient;
 
 class ClientOverridenConstructor extends AbstractClient
 {
+    /**
+     * @var \GuzzleHttp\Handler\MockHandler
+     */
     public $mockResponses;
 
     public function __construct()

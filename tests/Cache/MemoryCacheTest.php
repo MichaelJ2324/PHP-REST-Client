@@ -24,7 +24,7 @@ class MemoryCacheTest extends TestCase
      * @covers ::has
      * @covers ::delete
      */
-    public function testMemoryCache()
+    public function testMemoryCache(): void
     {
         $cache = MemoryCache::getInstance();
         $reflected = new \ReflectionClass($cache);
@@ -55,7 +55,7 @@ class MemoryCacheTest extends TestCase
      * @covers ::deleteMultiple
      * @covers ::delete
      */
-    public function testMultiCache()
+    public function testMultiCache(): void
     {
         $cache = MemoryCache::getInstance();
         $cache->setMultiple([

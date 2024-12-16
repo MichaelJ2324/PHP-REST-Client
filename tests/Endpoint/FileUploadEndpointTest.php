@@ -16,9 +16,8 @@ class FileUploadEndpointTest extends TestCase
 {
     /**
      * @covers ::buildMultiPartFileData
-     * @return void
      */
-    public function testBuildMultiPartFileData()
+    public function testBuildMultiPartFileData(): void
     {
         $Endpoint = new FileUploadEndpoint();
         $Reflection = new \ReflectionClass($Endpoint);
@@ -61,9 +60,8 @@ class FileUploadEndpointTest extends TestCase
      * @covers ::configureFileUploadRequest
      * @covers ::resetUpload
      * @depends testBuildMultiPartFileData
-     * @return void
      */
-    public function testConfigureFileUploadRequest()
+    public function testConfigureFileUploadRequest(): void
     {
         $Request = new Request('POST', 'localhost/foobar');
 

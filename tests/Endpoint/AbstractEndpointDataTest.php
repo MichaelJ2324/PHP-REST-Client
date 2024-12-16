@@ -45,7 +45,7 @@ class AbstractEndpointDataTest extends TestCase
      * @covers ::toArray
      * @covers ::getProperties
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $Data = new StockData();
         $this->assertEquals(true, $Data->isNull());
@@ -80,7 +80,7 @@ class AbstractEndpointDataTest extends TestCase
      * @covers ::offsetGet
      * @covers ::toArray
      */
-    public function testDataAccess()
+    public function testDataAccess(): void
     {
         $this->data = array_replace($this->data, ['test' => 'tester', 'abcd' => 'efg', 'pew' => 'die', 'arr' => [], 'iint' => 1234]);
         $Data = new StockData($this->data);
@@ -109,7 +109,7 @@ class AbstractEndpointDataTest extends TestCase
      * @covers ::setProperties
      * @covers ::getProperties
      */
-    public function testSetProperties()
+    public function testSetProperties(): void
     {
         $Data = new StockData();
         $this->assertEquals([StockData::DATA_PROPERTY_REQUIRED => [], StockData::DATA_PROPERTY_DEFAULTS => []], $Data->getProperties());
@@ -127,7 +127,7 @@ class AbstractEndpointDataTest extends TestCase
      * @covers ::reset
      * @covers ::clear
      */
-    public function testReset()
+    public function testReset(): void
     {
         $Data = new StockData();
         $Data['foo'] = 'bar';
@@ -148,7 +148,7 @@ class AbstractEndpointDataTest extends TestCase
      * @covers ::verifyRequiredData
      * @covers ::toArray
      */
-    public function testVerifyRequiredData()
+    public function testVerifyRequiredData(): void
     {
         $Data = new StubData();
         $Data['foo'] = 'bar';
@@ -159,7 +159,7 @@ class AbstractEndpointDataTest extends TestCase
      * @expectedException MRussell\REST\Exception\Endpoint\InvalidData
      * @expectedExceptionMessageRegExp /Missing or Invalid data on Endpoint Data\. Errors: (Missing \[[A-z0-9,].*\]|Invalid \[[A-z0-9,].*\])/
      */
-    public function testMissingData()
+    public function testMissingData(): void
     {
         $Data = new StubData();
         $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidData::class);
@@ -171,7 +171,7 @@ class AbstractEndpointDataTest extends TestCase
      * @expectedException MRussell\REST\Exception\Endpoint\InvalidData
      * @expectedExceptionMessageRegExp /Missing or Invalid data on Endpoint Data\. Errors: (Missing \[[A-z0-9,].*\]|Invalid \[[A-z0-9,].*\])/
      */
-    public function testInvalidData()
+    public function testInvalidData(): void
     {
         $Data = new StubData();
         $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidData::class);
@@ -184,7 +184,7 @@ class AbstractEndpointDataTest extends TestCase
      * @expectedException MRussell\REST\Exception\Endpoint\InvalidData
      * @expectedExceptionMessageRegExp /Missing or Invalid data on Endpoint Data\. Errors: (Missing \[[A-z0-9,].*\]|Invalid \[[A-z0-9,].*\])/
      */
-    public function testInvalidAndMissingData()
+    public function testInvalidAndMissingData(): void
     {
         $Data = new StubData();
         $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidData::class);
@@ -199,9 +199,8 @@ class AbstractEndpointDataTest extends TestCase
     /**
      * @covers ::isNull
      * @covers ::null
-     * @return void
      */
-    public function testNullable()
+    public function testNullable(): void
     {
         $Data = new StockData();
         $this->assertEquals(true, $Data->isNull());
