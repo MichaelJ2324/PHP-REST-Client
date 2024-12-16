@@ -109,9 +109,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
 
     /**
      * Parse Data Object to array for handling by Guzzle
-     * @param Request $request
      * @param $data
-     * @return Request
      */
     protected function configureRequest(Request $request, $data): Request
     {
@@ -138,7 +136,6 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
 
     /**
      * Build out the configured Data Object for the Endpoint
-     * @return DataInterface
      * @throws InvalidData
      */
     protected function buildDataObject(): DataInterface

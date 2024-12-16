@@ -24,7 +24,6 @@ class Stack implements StackInterface
     protected $endpoint;
 
     /**
-     * @param EndpointInterface $endpoint
      * @return $this
      */
     public function setEndpoint(EndpointInterface $endpoint): StackInterface
@@ -33,18 +32,13 @@ class Stack implements StackInterface
         return $this;
     }
 
-    /**
-     * @return EndpointInterface
-     */
     public function getEndpoint(): EndpointInterface
     {
         return $this->endpoint;
     }
 
     /**
-     * @param string $event
      * @param $data
-     * @return StackInterface
      */
     public function trigger(string $event, &$data = null): StackInterface
     {
@@ -60,7 +54,6 @@ class Stack implements StackInterface
     }
 
     /**
-     * @param callable $handler
      * @param $data
      * @return void
      */

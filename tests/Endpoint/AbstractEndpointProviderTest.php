@@ -71,7 +71,6 @@ class AbstractEndpointProviderTest extends TestCase
 
     /**
      * @depends testRegisterEndpoint
-     * @param EndpointProviderInterface $Provider
      * @covers ::registerEndpoint
      * @throws MRussell\REST\Exception\Endpoint\InvalidRegistration
      */
@@ -87,7 +86,6 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers ::hasEndpoint
      * @covers ::getEndpoint
      * @covers ::buildEndpoint
-     * @param EndpointProviderInterface $Provider
      */
     public function testGetEndpoint(EndpointProviderInterface $Provider)
     {
@@ -104,7 +102,6 @@ class AbstractEndpointProviderTest extends TestCase
 
     /**
      * @depends testRegisterEndpoint
-     * @param EndpointProviderInterface $Provider
      * @covers ::getEndpoint
      * @throws MRussell\REST\Exception\Endpoint\UnknownEndpoint
      */

@@ -6,8 +6,6 @@ interface ModelInterface extends EndpointInterface, ClearableInterface, GetInter
 {
     /**
      * Get or Set the Model ID Key used by the Model
-     * @param null $id
-     * @return string
      */
     public static function modelIdKey($id = null): string;
 
@@ -28,7 +26,6 @@ interface ModelInterface extends EndpointInterface, ClearableInterface, GetInter
 
     /**
      * Delete the current Model using a DELETE Request
-     * @return mixed
      */
     public function delete(): self;
 }

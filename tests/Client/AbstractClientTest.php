@@ -202,7 +202,6 @@ class AbstractClientTest extends TestCase
     }
 
     /**
-     * @param Client $Client
      * @depends testSetEndpointProvider
      * @covers ::__call
      * @covers ::last

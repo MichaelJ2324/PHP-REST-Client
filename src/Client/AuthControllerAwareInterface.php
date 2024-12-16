@@ -8,7 +8,6 @@ interface AuthControllerAwareInterface
 {
     /**
      * Set the Auth Controller that handles Auth for the API
-     * @param AuthControllerInterface $Auth
      * @return $this
      */
     public function setAuth(AuthControllerInterface $Auth);

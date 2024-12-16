@@ -377,7 +377,7 @@ class AbstractEndpointTest extends TestCase
         });
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('query must be a string or array');
-        $request = $Ping->buildRequest();
+        $Ping->buildRequest();
     }
 
     /**

@@ -54,8 +54,6 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
 
     /**
      * @param $name
-     * @param null $version
-     * @return EndpointInterface
      */
     protected function buildEndpoint($name, $version = null): EndpointInterface
     {

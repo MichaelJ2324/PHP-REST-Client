@@ -14,7 +14,6 @@ trait PsrSimpleCacheTrait
 
     /**
      * Get the Simple Cache object
-     * @return CacheInterface
      */
     public function getCache(): CacheInterface
     {
@@ -26,7 +25,6 @@ trait PsrSimpleCacheTrait
 
     /**
      * Set the Simple Cache object
-     * @param CacheInterface $cache
      * @return $this
      */
     public function setCache(CacheInterface $cache)

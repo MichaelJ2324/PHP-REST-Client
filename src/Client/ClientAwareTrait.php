@@ -10,7 +10,6 @@ trait ClientAwareTrait
     protected $client;
 
     /**
-     * @param ClientInterface $client
      * @return $this
      */
     public function setClient(ClientInterface $client)

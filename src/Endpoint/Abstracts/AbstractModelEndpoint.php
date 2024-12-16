@@ -79,10 +79,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     protected $action = self::MODEL_ACTION_RETRIEVE;
 
     //Static
-    /**
-     * @param null $id
-     * @return string
-     */
     public static function modelIdKey($id = null): string
     {
         if ($id !== null) {
@@ -170,9 +166,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     /**
      * Set the current action taking place on the Model
-     * @param string $action
-     * @param array $actionArgs
-     * @return $this
      */
     public function setCurrentAction(string $action, array $actionArgs = []): AbstractModelEndpoint
     {
@@ -195,7 +188,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      * Update any properties or data based on the current action
      * - Called when setting the Current Action
      * @param $action
-     * @param array $arguments
      */
     protected function configureAction($action, array $arguments = [])
     {
@@ -223,10 +215,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         return $data;
     }
 
-    /**
-     * @param Response $response
-     * @return EndpointInterface
-     */
     public function setResponse(Response $response): EndpointInterface
     {
         parent::setResponse($response);
@@ -234,9 +222,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getModelResponseProp(): string
     {
         return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? static::$_RESPONSE_PROP;
@@ -244,8 +229,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     /**
      * Parse the response for use by Model
-     * @param Response $response
-     * @return void
      */
     protected function parseResponse(Response $response): void
     {
@@ -273,10 +256,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         $this->set($model);
     }
 
-    /**
-     * @param array $urlArgs
-     * @return string
-     */
     protected function configureURL(array $urlArgs): string
     {
         if (empty($urlArgs[self::MODEL_ID_VAR])) {

@@ -27,7 +27,6 @@ abstract class AbstractBasicController extends AbstractAuthController
 
     /**
      * Parse the Credentials or Token to build out the Auth Header Value
-     * @return string
      */
     protected function getAuthHeaderValue(): string
     {

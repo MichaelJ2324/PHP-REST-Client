@@ -20,7 +20,6 @@ abstract class AbstractAuthController implements AuthControllerInterface
 
     /**
      * Auth Controller Actions, used to associate Endpoints
-     * @var array
      */
     protected static array $_DEFAULT_AUTH_ACTIONS = [self::ACTION_AUTH, self::ACTION_LOGOUT];
 
@@ -46,7 +45,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
      * The authentication token
      * @var mixed
      */
-    protected $token = null;
+    protected $token;
 
     /**
      * The Cache Key to store the token
@@ -75,9 +74,6 @@ abstract class AbstractAuthController implements AuthControllerInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCacheKey(): string
     {
         if (empty($this->cacheKey)) {
@@ -233,7 +229,6 @@ abstract class AbstractAuthController implements AuthControllerInterface
 
     /**
      * Cache the current token on the Auth Controller
-     * @return bool
      */
     protected function cacheToken(): bool
     {
@@ -251,7 +246,6 @@ abstract class AbstractAuthController implements AuthControllerInterface
 
     /**
      * Remove the cached token from the Auth Controller
-     * @return bool
      */
     protected function removeCachedToken(): bool
     {
@@ -260,9 +254,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
 
     /**
      * Configure an actions Endpoint Object
-     * @param EndpointInterface $Endpoint
      * @param string $action
-     * @return EndpointInterface
      */
     protected function configureEndpoint(EndpointInterface $Endpoint, $action): EndpointInterface
     {
@@ -279,19 +271,13 @@ abstract class AbstractAuthController implements AuthControllerInterface
 
     /**
      * Configure the data for the given Endpoint
-     * @param EndpointInterface $Endpoint
-     * @return EndpointInterface
      */
     protected function configureAuthenticationEndpoint(EndpointInterface $Endpoint): EndpointInterface
     {
         return $Endpoint->setData($this->credentials);
     }
 
-    /**
-     *
-     * @param EndpointInterface $Endpoint
-     * @return EndpointInterface
-     */
+
     protected function configureLogoutEndpoint(EndpointInterface $Endpoint): EndpointInterface
     {
         return $Endpoint->setData([]);
@@ -300,8 +286,6 @@ abstract class AbstractAuthController implements AuthControllerInterface
     /**
      * Given a response from Authentication endpoint, parse the response
      *
-     * @param string $action
-     * @param Response $response
      * @return mixed
      * @codeCoverageIgnore
      */

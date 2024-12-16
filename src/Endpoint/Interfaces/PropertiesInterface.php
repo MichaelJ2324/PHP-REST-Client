@@ -9,14 +9,12 @@ interface PropertiesInterface
 {
     /**
      * Set the properties that control the object
-     * @param array $properties
      * @return $this
      */
     public function setProperties(array $properties);
 
     /**
      * Set a specific property on an object
-     * @param string $name
      * @param mixed $value
      * @return $this
      */
@@ -24,7 +22,6 @@ interface PropertiesInterface
 
     /**
      * Get the properties configured on the Data
-     * @return array
      */
     public function getProperties(): array;
 
