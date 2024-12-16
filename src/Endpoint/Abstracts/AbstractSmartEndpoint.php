@@ -147,7 +147,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
     protected function buildDataObject(): DataInterface
     {
         $implements = class_implements(static::$_DATA_CLASS);
-        if (is_array($implements) && isset($implements[\MRussell\REST\Endpoint\Data\DataInterface::class])) {
+        if (is_array($implements) && isset($implements[DataInterface::class])) {
             return new static::$_DATA_CLASS([], $this->getProperty(self::PROPERTY_DATA) ?? []);
         }
 

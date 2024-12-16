@@ -2,13 +2,10 @@
 
 namespace MRussell\REST\Tests\Auth;
 
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Cache\MemoryCache;
 use MRussell\REST\Exception\Auth\InvalidAuthenticationAction;
 use MRussell\REST\Auth\Abstracts\AbstractAuthController;
-use MRussell\REST\Storage\StaticStorage;
 use MRussell\REST\Tests\Stubs\Auth\AuthController;
 use MRussell\REST\Tests\Stubs\Client\Client;
 use MRussell\REST\Tests\Stubs\Endpoint\AuthEndpoint;
@@ -107,7 +104,7 @@ class AbstractAuthControllerTest extends TestCase
     {
         $this->assertEquals('12345', $Auth->getToken());
         $this->assertEquals(true, $Auth->isAuthenticated());
-        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Auth\AuthController::class);
+        $Class = new \ReflectionClass(AuthController::class);
         $method = $Class->getMethod('setToken');
         $method->setAccessible(true);
         $this->assertEquals($Auth, $method->invoke($Auth, 'test'));
@@ -231,7 +228,7 @@ class AbstractAuthControllerTest extends TestCase
         $LogoutEndpoint = new LogoutEndpoint();
         $LogoutEndpoint->setBaseUrl('localhost');
 
-        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Auth\AuthController::class);
+        $Class = new \ReflectionClass(AuthController::class);
         $method = $Class->getMethod('configureEndpoint');
         $method->setAccessible(true);
         $this->assertEquals($AuthEndpoint, $method->invoke($Auth, $AuthEndpoint, AbstractAuthController::ACTION_AUTH));

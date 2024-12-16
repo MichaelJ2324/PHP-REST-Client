@@ -2,8 +2,6 @@
 
 namespace MRussell\REST\Endpoint\Traits;
 
-use MRussell\REST\Endpoint\Interfaces\ArrayableInterface;
-
 trait ArrayObjectAttributesTrait
 {
     /**

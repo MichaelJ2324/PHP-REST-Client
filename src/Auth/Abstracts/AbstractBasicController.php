@@ -3,7 +3,6 @@
 namespace MRussell\REST\Auth\Abstracts;
 
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 
 /**
  * Class AbstractBasicController

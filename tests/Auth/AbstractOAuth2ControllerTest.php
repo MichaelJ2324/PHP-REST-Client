@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Tests\Auth;
 
+use MRussell\REST\Exception\Auth\InvalidToken;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Auth\OAuth2Controller;
@@ -55,9 +56,8 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::__construct
      * @covers ::getGrantType
      * @covers ::setGrantType
-     * @return void
      */
-    public function testSetGrantType()
+    public function testSetGrantType(): void
     {
         $Auth = new OAuth2Controller();
         $this->assertEquals(OAuth2Controller::OAUTH_CLIENT_CREDENTIALS_GRANT, $Auth->getGrantType());
@@ -68,7 +68,7 @@ class AbstractOAuth2ControllerTest extends TestCase
     /**
      * @covers ::oauthHeader
      */
-    public function testOAuthHeader()
+    public function testOAuthHeader(): void
     {
         $this->assertEquals('Authorization', OAuth2Controller::oauthHeader());
         $this->assertEquals('Test', OAuth2Controller::oauthHeader('Test'));
@@ -88,10 +88,10 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::isAuthenticated
      * @covers ::isTokenExpired
      */
-    public function testSetToken()
+    public function testSetToken(): void
     {
         $Auth = new OAuth2Controller();
-        $Class = new \ReflectionClass(\MRussell\REST\Auth\OAuth2Controller::class);
+        $Class = new \ReflectionClass(OAuth2Controller::class);
         $isTokenExpired = $Class->getMethod('isTokenExpired');
         $isTokenExpired->setAccessible(true);
         $this->assertEquals($Auth, $Auth->setToken($this->token));
@@ -125,12 +125,12 @@ class AbstractOAuth2ControllerTest extends TestCase
 
     /**
      * @covers ::setToken
-     * @throws \MRussell\REST\Exception\Auth\InvalidToken
+     * @throws InvalidToken
      */
-    public function testInvalidToken()
+    public function testInvalidToken(): void
     {
         $Auth = new OAuth2Controller();
-        $this->expectException(\MRussell\REST\Exception\Auth\InvalidToken::class);
+        $this->expectException(InvalidToken::class);
         $Auth->setToken([]);
     }
 
@@ -141,7 +141,7 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::getTokenProp
      * @covers ::getAuthHeaderValue
      */
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $Auth = new OAuth2Controller();
         $Request = new Request("POST", "");
@@ -158,9 +158,9 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::setToken
      * @covers ::getTokenProp
      * @covers ::parseResponseToToken
-     * @throws \MRussell\REST\Exception\Auth\InvalidToken
+     * @throws InvalidToken
      */
-    public function testRefresh()
+    public function testRefresh(): void
     {
         $Auth = new OAuth2Controller();
         $Logger = new TestLogger();
@@ -194,7 +194,7 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::configureRefreshEndpoint
      * @covers ::configureAuthenticationEndpoint
      */
-    public function testConfigureData()
+    public function testConfigureData(): OAuth2Controller
     {
         $Auth = new OAuth2Controller();
         $Auth->setCredentials($this->credentials);
@@ -203,7 +203,7 @@ class AbstractOAuth2ControllerTest extends TestCase
         $AuthEndpoint = new AuthEndpoint();
         $AuthEndpoint->setBaseUrl('localhost');
 
-        $Class = new \ReflectionClass(\MRussell\REST\Auth\OAuth2Controller::class);
+        $Class = new \ReflectionClass(OAuth2Controller::class);
         $method = $Class->getMethod('configureEndpoint');
         $method->setAccessible(true);
 
@@ -225,9 +225,8 @@ class AbstractOAuth2ControllerTest extends TestCase
 
     /**
      * @covers ::reset
-     * @return void
      */
-    public function testReset()
+    public function testReset(): void
     {
         $Auth = new OAuth2Controller();
         $Auth->setCredentials($this->credentials);

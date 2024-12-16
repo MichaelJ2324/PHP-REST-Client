@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Tests\Client;
 
+use MRussell\REST\Exception\Client\EndpointProviderMissing;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -225,12 +226,12 @@ class AbstractClientTest extends TestCase
     }
 
     /**
-     * @throws MRussell\REST\Exception\Client\EndpointProviderMissing
+     * @throws EndpointProviderMissing
      */
     public function testProviderMissingException()
     {
         $this->Client = new Client();
-        $this->expectException(\MRussell\REST\Exception\Client\EndpointProviderMissing::class);
+        $this->expectException(EndpointProviderMissing::class);
         $this->expectExceptionMessage("Endpoint Provider not configured on Client object.");
         $this->Client->auth();
     }

@@ -2,8 +2,9 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
-use MRussell\Http\Request\JSON;
-use MRussell\REST\Endpoint\Provider\DefaultEndpointProvider;
+use MRussell\REST\Endpoint\Endpoint;
+use MRussell\REST\Exception\Endpoint\InvalidRegistration;
+use MRussell\REST\Exception\Endpoint\UnknownEndpoint;
 use MRussell\REST\Endpoint\Provider\EndpointProviderInterface;
 use MRussell\REST\Tests\Stubs\Endpoint\AuthEndpoint;
 use MRussell\REST\Tests\Stubs\Endpoint\EndpointProvider;
@@ -42,15 +43,15 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers MRussell\REST\Endpoint\Provider\DefaultEndpointProvider::__construct
      * @covers ::registerEndpoint
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $Provider = new EndpointProvider();
-        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\EndpointProvider::class);
+        $Class = new \ReflectionClass(EndpointProvider::class);
         $property = $Class->getProperty('registry');
         $property->setAccessible(true);
         $this->assertEquals([], $property->getValue($Provider));
 
-        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\EndpointProviderWithDefaults::class);
+        $Class = new \ReflectionClass(EndpointProviderWithDefaults::class);
         $property = $Class->getProperty('registry');
         $property->setAccessible(true);
 
@@ -62,22 +63,22 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers ::registerEndpoint
      * @return EndpointProviderInterface
      */
-    public function testRegisterEndpoint()
+    public function testRegisterEndpoint(): EndpointProvider
     {
         $Provider = new EndpointProvider();
-        $this->assertEquals($Provider, $Provider->registerEndpoint('auth', \MRussell\REST\Tests\Stubs\Endpoint\AuthEndpoint::class));
-        $this->assertEquals($Provider, $Provider->registerEndpoint('foo', \MRussell\REST\Endpoint\Endpoint::class, ['url' => 'foo', 'httpMethod' => "GET"]));
+        $this->assertEquals($Provider, $Provider->registerEndpoint('auth', AuthEndpoint::class));
+        $this->assertEquals($Provider, $Provider->registerEndpoint('foo', Endpoint::class, ['url' => 'foo', 'httpMethod' => "GET"]));
         return $Provider;
     }
 
     /**
      * @depends testRegisterEndpoint
      * @covers ::registerEndpoint
-     * @throws MRussell\REST\Exception\Endpoint\InvalidRegistration
+     * @throws InvalidRegistration
      */
-    public function testInvalidRegistration(EndpointProviderInterface $Provider)
+    public function testInvalidRegistration(EndpointProviderInterface $Provider): void
     {
-        $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidRegistration::class);
+        $this->expectException(InvalidRegistration::class);
         $this->expectExceptionMessage("Endpoint Object [baz] must extend MRussell\REST\Endpoint\Interfaces\EndpointInterface");
         $Provider->registerEndpoint("baz", "baz");
     }
@@ -88,7 +89,7 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers ::getEndpoint
      * @covers ::buildEndpoint
      */
-    public function testGetEndpoint(EndpointProviderInterface $Provider)
+    public function testGetEndpoint(EndpointProviderInterface $Provider): void
     {
         $this->assertEquals(false, $Provider->hasEndpoint('test'));
         $this->assertEquals(true, $Provider->hasEndpoint('foo'));
@@ -104,11 +105,11 @@ class AbstractEndpointProviderTest extends TestCase
     /**
      * @depends testRegisterEndpoint
      * @covers ::getEndpoint
-     * @throws MRussell\REST\Exception\Endpoint\UnknownEndpoint
+     * @throws UnknownEndpoint
      */
-    public function testUnknownEndpoint(EndpointProviderInterface $Provider)
+    public function testUnknownEndpoint(EndpointProviderInterface $Provider): void
     {
-        $this->expectException(\MRussell\REST\Exception\Endpoint\UnknownEndpoint::class);
+        $this->expectException(UnknownEndpoint::class);
         $this->expectExceptionMessage("An Unknown Endpoint [test] was requested.");
         $Provider->getEndpoint('test');
     }

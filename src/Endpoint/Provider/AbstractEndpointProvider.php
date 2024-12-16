@@ -21,7 +21,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
     {
         try {
             $implements = class_implements($className);
-            if (is_array($implements) && isset($implements[\MRussell\REST\Endpoint\Interfaces\EndpointInterface::class])) {
+            if (is_array($implements) && isset($implements[EndpointInterface::class])) {
                 $this->registry[$name] = ['class' => $className, 'properties' => $properties];
                 return $this;
             }

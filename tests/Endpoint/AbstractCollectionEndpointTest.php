@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
+use MRussell\REST\Exception\Endpoint\UnknownEndpoint;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\CollectionEndpoint;
 use MRussell\REST\Endpoint\ModelEndpoint;
@@ -110,7 +111,7 @@ class AbstractCollectionEndpointTest extends TestCase
         $this->assertEquals($Collection, $Collection->reset());
         $this->assertEquals([], $Collection->toArray());
 
-        $Collection = new \MRussell\REST\Endpoint\CollectionEndpoint();
+        $Collection = new CollectionEndpoint();
         $Collection->set($this->collection);
 
         $Model = $Collection->get('abc123');
@@ -125,7 +126,7 @@ class AbstractCollectionEndpointTest extends TestCase
     {
         $Collection = new CollectionEndpointWithoutModel();
         $Collection->setModelEndpoint(new ModelEndpoint());
-        $this->assertEquals(\MRussell\REST\Endpoint\ModelEndpoint::class, $Collection->getProperty('model'));
+        $this->assertEquals(ModelEndpoint::class, $Collection->getProperty('model'));
         $Collection->setModelEndpoint(\MRussell\REST\Tests\Stubs\Endpoint\ModelEndpoint::class);
         $this->assertEquals(\MRussell\REST\Tests\Stubs\Endpoint\ModelEndpoint::class, $Collection->getProperty('model'));
     }
@@ -138,7 +139,7 @@ class AbstractCollectionEndpointTest extends TestCase
     public function testUnknownEndpoint()
     {
         $Collection = new CollectionEndpointWithoutModel();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\UnknownEndpoint::class);
+        $this->expectException(UnknownEndpoint::class);
         $this->expectExceptionMessage("An Unknown Endpoint [test] was requested.");
         $Collection->setModelEndpoint('test');
 

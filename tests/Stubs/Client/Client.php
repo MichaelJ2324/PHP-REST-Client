@@ -2,7 +2,6 @@
 
 namespace MRussell\REST\Tests\Stubs\Client;
 
-use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -31,7 +30,7 @@ class Client extends AbstractClient
 
     public function current(EndpointInterface $endpoint = null)
     {
-        if ($endpoint instanceof \MRussell\REST\Endpoint\Interfaces\EndpointInterface) {
+        if ($endpoint instanceof EndpointInterface) {
             $this->setCurrentEndpoint($endpoint);
         }
 

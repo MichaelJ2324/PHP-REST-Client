@@ -2,8 +2,6 @@
 
 namespace MRussell\REST\Endpoint\Data;
 
-use MRussell\REST\Endpoint\Interfaces\ArrayableInterface;
-use MRussell\REST\Endpoint\Interfaces\ResettableInterface;
 use MRussell\REST\Endpoint\Traits\ArrayObjectAttributesTrait;
 use MRussell\REST\Endpoint\Traits\ClearAttributesTrait;
 use MRussell\REST\Endpoint\Traits\GetAttributesTrait;

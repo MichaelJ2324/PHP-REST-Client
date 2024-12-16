@@ -2,7 +2,8 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
-use GuzzleHttp\Psr7\Request;
+use MRussell\REST\Exception\Endpoint\UnknownModelAction;
+use MRussell\REST\Exception\Endpoint\MissingModelId;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Tests\Stubs\Client\Client;
 use MRussell\REST\Tests\Stubs\Endpoint\ModelEndpoint;
@@ -101,7 +102,7 @@ class AbstractModelEndpointTest extends TestCase
     public function testCallException()
     {
         $Model = new ModelEndpointWithActions();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\UnknownModelAction::class);
+        $this->expectException(UnknownModelAction::class);
         $this->expectExceptionMessage("Unregistered Action called on Model Endpoint [MRussell\REST\Tests\Stubs\Endpoint\ModelEndpointWithActions]: bar");
         $Model->bar();
     }
@@ -214,7 +215,7 @@ class AbstractModelEndpointTest extends TestCase
     public function testMissingModelId()
     {
         $Model = new ModelEndpoint();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\MissingModelId::class);
+        $this->expectException(MissingModelId::class);
         $this->expectExceptionMessage("Model ID missing for current action [retrieve] on Endpoint: MRussell\REST\Tests\Stubs\Endpoint\ModelEndpoint");
         $Model->retrieve();
     }

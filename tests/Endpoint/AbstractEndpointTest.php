@@ -2,21 +2,21 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
+use MRussell\REST\Exception\Endpoint\InvalidUrl;
+use MRussell\REST\Exception\Endpoint\InvalidRequest;
+use MRussell\REST\Exception\Endpoint\InvalidDataType;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Promise\Utils;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use MRussell\Http\Response\Standard;
 use MRussell\REST\Endpoint\Abstracts\AbstractEndpoint;
-use MRussell\REST\Tests\Stubs\Auth\AuthController;
 use MRussell\REST\Tests\Stubs\Client\Client;
 use MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint;
 use MRussell\REST\Tests\Stubs\Endpoint\EndpointData;
 use MRussell\REST\Tests\Stubs\Endpoint\PingEndpoint;
 use PHPUnit\Framework\TestCase;
-use Sugarcrm\REST\Endpoint\Ping;
 
 /**
  * Class AbstractEndpointTest
@@ -69,7 +69,7 @@ class AbstractEndpointTest extends TestCase
      * @covers ::getBaseUrl
      * @covers ::getEndpointUrl
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals([
@@ -105,7 +105,7 @@ class AbstractEndpointTest extends TestCase
      * @covers ::setUrlArgs
      * @covers ::getUrlArgs
      */
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals([], $Endpoint->getUrlArgs());
@@ -121,7 +121,7 @@ class AbstractEndpointTest extends TestCase
      * @covers ::setProperty
      * @covers ::getProperty
      */
-    public function testSetProperties()
+    public function testSetProperties(): void
     {
         $Endpoint = new BasicEndpoint();
         $Endpoint->setProperties([]);
@@ -145,7 +145,7 @@ class AbstractEndpointTest extends TestCase
      * @covers ::getBaseUrl
      * @covers ::getEndpointUrl
      */
-    public function testSetBaseUrl()
+    public function testSetBaseUrl(): void
     {
         $Endpoint = new BasicEndpoint();
         $Endpoint->setProperties($this->properties);
@@ -166,7 +166,7 @@ class AbstractEndpointTest extends TestCase
      * @covers ::setData
      * @covers ::getData
      */
-    public function testSetData()
+    public function testSetData(): void
     {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals($Endpoint, $Endpoint->setData('test'));
@@ -184,7 +184,7 @@ class AbstractEndpointTest extends TestCase
      * @depends testSetProperties
      * @covers ::useAuth
      */
-    public function testUseAuth()
+    public function testUseAuth(): void
     {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals(1, $Endpoint->useAuth());
@@ -199,13 +199,13 @@ class AbstractEndpointTest extends TestCase
     }
 
     /**
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidRequest
+     * @throws InvalidRequest
      * @covers ::execute
      */
-    public function testInvalidRequest()
+    public function testInvalidRequest(): void
     {
         $Endpoint = new BasicEndpoint();
-        $this->expectException(\GuzzleHttp\Exception\RequestException::class);
+        $this->expectException(RequestException::class);
         $Endpoint->execute();
     }
 
@@ -217,7 +217,7 @@ class AbstractEndpointTest extends TestCase
      * @covers ::verifyUrl
      * @covers ::configureJsonRequest
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         self::$client->mockResponses->append(new Response(200));
 
@@ -235,14 +235,14 @@ class AbstractEndpointTest extends TestCase
     /**
      * @expectedException MRussell\REST\Exception\Endpoint\InvalidUrl
      */
-    public function testInvalidUrl()
+    public function testInvalidUrl(): void
     {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals($Endpoint, $Endpoint->setBaseUrl('http://localhost'));
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
         $this->assertEquals('$foo', $Endpoint->getEndPointUrl());
         $this->assertEquals([], $Endpoint->getUrlArgs());
-        $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidUrl::class);
+        $this->expectException(InvalidUrl::class);
         $Endpoint->execute();
     }
 
@@ -250,10 +250,10 @@ class AbstractEndpointTest extends TestCase
      * @covers ::configureUrl
      *
      */
-    public function testConfigureUrl()
+    public function testConfigureUrl(): void
     {
         $Endpoint = new BasicEndpoint();
-        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint::class);
+        $Class = new \ReflectionClass(BasicEndpoint::class);
         $method = $Class->getMethod('configureURL');
         $method->setAccessible(true);
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
@@ -293,7 +293,7 @@ class AbstractEndpointTest extends TestCase
      * @covers ::setClient
      * @covers ::getClient
      */
-    public function testHttpClient()
+    public function testHttpClient(): void
     {
         $Ping = new PingEndpoint();
         $client = $Ping->getHttpClient();
@@ -312,9 +312,8 @@ class AbstractEndpointTest extends TestCase
      * @covers ::getMethod
      * @covers ::reset
      * @covers \MRussell\REST\Endpoint\Abstracts\AbstractSmartEndpoint::configureRequest
-     * @return void
      */
-    public function testBuildRequest()
+    public function testBuildRequest(): void
     {
         $Ping = new PingEndpoint();
         $Ping->setClient(static::$client);
@@ -351,9 +350,8 @@ class AbstractEndpointTest extends TestCase
 
     /**
      * @covers ::configureRequest
-     * @return void
      */
-    public function testInvalidArgumentException()
+    public function testInvalidArgumentException(): void
     {
         $Basic = new BasicEndpoint();
         $Basic->setClient(static::$client);
@@ -365,14 +363,13 @@ class AbstractEndpointTest extends TestCase
 
     /**
      * @covers ::onEvent
-     * @return void
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidDataType
+     * @throws InvalidDataType
      */
-    public function testInvalidQueryString()
+    public function testInvalidQueryString(): void
     {
         $Ping = new PingEndpoint();
         $Ping->setClient(static::$client);
-        $Ping->onEvent(PingEndpoint::EVENT_CONFIGURE_PAYLOAD, function (&$data) {
+        $Ping->onEvent(PingEndpoint::EVENT_CONFIGURE_PAYLOAD, function (&$data): void {
             $data = new \stdClass();
             $data->foo = 'bar';
         });
@@ -386,10 +383,9 @@ class AbstractEndpointTest extends TestCase
      * @covers ::setResponse
      * @covers ::getResponseBody
      * @covers ::getResponseContent
-     * @return void
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
-    public function testGetResponse()
+    public function testGetResponse(): void
     {
         $Ping = new PingEndpoint();
         $Ping->setClient(static::$client);
@@ -413,9 +409,8 @@ class AbstractEndpointTest extends TestCase
     /**
      * @covers ::asyncExecute
      * @covers ::getPromise
-     * @return void
      */
-    public function testAsyncExecute()
+    public function testAsyncExecute(): void
     {
         $Ping = new PingEndpoint();
         $Ping->setClient(static::$client);
@@ -427,11 +422,11 @@ class AbstractEndpointTest extends TestCase
 
         $self = $this;
         $promises = [];
-        $promises['first'] = $Ping->asyncExecute(['success' => function (Response $resp) use ($self, $respBody) {
+        $promises['first'] = $Ping->asyncExecute(['success' => function (Response $resp) use ($self, $respBody): void {
             $self->assertInstanceOf(Response::class, $resp);
             $self->assertEquals($respBody, $resp->getBody()->getContents());
         }])->getPromise();
-        $promises['second'] = $Ping->asyncExecute(['error' => function (RequestException $exception) use ($self) {
+        $promises['second'] = $Ping->asyncExecute(['error' => function (RequestException $exception) use ($self): void {
             $self->assertInstanceOf(RequestException::class, $exception);
             $self->assertInstanceOf(Response::class, $exception->getResponse());
             $self->assertEquals(json_encode(['error' => 'invalid_data']), $exception->getResponse()->getBody()->getContents());

@@ -2,18 +2,12 @@
 
 namespace MRussell\REST\Endpoint\Abstracts;
 
-use GuzzleHttp\Psr7\Request;
+use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Data\DataInterface;
-use MRussell\REST\Endpoint\Interfaces\ArrayableInterface;
-use MRussell\REST\Endpoint\Interfaces\ClearableInterface;
 use MRussell\REST\Endpoint\Interfaces\CollectionInterface;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
-use MRussell\REST\Endpoint\Interfaces\GetInterface;
 use MRussell\REST\Endpoint\Interfaces\ModelInterface;
-use MRussell\REST\Endpoint\Interfaces\PropertiesInterface;
-use MRussell\REST\Endpoint\Interfaces\ResettableInterface;
-use MRussell\REST\Endpoint\Interfaces\SetInterface;
 use MRussell\REST\Endpoint\Traits\ParseResponseBodyToArrayTrait;
 use MRussell\REST\Exception\Endpoint\UnknownEndpoint;
 
@@ -187,7 +181,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     //Collection Interface
     /**
      * @inheritdoc
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidRequest
+     * @throws InvalidRequest
      */
     public function fetch()
     {
@@ -298,7 +292,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     {
         try {
             $implements = class_implements($model);
-            if (is_array($implements) && isset($implements[\MRussell\REST\Endpoint\Interfaces\ModelInterface::class])) {
+            if (is_array($implements) && isset($implements[ModelInterface::class])) {
                 if (is_object($model)) {
                     $model = get_class($model);
                 }

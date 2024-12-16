@@ -4,7 +4,6 @@ namespace MRussell\REST\Auth;
 
 use GuzzleHttp\Psr7\Request;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
-use MRussell\REST\Storage\StorageControllerInterface;
 
 interface AuthControllerInterface
 {
