@@ -64,18 +64,13 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      * List of actions
      * @var array
      */
-    protected static $_DEFAULT_ACTIONS = array(
-        self::MODEL_ACTION_CREATE => 'POST',
-        self::MODEL_ACTION_RETRIEVE => 'GET',
-        self::MODEL_ACTION_UPDATE => 'PUT',
-        self::MODEL_ACTION_DELETE => 'DELETE'
-    );
+    protected static $_DEFAULT_ACTIONS = [self::MODEL_ACTION_CREATE => 'POST', self::MODEL_ACTION_RETRIEVE => 'GET', self::MODEL_ACTION_UPDATE => 'PUT', self::MODEL_ACTION_DELETE => 'DELETE'];
 
     /**
      * List of available actions and their associated Request Method
      * @var array
      */
-    protected $actions = array();
+    protected $actions = [];
 
     /**
      * Current action being executed
@@ -97,7 +92,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     }
 
     //Overloads
-    public function __construct(array $urlArgs = array(), array $properties = array())
+    public function __construct(array $urlArgs = [], array $properties = [])
     {
         parent::__construct($urlArgs, $properties);
         foreach (static::$_DEFAULT_ACTIONS as $action => $method) {
@@ -110,7 +105,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         if (array_key_exists($name, $this->actions)) {
             return $this->setCurrentAction($name, $arguments)->execute();
         }
-        throw new UnknownModelAction(array(get_class($this), $name));
+        throw new UnknownModelAction([get_class($this), $name]);
     }
 
     /**
@@ -129,14 +124,14 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     public function retrieve($id = null): ModelInterface
     {
         $this->setCurrentAction(self::MODEL_ACTION_RETRIEVE);
-        $idKey = $this->modelIdKey();
+        $idKey = static::modelIdKey();
         if ($id !== null) {
             if (isset($this->_attributes[$idKey])) {
                 $this->clear();
             }
             $this->set($idKey, $id);
         } elseif (!isset($this->_attributes[$idKey])) {
-            throw new MissingModelId(array($this->action, get_class($this)));
+            throw new MissingModelId([$this->action, get_class($this)]);
         }
         $this->triggerEvent(self::EVENT_BEFORE_RETRIEVE);
         $this->execute();
@@ -150,7 +145,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      */
     public function save(): ModelInterface
     {
-        if (isset($this->_attributes[$this->modelIdKey()])) {
+        if (isset($this->_attributes[static::modelIdKey()])) {
             $this->setCurrentAction(self::MODEL_ACTION_UPDATE);
         } else {
             $this->setCurrentAction(self::MODEL_ACTION_CREATE);
@@ -179,7 +174,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      * @param array $actionArgs
      * @return $this
      */
-    public function setCurrentAction(string $action, array $actionArgs = array()): AbstractModelEndpoint
+    public function setCurrentAction(string $action, array $actionArgs = []): AbstractModelEndpoint
     {
         if (array_key_exists($action, $this->actions)) {
             $this->action = $action;
@@ -202,7 +197,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      * @param $action
      * @param array $arguments
      */
-    protected function configureAction($action, array $arguments = array())
+    protected function configureAction($action, array $arguments = [])
     {
         $this->setProperty(self::PROPERTY_HTTP_METHOD, $this->actions[$action]);
     }
@@ -290,7 +285,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
                     $urlArgs[self::MODEL_ID_VAR] = '';
                     break;
                 default:
-                    $idKey = $this->modelIdKey();
+                    $idKey = static::modelIdKey();
                     $id = $this->get($idKey);
                     $urlArgs[self::MODEL_ID_VAR] = (empty($id) ? '' : $id);
             }

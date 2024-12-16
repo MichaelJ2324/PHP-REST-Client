@@ -85,7 +85,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
      */
     public function getHttpClient(): Client
     {
-        if($this->httpClient == null) {
+        if ($this->httpClient == null) {
             $this->initHttpClient();
         }
         return $this->httpClient;

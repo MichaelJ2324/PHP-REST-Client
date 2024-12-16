@@ -32,10 +32,7 @@ abstract class AbstractEndpointData implements DataInterface
     public const DATA_PROPERTY_REQUIRED = 'required';
     public const DATA_PROPERTY_DEFAULTS = 'defaults';
 
-    protected static $_DEFAULT_PROPERTIES = array(
-        self::DATA_PROPERTY_REQUIRED => [],
-        self::DATA_PROPERTY_DEFAULTS => [],
-    );
+    protected static $_DEFAULT_PROPERTIES = [self::DATA_PROPERTY_REQUIRED => [], self::DATA_PROPERTY_DEFAULTS => []];
 
     //Overloads
     public function __construct(array $data = null, array $properties = [])
@@ -171,7 +168,7 @@ abstract class AbstractEndpointData implements DataInterface
     {
         $errors = [
             'missing' => [],
-            'invalid' => []
+            'invalid' => [],
         ];
         $error = false;
         if (!empty($this->_properties[self::DATA_PROPERTY_REQUIRED])) {

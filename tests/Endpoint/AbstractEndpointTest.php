@@ -43,14 +43,9 @@ class AbstractEndpointTest extends TestCase
         //Add Tear Down for static properties here
     }
 
-    protected $options = array(
-        'foo',
-        'bar'
-    );
+    protected $options = ['foo', 'bar'];
 
-    protected $properties = array(
-        'url' => '$foo/$bar/$:test'
-    );
+    protected $properties = ['url' => '$foo/$bar/$:test'];
 
     public function setUp(): void
     {
@@ -80,7 +75,7 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals([
             'url' => '',
             'httpMethod' => '',
-            'auth' => 1
+            'auth' => 1,
         ], $Endpoint->getProperties());
         $this->assertEquals([], $Endpoint->getUrlArgs());
         $this->assertEmpty($Endpoint->getData());
@@ -88,11 +83,7 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals('', $Endpoint->getEndPointUrl());
 
         $Endpoint = new BasicEndpoint($this->options);
-        $this->assertEquals(array(
-            'url' => '',
-            'httpMethod' => '',
-            'auth' => 1
-        ), $Endpoint->getProperties());
+        $this->assertEquals(['url' => '', 'httpMethod' => '', 'auth' => 1], $Endpoint->getProperties());
         $this->assertEquals($this->options, $Endpoint->getUrlArgs());
         $this->assertEmpty($Endpoint->getData());
         $this->assertEmpty($Endpoint->getBaseUrl());
@@ -102,7 +93,7 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals([
             'url' => '$foo/$bar/$:test',
             'httpMethod' => '',
-            'auth' => 1
+            'auth' => 1,
         ], $Endpoint->getProperties());
         $this->assertEquals($this->options, $Endpoint->getUrlArgs());
         $this->assertEmpty($Endpoint->getData());
@@ -117,11 +108,11 @@ class AbstractEndpointTest extends TestCase
     public function testSetOptions()
     {
         $Endpoint = new BasicEndpoint();
-        $this->assertEquals(array(), $Endpoint->getUrlArgs());
+        $this->assertEquals([], $Endpoint->getUrlArgs());
         $this->assertEquals($Endpoint, $Endpoint->setUrlArgs($this->options));
         $this->assertEquals($this->options, $Endpoint->getUrlArgs());
-        $this->assertEquals($Endpoint, $Endpoint->setUrlArgs(array()));
-        $this->assertEquals(array(), $Endpoint->getUrlArgs());
+        $this->assertEquals($Endpoint, $Endpoint->setUrlArgs([]));
+        $this->assertEquals([], $Endpoint->getUrlArgs());
     }
 
     /**
@@ -135,11 +126,7 @@ class AbstractEndpointTest extends TestCase
         $Endpoint = new BasicEndpoint();
         $Endpoint->setProperties([]);
         $this->assertEquals(null, $Endpoint->getProperty('foobar'));
-        $this->assertEquals(array(
-            'url' => '',
-            'httpMethod' => '',
-            'auth' => 1
-        ), $Endpoint->getProperties());
+        $this->assertEquals(['url' => '', 'httpMethod' => '', 'auth' => 1], $Endpoint->getProperties());
         $Endpoint->setProperties($this->properties);
         $props = $this->properties;
         $props['httpMethod'] = '';
@@ -185,8 +172,8 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals('test', $Endpoint->getData());
         $this->assertEquals($Endpoint, $Endpoint->setData(null));
         $this->assertEquals(null, $Endpoint->getData());
-        $this->assertEquals($Endpoint, $Endpoint->setData(array()));
-        $this->assertEquals(array(), $Endpoint->getData());
+        $this->assertEquals($Endpoint, $Endpoint->setData([]));
+        $this->assertEquals([], $Endpoint->getData());
         $data = new EndpointData();
         $this->assertEquals($Endpoint, $Endpoint->setData($data));
         $this->assertEquals($data, $Endpoint->getData());
@@ -253,7 +240,7 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals($Endpoint, $Endpoint->setBaseUrl('http://localhost'));
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
         $this->assertEquals('$foo', $Endpoint->getEndPointUrl());
-        $this->assertEquals(array(), $Endpoint->getUrlArgs());
+        $this->assertEquals([], $Endpoint->getUrlArgs());
         $this->expectException(\MRussell\REST\Exception\Endpoint\InvalidUrl::class);
         $Endpoint->execute();
     }
@@ -265,56 +252,38 @@ class AbstractEndpointTest extends TestCase
     public function testConfigureUrl()
     {
         $Endpoint = new BasicEndpoint();
-        $Class = new \ReflectionClass('MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint');
+        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint::class);
         $method = $Class->getMethod('configureURL');
         $method->setAccessible(true);
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
-        $this->assertEquals('bar', $method->invoke($Endpoint, array('bar')));
+        $this->assertEquals('bar', $method->invoke($Endpoint, ['bar']));
 
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo/$bar'));
-        $this->assertEquals('bar/foo', $method->invoke($Endpoint, array('bar', 'foo')));
+        $this->assertEquals('bar/foo', $method->invoke($Endpoint, ['bar', 'foo']));
 
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo/$bar/$:baz'));
-        $this->assertEquals('bar/foo', $method->invoke($Endpoint, array('bar', 'foo')));
+        $this->assertEquals('bar/foo', $method->invoke($Endpoint, ['bar', 'foo']));
 
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo/$bar/$:baz'));
         $this->assertEquals('bar/foo/1234', $method->invoke(
             $Endpoint,
-            array(
-                'foo' => 'bar',
-                0 => 'foo',
-                1 => 1234
-            )
+            ['foo' => 'bar', 0 => 'foo', 1 => 1234],
         ));
         $this->assertEquals('bar/foo/1234', $method->invoke(
             $Endpoint,
-            array(
-                'foo' => 'bar',
-                3 => 'foo',
-                4 => 1234
-            )
+            ['foo' => 'bar', 3 => 'foo', 4 => 1234],
         ));
 
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo/$bar/$:baz/$:foz'));
         $this->assertEquals('bar/foo/foz/1234', $method->invoke(
             $Endpoint,
-            array(
-                'foo' => 'bar',
-                'bar' => 'foo',
-                'baz' => 'foz',
-                0 => 1234
-            )
+            ['foo' => 'bar', 'bar' => 'foo', 'baz' => 'foz', 0 => 1234],
         ));
 
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo/$bar/$:baz/$:foz/$:aaa/$:bbb'));
         $this->assertEquals('bar/foo/foz/1234', $method->invoke(
             $Endpoint,
-            array(
-                'foo' => 'bar',
-                'bar' => 'foo',
-                'baz' => 'foz',
-                0 => 1234
-            )
+            ['foo' => 'bar', 'bar' => 'foo', 'baz' => 'foz', 0 => 1234],
         ));
     }
 
@@ -349,7 +318,7 @@ class AbstractEndpointTest extends TestCase
         $Ping = new PingEndpoint();
         $Ping->setClient(static::$client);
         $Ping->setData([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
         $request = $Ping->buildRequest();
         $this->assertInstanceOf(Request::class, $request);
@@ -363,7 +332,7 @@ class AbstractEndpointTest extends TestCase
         $Ping->setProperty(AbstractEndpoint::PROPERTY_HTTP_METHOD, 'POST');
         $Ping->setClient(static::$client);
         $Ping->setData([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
         $request = $Ping->buildRequest();
         $this->assertInstanceOf(Request::class, $request);
@@ -371,7 +340,7 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals('phpunit.tests', $request->getUri()->getHost());
         $this->assertEquals('/ping', $request->getUri()->getPath());
         $this->assertEquals(json_encode([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]), $request->getBody()->getContents());
 
         $Ping->reset();

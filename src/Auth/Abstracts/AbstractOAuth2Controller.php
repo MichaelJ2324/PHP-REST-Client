@@ -33,17 +33,13 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
     /**
      * @inheritdoc
      */
-    protected static $_DEFAULT_AUTH_ACTIONS = array(
-        self::ACTION_AUTH,
-        self::ACTION_LOGOUT,
-        self::ACTION_OAUTH_REFRESH
-    );
+    protected static array $_DEFAULT_AUTH_ACTIONS = [self::ACTION_AUTH, self::ACTION_LOGOUT, self::ACTION_OAUTH_REFRESH];
 
     /**
      * The OAuth2 Full token
      * @var array
      */
-    protected $token = array();
+    protected $token = [];
 
     /**
      * @var
@@ -190,10 +186,10 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
                     $this->setToken($token);
                     $res = true;
                 }
-            } catch(InvalidAuthenticationAction $ex) {
+            } catch (InvalidAuthenticationAction $ex) {
                 $this->getLogger()->debug($ex->getMessage());
-            } catch(\Exception $ex) {
-                $this->getLogger()->error("[REST] OAuth Refresh Exception - ".$ex->getMessage());
+            } catch (\Exception $ex) {
+                $this->getLogger()->error("[REST] OAuth Refresh Exception - " . $ex->getMessage());
             }
         }
         return $res;
@@ -299,8 +295,8 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
             if ($token === null && !empty($tokenStr)) {
                 throw new \Exception("Invalid JSON string.");
             }
-        } catch(\Exception $ex) {
-            $this->getLogger()->critical("[REST] OAuth Token Parse Exception - ".$ex->getMessage());
+        } catch (\Exception $ex) {
+            $this->getLogger()->critical("[REST] OAuth Token Parse Exception - " . $ex->getMessage());
         }
         return $token ?? $tokenStr;
     }

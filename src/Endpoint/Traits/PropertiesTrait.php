@@ -55,9 +55,6 @@ trait PropertiesTrait
      */
     public function getProperty(string $name)
     {
-        if (isset($this->_properties[$name])) {
-            return $this->_properties[$name];
-        }
-        return null;
+        return $this->_properties[$name] ?? null;
     }
 }

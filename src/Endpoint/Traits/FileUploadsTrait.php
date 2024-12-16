@@ -35,11 +35,11 @@ trait FileUploadsTrait
         $request = $request->withUri($uri->withQuery(\http_build_query($this->configureFileUploadQueryParams(), '', '&', \PHP_QUERY_RFC3986)));
         $multiPartOptions = [];
         if (!empty($filesData)) {
-            foreach($filesData as $key => $fileData) {
+            foreach ($filesData as $key => $fileData) {
                 if (is_string($key) && is_string($fileData)) {
                     $fileData = [
                         'name' => $key,
-                        'path' => $fileData
+                        'path' => $fileData,
                     ];
                 }
                 $multiPartOptions[] = $this->buildMultiPartFileData($fileData);

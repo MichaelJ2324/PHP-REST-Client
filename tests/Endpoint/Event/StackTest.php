@@ -37,7 +37,7 @@ class StackTest extends TestCase
     {
         $ep = $stack->getEndpoint();
         $data = [
-            'foo' => 'bar'
+            'foo' => 'bar',
         ];
         $id = $stack->register('foobar', function (&$iData, EndpointInterface $endpoint) use ($ep) {
             $this->assertEquals($ep, $endpoint);
@@ -64,7 +64,7 @@ class StackTest extends TestCase
 
         $this->assertEquals($stack, $stack->trigger('foobar', $data));
         $this->assertEquals([
-            'bar' => 'foo'
+            'bar' => 'foo',
         ], $data);
 
         $this->assertEquals(true, $stack->remove('foobar', $id));

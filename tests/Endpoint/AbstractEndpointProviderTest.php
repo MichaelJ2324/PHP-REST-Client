@@ -45,12 +45,12 @@ class AbstractEndpointProviderTest extends TestCase
     public function testConstructor()
     {
         $Provider = new EndpointProvider();
-        $Class = new \ReflectionClass('MRussell\REST\Tests\Stubs\Endpoint\EndpointProvider');
+        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\EndpointProvider::class);
         $property = $Class->getProperty('registry');
         $property->setAccessible(true);
-        $this->assertEquals(array(), $property->getValue($Provider));
+        $this->assertEquals([], $property->getValue($Provider));
 
-        $Class = new \ReflectionClass('MRussell\REST\Tests\Stubs\Endpoint\EndpointProviderWithDefaults');
+        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\EndpointProviderWithDefaults::class);
         $property = $Class->getProperty('registry');
         $property->setAccessible(true);
         $Provider = new EndpointProviderWithDefaults();
@@ -64,11 +64,8 @@ class AbstractEndpointProviderTest extends TestCase
     public function testRegisterEndpoint()
     {
         $Provider = new EndpointProvider();
-        $this->assertEquals($Provider, $Provider->registerEndpoint('auth', 'MRussell\REST\Tests\Stubs\Endpoint\AuthEndpoint'));
-        $this->assertEquals($Provider, $Provider->registerEndpoint('foo', 'MRussell\REST\Endpoint\Endpoint', array(
-            'url' => 'foo',
-            'httpMethod' => "GET"
-        )));
+        $this->assertEquals($Provider, $Provider->registerEndpoint('auth', \MRussell\REST\Tests\Stubs\Endpoint\AuthEndpoint::class));
+        $this->assertEquals($Provider, $Provider->registerEndpoint('foo', \MRussell\REST\Endpoint\Endpoint::class, ['url' => 'foo', 'httpMethod' => "GET"]));
         return $Provider;
     }
 
@@ -102,11 +99,7 @@ class AbstractEndpointProviderTest extends TestCase
         $FooEP = $Provider->getEndpoint('foo');
         $this->assertNotEmpty($FooEP);
         $this->assertEquals('foo', $FooEP->getEndPointUrl());
-        $this->assertEquals(array(
-            'url' => 'foo',
-            'httpMethod' => "GET",
-            'auth' => 1
-        ), $FooEP->getProperties());
+        $this->assertEquals(['url' => 'foo', 'httpMethod' => "GET", 'auth' => 1], $FooEP->getProperties());
     }
 
     /**

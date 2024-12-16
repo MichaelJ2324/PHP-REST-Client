@@ -22,28 +22,25 @@ abstract class AbstractAuthController implements AuthControllerInterface
      * Auth Controller Actions, used to associate Endpoints
      * @var array
      */
-    protected static $_DEFAULT_AUTH_ACTIONS = array(
-        self::ACTION_AUTH,
-        self::ACTION_LOGOUT,
-    );
+    protected static array $_DEFAULT_AUTH_ACTIONS = [self::ACTION_AUTH, self::ACTION_LOGOUT];
 
     /**
      * Configured Actions on the Controlller
      * @var array
      */
-    protected $actions = array();
+    protected $actions = [];
 
     /**
      * Configured Endpoints for configured actions
      * @var array
      */
-    protected $endpoints = array();
+    protected $endpoints = [];
 
     /**
      * The credentials used for authentication
      * @var array
      */
-    protected $credentials = array();
+    protected $credentials = [];
 
     /**
      * The authentication token
@@ -84,7 +81,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
     public function getCacheKey(): string
     {
         if (empty($this->cacheKey)) {
-            $this->cacheKey = "AUTH_TOKEN_".sha1(json_encode($this->credentials));
+            $this->cacheKey = "AUTH_TOKEN_" . sha1(json_encode($this->credentials));
         }
         return $this->cacheKey;
     }
@@ -169,7 +166,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
         if (isset($this->endpoints[$action])) {
             return $this->endpoints[$action];
         }
-        throw new InvalidAuthenticationAction([$action, __CLASS__]);
+        throw new InvalidAuthenticationAction([$action, self::class]);
     }
 
     /**
@@ -197,7 +194,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
                 $this->setToken($token);
             }
         } catch (\Exception $e) {
-            $this->getLogger()->error("[REST] Authenticate Exception - ".$e->getMessage());
+            $this->getLogger()->error("[REST] Authenticate Exception - " . $e->getMessage());
             $ret = false;
         }
         return $ret;
@@ -217,10 +214,10 @@ abstract class AbstractAuthController implements AuthControllerInterface
                 $this->clearToken();
                 $this->removeCachedToken();
             }
-        } catch(InvalidAuthenticationAction $ex) {
+        } catch (InvalidAuthenticationAction $ex) {
             $this->getLogger()->debug($ex->getMessage());
         } catch (\Exception $ex) {
-            $this->getLogger()->error("[REST] Logout Exception - ".$ex->getMessage());
+            $this->getLogger()->error("[REST] Logout Exception - " . $ex->getMessage());
         }
         return $ret;
     }
@@ -230,7 +227,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
      **/
     public function reset(): AuthControllerInterface
     {
-        $this->credentials = array();
+        $this->credentials = [];
         return $this->clearToken();
     }
 
@@ -297,7 +294,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
      */
     protected function configureLogoutEndpoint(EndpointInterface $Endpoint): EndpointInterface
     {
-        return $Endpoint->setData(array());
+        return $Endpoint->setData([]);
     }
 
     /**
