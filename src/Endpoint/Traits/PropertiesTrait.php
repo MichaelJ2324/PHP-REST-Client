@@ -13,7 +13,6 @@ trait PropertiesTrait
 
     /**
      * Get the current Data Properties
-     * @return array
      * @implements PropertiesInterface
      */
     public function getProperties(): array
@@ -23,7 +22,6 @@ trait PropertiesTrait
 
     /**
      * Set the properties array
-     * @param array $properties
      * @return $this
      * @implements PropertiesInterface
      */
@@ -35,7 +33,6 @@ trait PropertiesTrait
 
     /**
      * Set a property in properties array
-     * @param string $name
      * @param $value
      * @return $this
      * @implements PropertiesInterface
@@ -49,7 +46,6 @@ trait PropertiesTrait
 
     /**
      * Get a specific property from properties array
-     * @param string $name
      * @return mixed
      * @implements PropertiesInterface
      */

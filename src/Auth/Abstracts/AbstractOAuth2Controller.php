@@ -62,9 +62,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getGrantType(): string
     {
         return $this->grant_type;
@@ -73,7 +70,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
     /**
      * Get/Set the OAuth Authorization header
      * @param $header
-     * @return string
      */
     public static function oauthHeader($header = null): string
     {
@@ -139,7 +135,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
 
     /**
      *
-     * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     protected function cacheToken(): bool
@@ -160,7 +155,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
 
     /**
      * Get the Value to be set on the Auth Header
-     * @return mixed
      */
     protected function getAuthHeaderValue(): string
     {
@@ -170,8 +164,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
     /**
      * Refreshes the OAuth 2 Token
      *
-     *
-     * @return bool
      */
     public function refresh(): bool
     {
@@ -216,7 +208,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
     /**
      * Checks if Token is expired based on 'expiration' flag on token
      * - Returns -1 if no expiration property is found
-     * @return int
      */
     protected function isTokenExpired(): int
     {
@@ -246,8 +237,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
 
     /**
      * Configure the Refresh Data based on Creds, Token, and Refresh Grant Type
-     * @param EndpointInterface $Endpoint
-     * @return EndpointInterface
      */
     protected function configureRefreshEndpoint(EndpointInterface $Endpoint): EndpointInterface
     {
@@ -282,8 +271,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
     /**
      * Parse token responses as string
      *
-     * @param string $action
-     * @param Response $response
      * @return mixed
      */
     protected function parseResponseToToken(string $action, Response $response)

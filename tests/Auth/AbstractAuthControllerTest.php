@@ -62,7 +62,6 @@ class AbstractAuthControllerTest extends TestCase
      * @covers ::getActions
      * @covers ::getLogger
      * @covers ::setLogger
-     * @return AuthController
      */
     public function testConstructor(): AuthController
     {
@@ -82,11 +81,9 @@ class AbstractAuthControllerTest extends TestCase
 
     /**
      * @depends testConstructor
-     * @param AuthController $Auth
      * @covers ::setCredentials
      * @covers ::getCredentials
      * @covers ::updateCredentials
-     * @return AuthController
      */
     public function testSetCredentials(AuthController $Auth): AuthController
     {
@@ -101,12 +98,10 @@ class AbstractAuthControllerTest extends TestCase
 
     /**
      * @depends testSetCredentials
-     * @param AuthController $Auth
      * @covers ::setToken
      * @covers ::getToken
      * @covers ::clearToken
      * @covers ::isAuthenticated
-     * @return AuthController
      */
     public function testGetToken(AuthController $Auth): AuthController
     {
@@ -133,12 +128,10 @@ class AbstractAuthControllerTest extends TestCase
 
     /**
      * @depends testGetToken
-     * @param AuthController $Auth
      * @covers ::setActions
      * @covers ::getActions
      * @covers ::getActionEndpoint
      * @covers ::setActionEndpoint
-     * @return AuthController
      */
     public function testSetActions(AuthController $Auth): AuthController
     {
@@ -160,7 +153,6 @@ class AbstractAuthControllerTest extends TestCase
 
     /**
      * @depends testSetActions
-     * @param AuthController $Auth
      * @return void
      */
     public function testInvalidActionException(AuthController $Auth)
@@ -172,7 +164,6 @@ class AbstractAuthControllerTest extends TestCase
 
     /**
      * @depends testSetActions
-     * @param AuthController $Auth
      * @covers ::setCache
      * @covers ::getCache
      * @covers ::cacheToken
@@ -226,7 +217,6 @@ class AbstractAuthControllerTest extends TestCase
      * @covers ::configureEndpoint
      * @covers ::configureAuthenticationEndpoint
      * @covers ::configureLogoutEndpoint
-     * @return AuthController
      */
     public function testConfigureData(): AuthController
     {
@@ -248,7 +238,6 @@ class AbstractAuthControllerTest extends TestCase
     }
 
     /**
-     * @param AuthController $Auth
      * @depends testConfigureData
      * @covers ::authenticate
      * @covers ::reset
@@ -270,7 +259,6 @@ class AbstractAuthControllerTest extends TestCase
     }
 
     /**
-     * @param AuthController $Auth
      * @depends testConfigureData
      * @covers ::logout
      * @covers ::getLogger

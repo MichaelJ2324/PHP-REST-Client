@@ -42,7 +42,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
     /**
      * @var string
      */
-    protected $version = null;
+    protected $version;
 
     /**
      * @var EndpointInterface
@@ -80,9 +80,6 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
         $this->guzzleHandlerStack = HandlerStack::create();
     }
 
-    /**
-     * @return Client
-     */
     public function getHttpClient(): Client
     {
         if ($this->httpClient == null) {
@@ -91,9 +88,6 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
         return $this->httpClient;
     }
 
-    /**
-     * @return HandlerStack
-     */
     public function getHandlerStack(): HandlerStack
     {
         if (!$this->guzzleHandlerStack) {
@@ -103,7 +97,6 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
     }
 
     /**
-     * @param HandlerStack $stackHandler
      * @return $this
      */
     public function setHandlerStack(HandlerStack $stackHandler)
@@ -224,7 +217,6 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
 
     /**
      * Rotates current Endpoint to Last Endpoint, and sets Current Endpoint with passed in Endpoint
-     * @param EndpointInterface $Endpoint
      * @return $this
      */
     protected function setCurrentEndpoint(EndpointInterface $Endpoint)

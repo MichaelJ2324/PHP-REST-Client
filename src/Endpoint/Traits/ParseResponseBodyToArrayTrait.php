@@ -6,8 +6,6 @@ trait ParseResponseBodyToArrayTrait
 {
     /**
      * @param $body
-     * @param string $prop
-     * @return array
      */
     protected function parseResponseBodyToArray($body, string $prop = ""): array
     {

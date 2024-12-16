@@ -6,9 +6,6 @@ use Psr\SimpleCache\CacheInterface;
 
 class MemoryCache implements CacheInterface
 {
-    /**
-     * @var array
-     */
     private array $cache = [];
 
     /**
@@ -18,8 +15,6 @@ class MemoryCache implements CacheInterface
 
     /**
      * Get the In Memory Cache Object
-     *
-     * @return MemoryCache
      */
     public static function getInstance(): MemoryCache
     {

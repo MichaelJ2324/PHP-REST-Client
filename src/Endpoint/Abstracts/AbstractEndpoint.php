@@ -105,10 +105,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         if (!empty($urlArgs)) {
             $this->setUrlArgs($urlArgs);
         }
-        if (!empty($properties)) {
-            foreach ($properties as $key => $value) {
-                $this->setProperty($key, $value);
-            }
+        foreach ($properties as $key => $value) {
+            $this->setProperty($key, $value);
         }
     }
 
@@ -187,7 +185,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      *
      * May deprecate in the future, just leaving it in right now to assess if its still needed
      * TODO:Deprecate me
-     * @return Request
      * @codeCoverageIgnore
      */
     protected function getRequest(): Request
@@ -196,7 +193,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     }
 
     /**
-     * @param Response $response
      * @return $this|EndpointInterface
      */
     protected function setResponse(Response $response)
@@ -216,7 +212,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     }
 
     /**
-     * @param bool $associative
      * @return mixed|null
      */
     public function getResponseBody(bool $associative = true)
@@ -225,9 +220,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         return $response ? $this->getResponseContent($response, $associative) : null;
     }
 
-    /**
-     * @return Client
-     */
     public function getHttpClient(): Client
     {
         return !$this->client ? new Client() : $this->getClient()->getHttpClient();
@@ -292,9 +284,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         return $auth;
     }
 
-    /**
-     * @return string
-     */
     public function getMethod(): string
     {
         $this->triggerEvent(self::EVENT_CONFIGURE_METHOD);
@@ -309,7 +298,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     /**
      * Verifies URL and Data are setup, then sets them on the Request Object
-     * @return Request
      */
     public function buildRequest(): Request
     {
@@ -337,9 +325,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     }
 
     /**
-     * @param Request $request
      * @param $data
-     * @return Request
      */
     protected function configureRequest(Request $request, $data): Request
     {
@@ -374,8 +360,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * Configures the URL, by updating any variable placeholders in the URL property on the Endpoint
      * - Replaces $var $options['var']
      * - If $options['var'] doesn't exist, replaces with next numeric option in array
-     * @param array $urlArgs
-     * @return string
      */
     protected function configureURL(array $urlArgs): string
     {
@@ -425,8 +409,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     /**
      * Verify if URL is configured properly
-     * @param string $url
-     * @return bool
      * @throws InvalidUrl
      */
     private function verifyUrl(string $url): bool
@@ -439,7 +421,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     /**
      * Checks if Endpoint URL requires Arguments
-     * @return bool
      */
     protected function hasUrlArgs(): bool
     {
@@ -451,7 +432,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * Helper method for extracting variables via Regex from a passed in URL
      * @param $url
-     * @return array
      */
     protected function extractUrlVariables($url): array
     {

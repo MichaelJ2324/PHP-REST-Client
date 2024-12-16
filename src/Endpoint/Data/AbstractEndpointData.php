@@ -38,10 +38,8 @@ abstract class AbstractEndpointData implements DataInterface
     public function __construct(array $data = null, array $properties = [])
     {
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
-        if (!empty($properties)) {
-            foreach ($properties as $key => $value) {
-                $this->setProperty($key, $value);
-            }
+        foreach ($properties as $key => $value) {
+            $this->setProperty($key, $value);
         }
         $this->configureDefaultData();
         if (!empty($data)) {
@@ -87,7 +85,6 @@ abstract class AbstractEndpointData implements DataInterface
 
     /**
      * Set properties for data
-     * @param array $properties
      */
     public function setProperties(array $properties): void
     {
@@ -123,9 +120,6 @@ abstract class AbstractEndpointData implements DataInterface
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isNull(): bool
     {
         return $this->isNull && empty($this->_attributes);
@@ -147,8 +141,6 @@ abstract class AbstractEndpointData implements DataInterface
 
     /**
      * Verify data requirements when converting to Array
-     * @param bool $verify
-     * @return array
      * @throws InvalidData
      */
     public function toArray(bool $verify = false): array
@@ -161,7 +153,6 @@ abstract class AbstractEndpointData implements DataInterface
 
     /**
      * Validate Required Data for the Endpoint
-     * @return bool
      * @throws InvalidData
      */
     protected function verifyRequiredData(): bool

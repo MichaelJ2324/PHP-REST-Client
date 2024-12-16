@@ -7,12 +7,8 @@ use GuzzleHttp\Psr7\Response;
 
 trait JsonHandlerTrait
 {
-    protected $respContent = null;
+    protected $respContent;
 
-    /**
-     * @param Request $request
-     * @return Request
-     */
     protected function configureJsonRequest(Request $request): Request
     {
         return $request->withHeader('Content-Type', 'application/json');

@@ -77,7 +77,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     /**
      * Whether or not an offset exists
      * @param string $offset - An offset to check for
-     * @return boolean
      * @abstracting ArrayAccess
      */
     public function offsetExists($offset): bool
@@ -110,7 +109,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     }
 
     /**
-     * @return array
      * @implements ArrayableInterface
      */
     public function toArray(): array
@@ -161,7 +159,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         return key($this->models);
     }
     /**
-     * @return mixed|void
      * @implements \Iterator
      */
     public function next(): void
@@ -170,7 +167,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     }
 
     /**
-     * @return mixed|void
      * @implements \Iterator
      */
     public function rewind(): void
@@ -240,9 +236,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         return $return;
     }
 
-    /**
-     * @return string
-     */
     protected function getModelIdKey(): string
     {
         $model = $this->buildModel();
@@ -254,7 +247,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     /**
      * Append models to the collection
-     * @param array $models
      * @return AbstractCollectionEndpoint
      */
     public function set(array $models, array $options = [])
@@ -265,7 +257,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         if ($reset) {
             $this->models = [];
         }
-        foreach ($models as $key => $m) {
+        foreach ($models as $m) {
             if ($m instanceof DataInterface) {
                 $m = $m->toArray();
             } elseif ($m instanceof \stdClass) {
@@ -287,7 +279,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     /**
      * Return the current collection count
-     * @return int
      */
     public function length(): int
     {
@@ -317,7 +308,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     /**
      * @param bool $full
-     * @return string
      */
     public function getEndPointUrl($full = false): string
     {
@@ -334,10 +324,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         return $epURL;
     }
 
-    /**
-     * @param Response $response
-     * @return EndpointInterface
-     */
     public function setResponse(Response $response): EndpointInterface
     {
         parent::setResponse($response);
@@ -345,9 +331,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getCollectionResponseProp(): string
     {
         return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? static::$_RESPONSE_PROP;
@@ -375,7 +358,6 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     /**
      * Build the ModelEndpoint
-     * @param array $data
      * @return AbstractModelEndpoint|null
      */
     protected function buildModel(array $data = [])
