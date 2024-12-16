@@ -47,11 +47,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     public const AUTH_EITHER = 1;
     public const AUTH_REQUIRED = 2;
 
-    protected static $_DEFAULT_PROPERTIES = array(
-        self::PROPERTY_URL => '',
-        self::PROPERTY_HTTP_METHOD => '',
-        self::PROPERTY_AUTH => self::AUTH_EITHER
-    );
+    protected static $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => self::AUTH_EITHER];
 
     /**
      * @var Promise
@@ -80,7 +76,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * The passed in Options for the Endpoint, mainly used for parsing URL Variables
      * @var array
      */
-    protected $urlArgs = array();
+    protected $urlArgs = [];
 
     /**
      * The data being passed to the API Endpoint.
@@ -101,7 +97,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     protected $response;
 
-    public function __construct(array $urlArgs = array(), array $properties = array())
+    public function __construct(array $urlArgs = [], array $properties = [])
     {
         $this->eventStack = new Stack();
         $this->eventStack->setEndpoint($this);
@@ -271,7 +267,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                 if (isset($options['error']) && is_callable($options['error'])) {
                     $options['error']($e);
                 }
-            }
+            },
         );
         return $this;
     }
@@ -369,10 +365,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                     $request = $request->withBody(Utils::streamFor($data));
             }
         }
-        $args = array(
-            'request' => $request,
-            'data' => $data
-        );
+        $args = ['request' => $request, 'data' => $data];
         $this->triggerEvent(self::EVENT_AFTER_CONFIGURED_REQUEST, $args);
         return $args['request'];
     }
@@ -407,7 +400,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                         $optional = true;
                         $replace = '';
                     }
-                    $opt = str_replace(array(static::$_URL_VAR_CHARACTER, ':'), '', $urlPart);
+                    $opt = str_replace([static::$_URL_VAR_CHARACTER, ':'], '', $urlPart);
                     if (isset($urlArgs[$opt])) {
                         $replace = $urlArgs[$opt];
                     }
@@ -439,7 +432,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     private function verifyUrl(string $url): bool
     {
         if (strpos($url, static::$_URL_VAR_CHARACTER) !== false) {
-            throw new InvalidUrl(array(get_class($this), $url));
+            throw new InvalidUrl([get_class($this), $url]);
         }
         return true;
     }
@@ -462,7 +455,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     protected function extractUrlVariables($url): array
     {
-        $variables = array();
+        $variables = [];
         $pattern = "/(\\" . static::$_URL_VAR_CHARACTER . ".*?[^\\/]*)/";
         if (preg_match_all($pattern, $url, $matches)) {
             foreach ($matches as $match) {

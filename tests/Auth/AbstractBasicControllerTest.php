@@ -51,7 +51,7 @@ class AbstractBasicControllerTest extends TestCase
         $this->assertEquals(['Authorization' => ["Basic"]], $Request->getHeaders());
         $Auth->setCredentials([
             'username' => 'foo',
-            'password' => 'bar'
+            'password' => 'bar',
         ]);
         $Request = $Auth->configureRequest($Request);
         $this->assertEquals(['Authorization' => ['Basic ' . base64_encode("foo:bar")]], $Request->getHeaders());

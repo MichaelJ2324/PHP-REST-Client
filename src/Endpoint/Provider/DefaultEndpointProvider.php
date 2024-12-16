@@ -8,13 +8,13 @@ class DefaultEndpointProvider extends AbstractEndpointProvider
      * List of default endpoints to load
      * @var array
      */
-    protected static $_DEFAULT_ENDPOINTS = array();
+    protected static $_DEFAULT_ENDPOINTS = [];
 
     public function __construct()
     {
         foreach (static::$_DEFAULT_ENDPOINTS as $name => $epData) {
             if (!isset($epData['properties'])) {
-                $epData['properties'] = array();
+                $epData['properties'] = [];
             }
             $this->registerEndpoint($name, $epData['class'], $epData['properties']);
         }

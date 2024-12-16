@@ -43,15 +43,9 @@ class AbstractAuthControllerTest extends TestCase
     }
 
 
-    protected $authActions = array(
-        AuthController::ACTION_AUTH,
-        AuthController::ACTION_LOGOUT
-    );
+    protected $authActions = [AuthController::ACTION_AUTH, AuthController::ACTION_LOGOUT];
 
-    protected $credentials = array(
-        'user' => 'foo',
-        'password' => 'bar'
-    );
+    protected $credentials = ['user' => 'foo', 'password' => 'bar'];
 
     public function setUp(): void
     {
@@ -98,13 +92,10 @@ class AbstractAuthControllerTest extends TestCase
     {
         $this->assertEquals($Auth, $Auth->setCredentials($this->credentials));
         $this->assertEquals($this->credentials, $Auth->getCredentials());
-        $this->assertEquals($Auth, $Auth->updateCredentials(array('user' => 'foobar')));
-        $this->assertEquals(array(
-            'user' => 'foobar',
-            'password' => $this->credentials['password']
-        ), $Auth->getCredentials());
-        $Auth->setCredentials(array());
-        $this->assertEquals(array(), $Auth->getCredentials());
+        $this->assertEquals($Auth, $Auth->updateCredentials(['user' => 'foobar']));
+        $this->assertEquals(['user' => 'foobar', 'password' => $this->credentials['password']], $Auth->getCredentials());
+        $Auth->setCredentials([]);
+        $this->assertEquals([], $Auth->getCredentials());
         return $Auth;
     }
 
@@ -121,7 +112,7 @@ class AbstractAuthControllerTest extends TestCase
     {
         $this->assertEquals('12345', $Auth->getToken());
         $this->assertEquals(true, $Auth->isAuthenticated());
-        $Class = new \ReflectionClass('MRussell\REST\Tests\Stubs\Auth\AuthController');
+        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Auth\AuthController::class);
         $method = $Class->getMethod('setToken');
         $method->setAccessible(true);
         $this->assertEquals($Auth, $method->invoke($Auth, 'test'));
@@ -152,8 +143,8 @@ class AbstractAuthControllerTest extends TestCase
     public function testSetActions(AuthController $Auth): AuthController
     {
         $this->assertEquals($this->authActions, $Auth->getActions());
-        $this->assertEquals($Auth, $Auth->setActions(array()));
-        $this->assertEquals(array(), $Auth->getActions());
+        $this->assertEquals($Auth, $Auth->setActions([]));
+        $this->assertEquals([], $Auth->getActions());
         unset($Auth);
         $Auth = new AuthController();
         $this->assertEquals($this->authActions, $Auth->getActions());
@@ -219,7 +210,7 @@ class AbstractAuthControllerTest extends TestCase
         $Auth->setCredentials(['username' => 'foo']);
         $this->assertNotEquals($cacheKey, $Auth->getCacheKey());
         $cacheKey = $Auth->getCacheKey();
-        $this->assertEquals("AUTH_TOKEN_".sha1(json_encode(['username' => 'foo'])), $cacheKey);
+        $this->assertEquals("AUTH_TOKEN_" . sha1(json_encode(['username' => 'foo'])), $cacheKey);
         $Auth->setToken($token1);
         $this->assertEquals($token1, $getCachedTokenMethod->invoke($Auth));
         $this->assertEquals($token1, $cache->get($cacheKey));
@@ -245,13 +236,13 @@ class AbstractAuthControllerTest extends TestCase
         $AuthEndpoint->setBaseUrl('localhost');
         $LogoutEndpoint = new LogoutEndpoint();
         $LogoutEndpoint->setBaseUrl('localhost');
-        $Class = new \ReflectionClass('MRussell\REST\Tests\Stubs\Auth\AuthController');
+        $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Auth\AuthController::class);
         $method = $Class->getMethod('configureEndpoint');
         $method->setAccessible(true);
         $this->assertEquals($AuthEndpoint, $method->invoke($Auth, $AuthEndpoint, AbstractAuthController::ACTION_AUTH));
         $this->assertEquals($this->credentials, $AuthEndpoint->getData()->toArray());
         $this->assertEquals($LogoutEndpoint, $method->invoke($Auth, $LogoutEndpoint, AbstractAuthController::ACTION_LOGOUT));
-        $this->assertEquals(array(), $LogoutEndpoint->getData());
+        $this->assertEquals([], $LogoutEndpoint->getData());
 
         return $Auth;
     }

@@ -9,7 +9,7 @@ class MemoryCache implements CacheInterface
     /**
      * @var array
      */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @var MemoryCache
@@ -21,7 +21,7 @@ class MemoryCache implements CacheInterface
      *
      * @return MemoryCache
      */
-    public static function getInstance()
+    public static function getInstance(): MemoryCache
     {
         if (empty(static::$instance)) {
             // @codeCoverageIgnoreStart
@@ -79,7 +79,7 @@ class MemoryCache implements CacheInterface
     public function getMultiple($keys, $default = null)
     {
         $items = $default ?? [];
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             if ($this->has($key)) {
                 $items[$key] = $this->cache[$key];
             }
@@ -95,7 +95,7 @@ class MemoryCache implements CacheInterface
      */
     public function setMultiple($values, $ttl = null)
     {
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
             $this->set($key, $value, $ttl);
         }
         return true;
@@ -107,7 +107,7 @@ class MemoryCache implements CacheInterface
     public function deleteMultiple($keys)
     {
         $return = true;
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             if (!$this->delete($key)) {
                 $return = false;
             }

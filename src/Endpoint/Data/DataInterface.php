@@ -10,6 +10,4 @@ use MRussell\REST\Endpoint\Interfaces\ResettableInterface;
 use MRussell\REST\Endpoint\Interfaces\SetInterface;
 
 interface DataInterface extends \ArrayAccess, PropertiesInterface, SetInterface, GetInterface, ClearableInterface,
-    ResettableInterface, ArrayableInterface
-{
-}
+    ResettableInterface, ArrayableInterface {}

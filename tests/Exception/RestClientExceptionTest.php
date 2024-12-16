@@ -41,7 +41,7 @@ class RestClientExceptionTest extends TestCase
     {
         $Exception = new RestClientException();
         $this->assertEquals('An Unknown Exception occurred in the REST Client Framework', $Exception->getMessage());
-        $Exception = new EndpointException(array('AuthEndpoint'));
+        $Exception = new EndpointException(['AuthEndpoint']);
         $this->assertEquals('Unknown Exception occurred on Endpoint: AuthEndpoint', $Exception->getMessage());
     }
 }

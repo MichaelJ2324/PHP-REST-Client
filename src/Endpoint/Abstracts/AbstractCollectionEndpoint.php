@@ -51,7 +51,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * The Collection of Models
      * @var array
      */
-    protected $models = array();
+    protected $models = [];
 
     /**
      * The Class Name of the ModelEndpoint
@@ -135,7 +135,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      */
     public function clear()
     {
-        $this->models = array();
+        $this->models = [];
         return $this;
     }
 
@@ -269,7 +269,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
             if ($m instanceof DataInterface) {
                 $m = $m->toArray();
             } elseif ($m instanceof \stdClass) {
-                $m = (array)$m;
+                $m = (array) $m;
             }
             if (!empty($m[$modelIdKey])) {
                 $id = $m[$modelIdKey];
@@ -302,7 +302,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     {
         try {
             $implements = class_implements($model);
-            if (is_array($implements) && isset($implements['MRussell\REST\Endpoint\Interfaces\ModelInterface'])) {
+            if (is_array($implements) && isset($implements[\MRussell\REST\Endpoint\Interfaces\ModelInterface::class])) {
                 if (is_object($model)) {
                     $model = get_class($model);
                 }
@@ -378,7 +378,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @param array $data
      * @return AbstractModelEndpoint|null
      */
-    protected function buildModel(array $data = array())
+    protected function buildModel(array $data = [])
     {
         $Model = null;
         $class = $this->getProperty(self::PROPERTY_MODEL_CLASS) ?? static::$_MODEL_CLASS;

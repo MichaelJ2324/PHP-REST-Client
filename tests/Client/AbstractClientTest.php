@@ -88,9 +88,7 @@ class AbstractClientTest extends TestCase
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, function ($item) {
-            return $item[1] == 'configureAuth';
-        });
+        $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -115,9 +113,7 @@ class AbstractClientTest extends TestCase
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, function ($item) {
-            return $item[1] == 'configureAuth';
-        });
+        $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -129,9 +125,7 @@ class AbstractClientTest extends TestCase
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, function ($item) {
-            return $item[1] == 'configureAuth';
-        });
+        $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -201,8 +195,8 @@ class AbstractClientTest extends TestCase
         $this->assertEquals(1, $this->Client->getVersion());
         $this->assertEquals($this->Client, $this->Client->setVersion(null));
         $this->assertEquals(null, $this->Client->getVersion());
-        $this->assertEquals($this->Client, $this->Client->setVersion(array()));
-        $this->assertEquals(array(), $this->Client->getVersion());
+        $this->assertEquals($this->Client, $this->Client->setVersion([]));
+        $this->assertEquals([], $this->Client->getVersion());
         $this->assertEquals($this->Client, $this->Client->setVersion($this->version));
         $this->assertEquals($this->version, $this->Client->getVersion());
     }

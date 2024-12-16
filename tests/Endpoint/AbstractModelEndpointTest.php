@@ -71,12 +71,7 @@ class AbstractModelEndpointTest extends TestCase
         $Class = new \ReflectionClass($Model);
         $actions = $Class->getProperty('actions');
         $actions->setAccessible(true);
-        $this->assertEquals(array(
-            'create' => "POST",
-            'retrieve' => "GET",
-            'update' => "PUT",
-            'delete' => "DELETE"
-        ), $actions->getValue($Model));
+        $this->assertEquals(['create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
     }
 
     /**
@@ -89,13 +84,7 @@ class AbstractModelEndpointTest extends TestCase
         $Class = new \ReflectionClass($Model);
         $actions = $Class->getProperty('actions');
         $actions->setAccessible(true);
-        $this->assertEquals(array(
-            'foo' => "GET",
-            'create' => "POST",
-            'retrieve' => "GET",
-            'update' => "PUT",
-            'delete' => "DELETE"
-        ), $actions->getValue($Model));
+        $this->assertEquals(['foo' => "GET", 'create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
 
         static::$client->mockResponses->append(new Response(200));
         $Model->setClient(static::$client);
@@ -139,32 +128,22 @@ class AbstractModelEndpointTest extends TestCase
         $this->assertEquals($Model, $Model->set('foo', 'bar'));
         $this->assertEquals(true, isset($Model['foo']));
         $this->assertEquals('bar', $Model['foo']);
-        $this->assertEquals(array(
-            'foo' => 'bar'
-        ), $Model->toArray());
+        $this->assertEquals(['foo' => 'bar'], $Model->toArray());
         $this->assertEquals($Model, $Model->clear());
-        $this->assertEquals(array(), $Model->toArray());
+        $this->assertEquals([], $Model->toArray());
         $Model['foo'] = 'bar';
         $this->assertEquals('bar', $Model->get('foo'));
         unset($Model['foo']);
         $this->assertEquals(false, isset($Model['foo']));
-        $this->assertEquals(array(), $Model->toArray());
+        $this->assertEquals([], $Model->toArray());
 
-        $Model[] = array(
-            'foo' => 'bar'
-        );
-        $this->assertEquals(array(array(
-            'foo' => 'bar'
-        )), $Model->toArray());
-        $this->assertEquals($Model, $Model->set(array(
-            'foo' => 'bar'
-        )));
+        $Model[] = ['foo' => 'bar'];
+        $this->assertEquals([['foo' => 'bar']], $Model->toArray());
+        $this->assertEquals($Model, $Model->set(['foo' => 'bar']));
         $this->assertEquals('bar', $Model->get('foo'));
-        $this->assertEquals(array(
-            'foo' => 'bar'
-        ), $Model[0]);
+        $this->assertEquals(['foo' => 'bar'], $Model[0]);
         $this->assertEquals($Model, $Model->reset());
-        $this->assertEquals(array(), $Model->toArray());
+        $this->assertEquals([], $Model->toArray());
 
         $Model->foo = 'bar';
         $Model['bar'] = 'foo';
@@ -326,7 +305,7 @@ class AbstractModelEndpointTest extends TestCase
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode([
             'id' => '1234',
-            'name' => 'foo'
+            'name' => 'foo',
         ])));
         $Model->setData(['name' => 'foo']);
         $Model->save();
@@ -338,10 +317,10 @@ class AbstractModelEndpointTest extends TestCase
         static::$client->mockResponses->append(new Response(200, [], json_encode([
             'id' => '1234',
             'name' => 'foo',
-            'foo' => 'bar'
+            'foo' => 'bar',
         ])));
         $Model->set([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
         $Model->save();
         $this->assertEquals($Model->getResponse()->getStatusCode(), 200);
@@ -368,7 +347,7 @@ class AbstractModelEndpointTest extends TestCase
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode(['account' => [
             'id' => '1234',
-            'name' => 'foo'
+            'name' => 'foo',
         ]])));
         $Model->setData(['name' => 'foo']);
         $Model->save();
@@ -378,11 +357,11 @@ class AbstractModelEndpointTest extends TestCase
         $parseModelFromResponseBody->setAccessible(true);
         $this->assertEquals([
             'id' => '1234',
-            'name' => 'foo'
+            'name' => 'foo',
         ], $parseModelFromResponseBody->invoke($Model, $Model->getResponseBody(false), $Model->getModelResponseProp()));
         $this->assertEquals([
             'id' => '1234',
-            'name' => 'foo'
+            'name' => 'foo',
         ], $parseModelFromResponseBody->invoke($Model, $Model->getResponseBody(true), $Model->getModelResponseProp()));
 
         $Model->setProperty('response_prop', 'foobar');

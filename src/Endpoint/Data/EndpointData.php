@@ -2,6 +2,4 @@
 
 namespace MRussell\REST\Endpoint\Data;
 
-class EndpointData extends AbstractEndpointData
-{
-}
+class EndpointData extends AbstractEndpointData {}

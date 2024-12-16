@@ -20,7 +20,7 @@ interface EndpointProviderInterface
      * @param array $properties
      * @return $this
      */
-    public function registerEndpoint(string $name, string $className, array $properties = array()): self;
+    public function registerEndpoint(string $name, string $className, array $properties = []): self;
 
     /**
      * Check if Endpoint is registered

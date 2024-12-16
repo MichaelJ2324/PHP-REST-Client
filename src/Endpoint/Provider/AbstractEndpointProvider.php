@@ -11,21 +11,18 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
     /**
      * @var array
      */
-    protected $registry = array();
+    protected $registry = [];
 
     /**
      * @inheritdoc
      * @throws InvalidRegistration
      */
-    public function registerEndpoint($name, $className, array $properties = array()): EndpointProviderInterface
+    public function registerEndpoint($name, $className, array $properties = []): EndpointProviderInterface
     {
         try {
             $implements = class_implements($className);
-            if (is_array($implements) && isset($implements['MRussell\REST\Endpoint\Interfaces\EndpointInterface'])) {
-                $this->registry[$name] = array(
-                    'class' => $className,
-                    'properties' => $properties
-                );
+            if (is_array($implements) && isset($implements[\MRussell\REST\Endpoint\Interfaces\EndpointInterface::class])) {
+                $this->registry[$name] = ['class' => $className, 'properties' => $properties];
                 return $this;
             }
         } catch (\Exception $ex) {

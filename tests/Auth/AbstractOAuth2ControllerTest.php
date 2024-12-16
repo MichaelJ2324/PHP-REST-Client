@@ -37,16 +37,9 @@ class AbstractOAuth2ControllerTest extends TestCase
         //Add Tear Down for static properties here
     }
 
-    protected $token = array(
-        'access_token' => '12345',
-        'refresh_token' => '67890',
-        'expires_in' => 3600
-    );
+    protected $token = ['access_token' => '12345', 'refresh_token' => '67890', 'expires_in' => 3600];
 
-    protected $credentials = array(
-        'client_id' => 'test',
-        'client_secret' => 's3cr3t'
-    );
+    protected $credentials = ['client_id' => 'test', 'client_secret' => 's3cr3t'];
 
     public function setUp(): void
     {
@@ -98,7 +91,7 @@ class AbstractOAuth2ControllerTest extends TestCase
     public function testSetToken()
     {
         $Auth = new OAuth2Controller();
-        $Class = new \ReflectionClass('MRussell\REST\Auth\OAuth2Controller');
+        $Class = new \ReflectionClass(\MRussell\REST\Auth\OAuth2Controller::class);
         $isTokenExpired = $Class->getMethod('isTokenExpired');
         $isTokenExpired->setAccessible(true);
         $this->assertEquals($Auth, $Auth->setToken($this->token));
@@ -189,7 +182,7 @@ class AbstractOAuth2ControllerTest extends TestCase
         $Auth->setToken($this->token);
         $this->assertEquals(true, $Auth->refresh());
         $Logger->reset();
-        self::$client->mockResponses->append(new Response(200, [], "}".json_encode($this->token)."{"));
+        self::$client->mockResponses->append(new Response(200, [], "}" . json_encode($this->token) . "{"));
         $Auth->setToken($this->token);
         $this->assertEquals(false, $Auth->refresh());
         $this->assertEquals(true, $Logger->hasErrorThatContains("An Invalid Token was attempted to be set on the Auth Controller"));
@@ -209,7 +202,7 @@ class AbstractOAuth2ControllerTest extends TestCase
 
         $AuthEndpoint = new AuthEndpoint();
         $AuthEndpoint->setBaseUrl('localhost');
-        $Class = new \ReflectionClass('MRussell\REST\Auth\OAuth2Controller');
+        $Class = new \ReflectionClass(\MRussell\REST\Auth\OAuth2Controller::class);
         $method = $Class->getMethod('configureEndpoint');
         $method->setAccessible(true);
         $AuthEndpoint = $method->invoke($Auth, $AuthEndpoint, OAuth2Controller::ACTION_AUTH);
