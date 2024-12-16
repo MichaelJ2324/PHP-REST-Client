@@ -41,12 +41,12 @@ class AbstractOAuth2ControllerTest extends TestCase
 
     protected $credentials = ['client_id' => 'test', 'client_secret' => 's3cr3t'];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -202,9 +202,11 @@ class AbstractOAuth2ControllerTest extends TestCase
 
         $AuthEndpoint = new AuthEndpoint();
         $AuthEndpoint->setBaseUrl('localhost');
+
         $Class = new \ReflectionClass(\MRussell\REST\Auth\OAuth2Controller::class);
         $method = $Class->getMethod('configureEndpoint');
         $method->setAccessible(true);
+
         $AuthEndpoint = $method->invoke($Auth, $AuthEndpoint, OAuth2Controller::ACTION_AUTH);
         $data = $AuthEndpoint->getData();
         $this->assertEquals(OAuth2Controller::OAUTH_CLIENT_CREDENTIALS_GRANT, $data['grant_type']);
@@ -212,6 +214,7 @@ class AbstractOAuth2ControllerTest extends TestCase
         $RefreshEndpoint = new RefreshEndpoint();
         $RefreshEndpoint->setBaseUrl('localhost');
         $RefreshEndpoint = $method->invoke($Auth, $RefreshEndpoint, OAuth2Controller::ACTION_OAUTH_REFRESH);
+
         $data = $RefreshEndpoint->getData();
         $this->assertEquals(OAuth2Controller::OAUTH_REFRESH_GRANT, $data['grant_type']);
         $this->assertEquals('test', $data['client_id']);

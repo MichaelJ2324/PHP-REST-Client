@@ -13,4 +13,4 @@ return RectorConfig::configure()
         IssetOnPropertyObjectToPropertyExistsRector::class,
         SimplifyEmptyCheckOnEmptyArrayRector::class,
     ])
-    ->withPreparedSets(true, true);
+    ->withPreparedSets(true, true, true);

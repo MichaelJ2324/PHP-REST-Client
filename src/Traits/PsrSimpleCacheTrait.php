@@ -20,6 +20,7 @@ trait PsrSimpleCacheTrait
         if (empty($this->cache)) {
             $this->cache = MemoryCache::getInstance();
         }
+
         return $this->cache;
     }
 

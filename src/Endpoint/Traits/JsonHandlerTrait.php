@@ -25,12 +25,14 @@ trait JsonHandlerTrait
             $this->respContent = $response->getBody()->getContents();
             $response->getBody()->rewind();
         }
+
         $body = null;
         try {
             $body = json_decode($this->respContent, $associative);
             // @codeCoverageIgnoreStart
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
         }
+
         // @codeCoverageIgnoreEnd
         return $body;
     }

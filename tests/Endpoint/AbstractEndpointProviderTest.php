@@ -28,12 +28,12 @@ class AbstractEndpointProviderTest extends TestCase
         //Add Tear Down for static properties here
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -53,6 +53,7 @@ class AbstractEndpointProviderTest extends TestCase
         $Class = new \ReflectionClass(\MRussell\REST\Tests\Stubs\Endpoint\EndpointProviderWithDefaults::class);
         $property = $Class->getProperty('registry');
         $property->setAccessible(true);
+
         $Provider = new EndpointProviderWithDefaults();
         $this->assertNotEmpty($property->getValue($Provider));
     }

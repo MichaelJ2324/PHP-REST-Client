@@ -16,6 +16,7 @@ class DefaultEndpointProvider extends AbstractEndpointProvider
             if (!isset($epData['properties'])) {
                 $epData['properties'] = [];
             }
+
             $this->registerEndpoint($name, $epData['class'], $epData['properties']);
         }
     }

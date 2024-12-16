@@ -158,6 +158,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     {
         return key($this->models);
     }
+
     /**
      * @implements \Iterator
      */
@@ -207,6 +208,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
                 $data = $Model;
             }
         }
+
         return $data;
     }
 
@@ -223,16 +225,19 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         if ($index < 0) {
             $index += $this->length();
         }
+
         $c = 1;
         while ($c <= $index) {
             $this->next();
             $c++;
         }
+
         $return = $this->current();
         $Model = $this->buildModel($return);
         if ($Model !== null) {
             $return = $Model;
         }
+
         return $return;
     }
 
@@ -242,6 +247,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         if ($model) {
             return $model->modelIdKey();
         }
+
         return $this->getProperty(self::PROPERTY_MODEL_ID_KEY) ?? static::$_MODEL_ID_KEY;
     }
 
@@ -257,12 +263,14 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         if ($reset) {
             $this->models = [];
         }
+
         foreach ($models as $m) {
             if ($m instanceof DataInterface) {
                 $m = $m->toArray();
             } elseif ($m instanceof \stdClass) {
                 $m = (array) $m;
             }
+
             if (!empty($m[$modelIdKey])) {
                 $id = $m[$modelIdKey];
                 $this->models[$id] = $merge && isset($this->models[$id]) ? array_merge($this->models[$id], $m) : $m;
@@ -270,6 +278,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
                 $this->models[] = $m;
             }
         }
+
         return $this;
     }
 
@@ -293,12 +302,14 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
                 if (is_object($model)) {
                     $model = get_class($model);
                 }
+
                 $this->setProperty(self::PROPERTY_MODEL_CLASS, $model);
                 return $this;
             }
-        } catch (\Exception $ex) {
+        } catch (\Exception $exception) {
             //If class_implements cannot load class
         }
+
         throw new UnknownEndpoint($model);
     }
 
@@ -314,13 +325,15 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
                 $epURL = $model->getEndPointUrl();
             }
         }
+
         if ($full) {
-            $epURL = rtrim($this->getBaseUrl(), "/") . "/$epURL";
+            $epURL = rtrim($this->getBaseUrl(), "/") . ('/' . $epURL);
         }
+
         return $epURL;
     }
 
-    public function setResponse(Response $response): EndpointInterface
+    protected function setResponse(Response $response): EndpointInterface
     {
         parent::setResponse($response);
         $this->parseResponse($response);
@@ -367,10 +380,12 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
             } else {
                 $Model->setBaseUrl($this->getBaseUrl());
             }
+
             if (!empty($data)) {
                 $Model->set($data);
             }
         }
+
         return $Model;
     }
 }

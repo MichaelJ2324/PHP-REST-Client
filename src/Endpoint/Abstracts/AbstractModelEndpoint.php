@@ -30,20 +30,27 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     use ParseResponseBodyToArrayTrait;
 
     public const PROPERTY_RESPONSE_PROP = 'response_prop';
+
     public const MODEL_ID_VAR = 'id';
 
     public const MODEL_ACTION_CREATE = 'create';
+
     public const MODEL_ACTION_RETRIEVE = 'retrieve';
+
     public const MODEL_ACTION_UPDATE = 'update';
+
     public const MODEL_ACTION_DELETE = 'delete';
 
     public const EVENT_BEFORE_SAVE = 'before_save';
+
     public const EVENT_AFTER_SAVE = 'after_save';
 
     public const EVENT_BEFORE_DELETE = 'before_delete';
+
     public const EVENT_AFTER_DELETE = 'after_delete';
 
     public const EVENT_BEFORE_RETRIEVE = 'before_retrieve';
+
     public const EVENT_AFTER_RETRIEVE = 'after_retrieve';
 
     public const EVENT_BEFORE_SYNC = 'before_sync';
@@ -84,6 +91,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         if ($id !== null) {
             static::$_MODEL_ID_KEY = $id;
         }
+
         return static::$_MODEL_ID_KEY;
     }
 
@@ -101,6 +109,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         if (array_key_exists($name, $this->actions)) {
             return $this->setCurrentAction($name, $arguments)->execute();
         }
+
         throw new UnknownModelAction([get_class($this), $name]);
     }
 
@@ -125,10 +134,12 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
             if (isset($this->_attributes[$idKey])) {
                 $this->clear();
             }
+
             $this->set($idKey, $id);
         } elseif (!isset($this->_attributes[$idKey])) {
             throw new MissingModelId([$this->action, get_class($this)]);
         }
+
         $this->triggerEvent(self::EVENT_BEFORE_RETRIEVE);
         $this->execute();
         $this->triggerEvent(self::EVENT_AFTER_RETRIEVE);
@@ -146,6 +157,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         } else {
             $this->setCurrentAction(self::MODEL_ACTION_CREATE);
         }
+
         $this->triggerEvent(self::EVENT_BEFORE_SAVE);
         $this->execute();
         $this->triggerEvent(self::EVENT_AFTER_SAVE);
@@ -173,6 +185,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
             $this->action = $action;
             $this->configureAction($this->action, $actionArgs);
         }
+
         return $this;
     }
 
@@ -209,13 +222,15 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
                 } elseif (is_array($data)) {
                     $data = array_replace($data, $this->toArray());
                 }
+
                 break;
         }
+
         $this->triggerEvent(self::EVENT_CONFIGURE_PAYLOAD, $data);
         return $data;
     }
 
-    public function setResponse(Response $response): EndpointInterface
+    protected function setResponse(Response $response): EndpointInterface
     {
         parent::setResponse($response);
         $this->parseResponse($response);
@@ -269,6 +284,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
                     $urlArgs[self::MODEL_ID_VAR] = (empty($id) ? '' : $id);
             }
         }
+
         return parent::configureURL($urlArgs);
     }
 }

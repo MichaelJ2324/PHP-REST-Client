@@ -25,9 +25,10 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
                 $this->registry[$name] = ['class' => $className, 'properties' => $properties];
                 return $this;
             }
-        } catch (\Exception $ex) {
+        } catch (\Exception $exception) {
             //Class Implements failed to Load Class completely
         }
+
         throw new InvalidRegistration([$className]);
     }
 
@@ -66,6 +67,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
                 $Endpoint->setProperty($prop, $value);
             }
         }
+
         return $Endpoint;
     }
 }

@@ -47,12 +47,12 @@ class AbstractEndpointTest extends TestCase
 
     protected $properties = ['url' => '$foo/$bar/$:test'];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -149,6 +149,7 @@ class AbstractEndpointTest extends TestCase
     {
         $Endpoint = new BasicEndpoint();
         $Endpoint->setProperties($this->properties);
+
         $props = $this->properties;
         $props['httpMethod'] = '';
         $props['auth'] = 1;
@@ -392,10 +393,12 @@ class AbstractEndpointTest extends TestCase
     {
         $Ping = new PingEndpoint();
         $Ping->setClient(static::$client);
+
         $pong = ['pong' => time()];
         $respBody = json_encode($pong);
         static::$client->mockResponses->append(new Response(200, [], $respBody));
         static::$client->mockResponses->append(new Response(200, [], json_encode([])));
+
         $Ping->execute();
         $this->assertInstanceOf(Response::class, $Ping->getResponse());
         $this->assertEquals($pong, $Ping->getResponseContent($Ping->getResponse()));
@@ -416,6 +419,7 @@ class AbstractEndpointTest extends TestCase
     {
         $Ping = new PingEndpoint();
         $Ping->setClient(static::$client);
+
         $pong = ['pong' => time()];
         $respBody = json_encode($pong);
         static::$client->mockResponses->append(new Response(200, [], $respBody));
@@ -439,9 +443,9 @@ class AbstractEndpointTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         try {
             $response = $promises['second']->wait();
-        } catch (\Exception $ex) {
-            $self->assertInstanceOf(RequestException::class, $ex);
-            $self->assertInstanceOf(Response::class, $ex->getResponse());
+        } catch (\Exception $exception) {
+            $self->assertInstanceOf(RequestException::class, $exception);
+            $self->assertInstanceOf(Response::class, $exception->getResponse());
         }
     }
 }

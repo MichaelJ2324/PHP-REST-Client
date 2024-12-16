@@ -16,6 +16,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
     use PsrSimpleCacheTrait;
 
     public const ACTION_AUTH = 'authenticate';
+
     public const ACTION_LOGOUT = 'logout';
 
     /**
@@ -71,6 +72,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
         if (!empty($token)) {
             $this->setToken($token);
         }
+
         return $this;
     }
 
@@ -79,6 +81,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
         if (empty($this->cacheKey)) {
             $this->cacheKey = "AUTH_TOKEN_" . sha1(json_encode($this->credentials));
         }
+
         return $this->cacheKey;
     }
 
@@ -151,6 +154,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
         if (in_array($action, $this->actions)) {
             $this->endpoints[$action] = $Endpoint;
         }
+
         return $this;
     }
 
@@ -162,6 +166,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
         if (isset($this->endpoints[$action])) {
             return $this->endpoints[$action];
         }
+
         throw new InvalidAuthenticationAction([$action, self::class]);
     }
 
@@ -186,10 +191,11 @@ abstract class AbstractAuthController implements AuthControllerInterface
                 $token = $this->parseResponseToToken(self::ACTION_AUTH, $response);
                 $this->setToken($token);
             }
-        } catch (\Exception $e) {
-            $this->getLogger()->error("[REST] Authenticate Exception - " . $e->getMessage());
+        } catch (\Exception $exception) {
+            $this->getLogger()->error("[REST] Authenticate Exception - " . $exception->getMessage());
             $ret = false;
         }
+
         return $ret;
     }
 
@@ -212,6 +218,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
         } catch (\Exception $ex) {
             $this->getLogger()->error("[REST] Logout Exception - " . $ex->getMessage());
         }
+
         return $ret;
     }
 
@@ -263,6 +270,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
                 $Endpoint = $this->configureLogoutEndpoint($Endpoint);
                 break;
         }
+
         return $Endpoint;
     }
 

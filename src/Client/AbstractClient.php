@@ -85,6 +85,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
         if ($this->httpClient == null) {
             $this->initHttpClient();
         }
+
         return $this->httpClient;
     }
 
@@ -93,6 +94,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
         if (!$this->guzzleHandlerStack) {
             $this->initHttpHandlerStack();
         }
+
         return $this->guzzleHandlerStack;
     }
 
@@ -106,6 +108,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
         if ($this->Auth) {
             $this->configureAuth();
         }
+
         return $this;
     }
 
@@ -125,6 +128,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
                     return $Auth->configureRequest($request);
                 }
             }
+
             return $request;
         }), 'configureAuth');
     }
@@ -226,6 +230,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
             $this->lastEndPoint = $this->currentEndPoint;
             unset($this->currentEndPoint);
         }
+
         $this->currentEndPoint = $Endpoint;
         return $this;
     }

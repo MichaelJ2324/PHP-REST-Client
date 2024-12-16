@@ -72,6 +72,7 @@ class FileUploadEndpointTest extends TestCase
         $upload = $Reflection->getProperty('_upload');
         $upload->setAccessible(true);
         $upload->setValue($Endpoint, true);
+
         $configureFileUploadRequest = $Reflection->getMethod('configureFileUploadRequest');
         $configureFileUploadRequest->setAccessible(true);
 

@@ -22,6 +22,7 @@ trait SetAttributesTrait
         } else {
             $this->_attributes[$key] = $value;
         }
+
         return $this;
     }
 }
