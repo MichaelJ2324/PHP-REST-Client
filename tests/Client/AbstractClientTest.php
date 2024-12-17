@@ -193,12 +193,6 @@ class AbstractClientTest extends TestCase
      */
     public function testSetVersion(): void
     {
-        $this->assertEquals($this->Client, $this->Client->setVersion(1));
-        $this->assertEquals(1, $this->Client->getVersion());
-        $this->assertEquals($this->Client, $this->Client->setVersion(null));
-        $this->assertEquals(null, $this->Client->getVersion());
-        $this->assertEquals($this->Client, $this->Client->setVersion([]));
-        $this->assertEquals([], $this->Client->getVersion());
         $this->assertEquals($this->Client, $this->Client->setVersion($this->version));
         $this->assertEquals($this->version, $this->Client->getVersion());
     }

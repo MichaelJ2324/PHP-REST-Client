@@ -8,16 +8,13 @@ use MRussell\REST\Exception\Endpoint\UnknownEndpoint;
 
 abstract class AbstractEndpointProvider implements EndpointProviderInterface
 {
-    /**
-     * @var array
-     */
-    protected $registry = [];
+    protected array $registry = [];
 
     /**
      * @inheritdoc
      * @throws InvalidRegistration
      */
-    public function registerEndpoint($name, $className, array $properties = []): EndpointProviderInterface
+    public function registerEndpoint($name, $className, array $properties = []): static
     {
         try {
             $implements = class_implements($className);
@@ -25,7 +22,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
                 $this->registry[$name] = ['class' => $className, 'properties' => $properties];
                 return $this;
             }
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             //Class Implements failed to Load Class completely
         }
 
@@ -56,7 +53,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
     /**
      * @param $name
      */
-    protected function buildEndpoint($name, $version = null): EndpointInterface
+    protected function buildEndpoint(string $name, string $version = null): EndpointInterface
     {
         $endPointArray = $this->registry[$name];
         $Class = $endPointArray['class'];

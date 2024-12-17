@@ -60,7 +60,7 @@ abstract class AbstractEndpointData implements DataInterface
      * @param mixed $value - The value to set
      * @abstracting ArrayAccess
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet($offset, mixed $value): void
     {
         $this->isNull = false;
         if (is_null($offset)) {
@@ -75,7 +75,7 @@ abstract class AbstractEndpointData implements DataInterface
      * @param $value
      * @return $this
      */
-    public function set($key, $value = null)
+    public function set($key, $value = null): static
     {
         if ((is_array($key) && !empty($key)) || !is_array($key)) {
             $this->isNull = false;
@@ -87,7 +87,7 @@ abstract class AbstractEndpointData implements DataInterface
     /**
      * Set properties for data
      */
-    public function setProperties(array $properties): void
+    public function setProperties(array $properties): static
     {
         if (!isset($properties[self::DATA_PROPERTY_REQUIRED])) {
             $properties[self::DATA_PROPERTY_REQUIRED] = [];
@@ -97,15 +97,14 @@ abstract class AbstractEndpointData implements DataInterface
             $properties[self::DATA_PROPERTY_DEFAULTS] = [];
         }
 
-        $this->rawSetProperties($properties);
+        return $this->rawSetProperties($properties);
     }
 
     /**
      * Set Data back to Defaults and clear out data
-     * @return AbstractEndpointData
      * @implements ResettableInterface
      */
-    public function reset(): DataInterface
+    public function reset(): static
     {
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
         $this->null();
@@ -116,7 +115,7 @@ abstract class AbstractEndpointData implements DataInterface
      * Set data to null
      * @return $this
      */
-    public function null()
+    public function null(): static
     {
         $this->clear();
         $this->isNull = true;

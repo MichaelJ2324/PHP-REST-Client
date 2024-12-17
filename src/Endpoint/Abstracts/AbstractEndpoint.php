@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
 use MRussell\REST\Client\ClientAwareTrait;
@@ -57,52 +56,45 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     public const AUTH_REQUIRED = 2;
 
-    protected static $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => self::AUTH_EITHER];
+    protected static array $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => self::AUTH_EITHER];
 
-    private ?PromiseInterface $promise = null;
+    private PromiseInterface $promise;
 
     /**
      * The Variable Identifier to parse Endpoint URL
-     * @var string
      */
-    protected static $_URL_VAR_CHARACTER = '$';
+    protected static string $_URL_VAR_CHARACTER = '$';
 
     /**
      * The Endpoint Relative URL to the API
-     * @var string
      */
-    protected static $_ENDPOINT_URL = '';
+    protected static string $_ENDPOINT_URL = '';
 
     /**
      * The initial URL passed into the Endpoint
-     * @var string
      */
-    protected $baseUrl = '';
+    protected string $baseUrl = '';
 
     /**
      * The passed in Options for the Endpoint, mainly used for parsing URL Variables
-     * @var array
      */
-    protected $urlArgs = [];
+    protected array $urlArgs = [];
 
     /**
      * The data being passed to the API Endpoint.
      * Defaults to Array, but can be mixed based on how you want to use Endpoint.
-     * @var mixed
      */
-    protected $data;
+    protected string|array|\ArrayAccess|null $data;
 
     /**
      * The Request Object used by the Endpoint to submit the data
-     * @var Request
      */
-    protected $request;
+    protected Request $request;
 
     /**
      * The Response Object used by the Endpoint
-     * @var Response
      */
-    protected $response;
+    protected Response $response;
 
     public function __construct(array $urlArgs = [], array $properties = [])
     {
@@ -121,7 +113,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setUrlArgs(array $args): EndpointInterface
+    public function setUrlArgs(array $args): static
     {
         $this->urlArgs = $args;
         return $this;
@@ -138,7 +130,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setBaseUrl($url): EndpointInterface
+    public function setBaseUrl($url): static
     {
         $this->baseUrl = $url;
         return $this;
@@ -159,10 +151,10 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getEndPointUrl($full = false): string
+    public function getEndPointUrl(bool $full = false): string
     {
         $url = static::$_ENDPOINT_URL;
-        if (isset($this->_properties[self::PROPERTY_URL]) && $this->_properties[self::PROPERTY_URL] !== '') {
+        if (!empty($this->_properties[self::PROPERTY_URL])) {
             $url = $this->_properties[self::PROPERTY_URL];
         }
 
@@ -176,7 +168,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setData($data)
+    public function setData(string|array|\ArrayAccess|null $data): static
     {
         $this->data = $data;
         return $this;
@@ -185,28 +177,15 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getData()
+    public function getData(): string|array|\ArrayAccess|null
     {
-        return $this->data;
-    }
-
-    /**
-     * Due to how Guzzle Requests work, this may not return the actual Request object used
-     * - Use Middleware::history() if you need the request that was sent to server
-     *
-     * May deprecate in the future, just leaving it in right now to assess if its still needed
-     * TODO:Deprecate me
-     * @codeCoverageIgnore
-     */
-    protected function getRequest(): Request
-    {
-        return $this->request;
+        return $this->data ?? null;
     }
 
     /**
      * @return $this|EndpointInterface
      */
-    protected function setResponse(Response $response)
+    protected function setResponse(Response $response): static
     {
         $this->response = $response;
         $this->respContent = null;
@@ -217,7 +196,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }
@@ -243,7 +222,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @return $this
      * @throws GuzzleException
      */
-    public function execute(array $options = []): EndpointInterface
+    public function execute(array $options = []): static
     {
         $this->setResponse($this->getHttpClient()->send($this->buildRequest(), $options));
         return $this;
@@ -275,12 +254,9 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         return $this;
     }
 
-    /**
-     * @return Promise
-     */
-    public function getPromise()
+    public function getPromise(): ?PromiseInterface
     {
-        return $this->promise;
+        return $this->promise ?? null;
     }
 
     /**
@@ -399,8 +375,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
             foreach ($urlArr as $key => $urlPart) {
                 $replace = null;
-                if (strpos($urlPart, static::$_URL_VAR_CHARACTER) !== false) {
-                    if (strpos($urlPart, ':') !== false) {
+                if (str_contains($urlPart, static::$_URL_VAR_CHARACTER)) {
+                    if (str_contains($urlPart, ':')) {
                         $optional = true;
                         $replace = '';
                     }
@@ -439,8 +415,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     private function verifyUrl(string $url): bool
     {
-        if (strpos($url, static::$_URL_VAR_CHARACTER) !== false) {
-            throw new InvalidUrl([get_class($this), $url]);
+        if (str_contains($url, static::$_URL_VAR_CHARACTER)) {
+            throw new InvalidUrl([static::class, $url]);
         }
 
         return true;
@@ -463,7 +439,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     protected function extractUrlVariables($url): array
     {
         $variables = [];
-        $pattern = "/(\\" . static::$_URL_VAR_CHARACTER . ".*?[^\\/]*)/";
+        $pattern = "/(" . preg_quote(static::$_URL_VAR_CHARACTER) . ".*?[^\\/]*)/";
         if (preg_match_all($pattern, $url, $matches)) {
             foreach ($matches as $match) {
                 $variables[] = $match[0];
@@ -476,10 +452,10 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @return $this
      */
-    public function reset()
+    public function reset(): static
     {
-        $this->request = null;
-        $this->response = null;
+        unset($this->request);
+        unset($this->response);
         $this->urlArgs = [];
         $this->setData(null);
         $this->setProperties([]);
@@ -489,7 +465,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): static
     {
         if (!isset($properties[self::PROPERTY_HTTP_METHOD])) {
             $properties[self::PROPERTY_HTTP_METHOD] = '';

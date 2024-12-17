@@ -12,11 +12,7 @@ class DefaultEndpointProvider extends AbstractEndpointProvider
     public function __construct()
     {
         foreach (static::$_DEFAULT_ENDPOINTS as $name => $epData) {
-            if (!isset($epData['properties'])) {
-                $epData['properties'] = [];
-            }
-
-            $this->registerEndpoint($name, $epData['class'], $epData['properties']);
+            $this->registerEndpoint($name, $epData['class'], $epData['properties'] ?? []);
         }
     }
 }

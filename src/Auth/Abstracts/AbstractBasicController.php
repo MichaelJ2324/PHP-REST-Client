@@ -14,9 +14,9 @@ abstract class AbstractBasicController extends AbstractAuthController
 
     public const DEFAULT_AUTH_TYPE = 'Basic';
 
-    protected static $_AUTH_HEADER = self::DEFAULT_AUTH_HEADER;
+    protected static string $_AUTH_HEADER = self::DEFAULT_AUTH_HEADER;
 
-    protected static $_AUTH_TYPE = self::DEFAULT_AUTH_TYPE;
+    protected static string $_AUTH_TYPE = self::DEFAULT_AUTH_TYPE;
 
     /**
      * @inheritdoc

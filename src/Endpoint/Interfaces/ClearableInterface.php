@@ -8,5 +8,5 @@ interface ClearableInterface
      * Clear an object of data
      * @return $this
      */
-    public function clear();
+    public function clear(): static;
 }

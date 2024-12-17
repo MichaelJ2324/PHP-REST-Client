@@ -28,7 +28,7 @@ class Client extends AbstractClient
         parent::__construct();
     }
 
-    public function current(EndpointInterface $endpoint = null)
+    public function current(EndpointInterface $endpoint = null): EndpointInterface
     {
         if ($endpoint instanceof EndpointInterface) {
             $this->setCurrentEndpoint($endpoint);

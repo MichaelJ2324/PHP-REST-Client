@@ -6,5 +6,5 @@ use MRussell\REST\Endpoint\Abstracts\AbstractCollectionEndpoint;
 
 class CollectionEndpointWithoutModel extends AbstractCollectionEndpoint
 {
-    protected static $_ENDPOINT_URL = 'accounts';
+    protected static string $_ENDPOINT_URL = 'accounts';
 }
