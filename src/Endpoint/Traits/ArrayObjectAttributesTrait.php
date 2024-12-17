@@ -2,8 +2,6 @@
 
 namespace MRussell\REST\Endpoint\Traits;
 
-use MRussell\REST\Endpoint\Interfaces\ArrayableInterface;
-
 trait ArrayObjectAttributesTrait
 {
     /**
@@ -70,7 +68,6 @@ trait ArrayObjectAttributesTrait
     /**
      * Whether or not an offset exists
      * @param string $offset - An offset to check for
-     * @return boolean
      * @abstracting ArrayAccess
      */
     public function offsetExists($offset): bool

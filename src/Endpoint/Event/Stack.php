@@ -24,7 +24,6 @@ class Stack implements StackInterface
     protected $endpoint;
 
     /**
-     * @param EndpointInterface $endpoint
      * @return $this
      */
     public function setEndpoint(EndpointInterface $endpoint): StackInterface
@@ -33,18 +32,13 @@ class Stack implements StackInterface
         return $this;
     }
 
-    /**
-     * @return EndpointInterface
-     */
     public function getEndpoint(): EndpointInterface
     {
         return $this->endpoint;
     }
 
     /**
-     * @param string $event
      * @param $data
-     * @return StackInterface
      */
     public function trigger(string $event, &$data = null): StackInterface
     {
@@ -54,13 +48,14 @@ class Stack implements StackInterface
             foreach ($this->events[$event] as $callable) {
                 $this->runEventHandler($callable, $data);
             }
+
             unset(self::$IN_EVENT[$event]);
         }
+
         return $this;
     }
 
     /**
-     * @param callable $handler
      * @param $data
      * @return void
      */
@@ -77,9 +72,11 @@ class Stack implements StackInterface
         if (!isset($this->events[$event])) {
             $this->events[$event] = [];
         }
+
         if (empty($id)) {
             $id = count($this->events);
         }
+
         $this->events[$event][$id] = $func;
         return $id;
     }
@@ -94,8 +91,10 @@ class Stack implements StackInterface
             if (empty($this->events[$event])) {
                 unset($this->events[$event]);
             }
+
             return true;
         }
+
         return false;
     }
 }

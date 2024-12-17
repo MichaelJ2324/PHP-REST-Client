@@ -37,7 +37,7 @@ class MemoryCacheTest extends TestCase
 
         $cache2->set('foo', 'bar');
         $this->assertEquals([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ], $arrCache->getValue($cache));
         $this->assertEquals(true, $cache->has('foo'));
         $this->assertEquals('bar', $cache2->get('foo'));
@@ -60,19 +60,19 @@ class MemoryCacheTest extends TestCase
         $cache = MemoryCache::getInstance();
         $cache->setMultiple([
             'foo' => 'bar',
-            'baz' => 'foz'
+            'baz' => 'foz',
         ]);
         $this->assertEquals([
             'foo' => 'bar',
-            'baz' => 'foz'
+            'baz' => 'foz',
         ], $cache->getMultiple(['foo','baz']));
         $this->assertEquals([
             'foo' => 'bar',
-            'bar' => 'foo'
+            'bar' => 'foo',
         ], $cache->getMultiple(['foo','bar'], ['bar' => 'foo']));
         $this->assertEquals(true, $cache->deleteMultiple(['foo','baz']));
         $this->assertEquals(false, $cache->deleteMultiple(['foo']));
-        $this->assertEquals(null, $cache->getMultiple(['foo','baz']));
+        $this->assertEquals([], $cache->getMultiple(['foo','baz']));
     }
 
 

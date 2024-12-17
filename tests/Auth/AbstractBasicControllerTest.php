@@ -30,12 +30,12 @@ class AbstractBasicControllerTest extends TestCase
         //Add Tear Down for static properties here
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -51,13 +51,14 @@ class AbstractBasicControllerTest extends TestCase
         $this->assertEquals(['Authorization' => ["Basic"]], $Request->getHeaders());
         $Auth->setCredentials([
             'username' => 'foo',
-            'password' => 'bar'
+            'password' => 'bar',
         ]);
         $Request = $Auth->configureRequest($Request);
         $this->assertEquals(['Authorization' => ['Basic ' . base64_encode("foo:bar")]], $Request->getHeaders());
 
         $Auth = new BasicAuthController();
         $Auth->setToken(base64_encode("foo:bar"));
+
         $Request = $Auth->configureRequest(new Request("GET", ""));
         $this->assertEquals(['Authorization' => ['Basic ' . base64_encode("foo:bar")]], $Request->getHeaders());
 

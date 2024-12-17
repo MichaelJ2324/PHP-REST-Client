@@ -2,7 +2,6 @@
 
 namespace MRussell\REST\Traits;
 
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -17,8 +16,6 @@ trait PsrLoggerTrait
 
     /**
      * Sets a logger.
-     *
-     * @param LoggerInterface $logger
      */
     public function setLogger(LoggerInterface $logger)
     {
@@ -35,6 +32,7 @@ trait PsrLoggerTrait
         if (!isset($this->logger)) {
             $this->setLogger(new NullLogger());
         }
+
         return $this->logger;
     }
 }

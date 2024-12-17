@@ -6,10 +6,7 @@ use Psr\SimpleCache\CacheInterface;
 
 class MemoryCache implements CacheInterface
 {
-    /**
-     * @var array
-     */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @var MemoryCache
@@ -18,16 +15,15 @@ class MemoryCache implements CacheInterface
 
     /**
      * Get the In Memory Cache Object
-     *
-     * @return MemoryCache
      */
-    public static function getInstance()
+    public static function getInstance(): MemoryCache
     {
         if (empty(static::$instance)) {
             // @codeCoverageIgnoreStart
             static::$instance = new static();
             // @codeCoverageIgnoreEnd
         }
+
         return static::$instance;
     }
 
@@ -61,6 +57,7 @@ class MemoryCache implements CacheInterface
             unset($this->cache[$key]);
             $return = true;
         }
+
         return $return;
     }
 
@@ -79,15 +76,17 @@ class MemoryCache implements CacheInterface
     public function getMultiple($keys, $default = null)
     {
         $items = $default ?? [];
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             if ($this->has($key)) {
                 $items[$key] = $this->cache[$key];
             }
         }
+
         if (empty($items)) {
             $items = $default;
         }
-        return $items;
+
+        return $items ?? [];
     }
 
     /**
@@ -95,9 +94,10 @@ class MemoryCache implements CacheInterface
      */
     public function setMultiple($values, $ttl = null)
     {
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
             $this->set($key, $value, $ttl);
         }
+
         return true;
     }
 
@@ -107,11 +107,12 @@ class MemoryCache implements CacheInterface
     public function deleteMultiple($keys)
     {
         $return = true;
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             if (!$this->delete($key)) {
                 $return = false;
             }
         }
+
         return $return;
     }
 

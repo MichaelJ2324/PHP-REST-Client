@@ -3,7 +3,6 @@
 namespace MRussell\REST\Auth\Abstracts;
 
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 
 /**
  * Class AbstractBasicController
@@ -12,9 +11,11 @@ use GuzzleHttp\Psr7\Response;
 abstract class AbstractBasicController extends AbstractAuthController
 {
     public const DEFAULT_AUTH_HEADER = 'Authorization';
+
     public const DEFAULT_AUTH_TYPE = 'Basic';
 
     protected static $_AUTH_HEADER = self::DEFAULT_AUTH_HEADER;
+
     protected static $_AUTH_TYPE = self::DEFAULT_AUTH_TYPE;
 
     /**
@@ -27,7 +28,6 @@ abstract class AbstractBasicController extends AbstractAuthController
 
     /**
      * Parse the Credentials or Token to build out the Auth Header Value
-     * @return string
      */
     protected function getAuthHeaderValue(): string
     {
@@ -36,9 +36,11 @@ abstract class AbstractBasicController extends AbstractAuthController
             $value = $this->credentials['username'] . ":" . $this->credentials['password'];
             $value = base64_encode($value);
         }
+
         if ($this->getToken() != null) {
             $value = $this->getToken();
         }
+
         return static::$_AUTH_TYPE . " " . $value;
     }
 }

@@ -15,9 +15,8 @@ class StackTest extends TestCase
     /**
      * @covers ::getEndpoint
      * @covers ::setEndpoint
-     * @return Stack
      */
-    public function testGetSetEndpoint()
+    public function testGetSetEndpoint(): Stack
     {
         $stack = new Stack();
         $ep = new BasicEndpoint();
@@ -33,13 +32,13 @@ class StackTest extends TestCase
      * @covers ::trigger
      * @covers ::runEventHandler
      */
-    public function testEvents(Stack $stack)
+    public function testEvents(Stack $stack): void
     {
         $ep = $stack->getEndpoint();
         $data = [
-            'foo' => 'bar'
+            'foo' => 'bar',
         ];
-        $id = $stack->register('foobar', function (&$iData, EndpointInterface $endpoint) use ($ep) {
+        $id = $stack->register('foobar', function (array &$iData, EndpointInterface $endpoint) use ($ep) {
             $this->assertEquals($ep, $endpoint);
             $iData['bar'] = 'foo';
             return $iData;
@@ -54,7 +53,7 @@ class StackTest extends TestCase
         $this->assertEquals($stack, $stack->trigger('foobar', $data));
         $this->assertEquals('foo', $data['bar']);
 
-        $id2 = $stack->register('foobar', function (&$iData, EndpointInterface $endpoint) use ($ep) {
+        $id2 = $stack->register('foobar', function (array &$iData, EndpointInterface $endpoint) use ($ep): array {
             $this->assertEquals($ep, $endpoint);
             unset($iData['foo']);
             return $iData;
@@ -64,7 +63,7 @@ class StackTest extends TestCase
 
         $this->assertEquals($stack, $stack->trigger('foobar', $data));
         $this->assertEquals([
-            'bar' => 'foo'
+            'bar' => 'foo',
         ], $data);
 
         $this->assertEquals(true, $stack->remove('foobar', $id));

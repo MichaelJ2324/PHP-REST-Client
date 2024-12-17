@@ -2,8 +2,6 @@
 
 namespace MRussell\REST\Endpoint\Data;
 
-use MRussell\REST\Endpoint\Interfaces\ArrayableInterface;
-use MRussell\REST\Endpoint\Interfaces\ResettableInterface;
 use MRussell\REST\Endpoint\Traits\ArrayObjectAttributesTrait;
 use MRussell\REST\Endpoint\Traits\ClearAttributesTrait;
 use MRussell\REST\Endpoint\Traits\GetAttributesTrait;
@@ -30,22 +28,19 @@ abstract class AbstractEndpointData implements DataInterface
     protected $isNull = true;
 
     public const DATA_PROPERTY_REQUIRED = 'required';
+
     public const DATA_PROPERTY_DEFAULTS = 'defaults';
 
-    protected static $_DEFAULT_PROPERTIES = array(
-        self::DATA_PROPERTY_REQUIRED => [],
-        self::DATA_PROPERTY_DEFAULTS => [],
-    );
+    protected static $_DEFAULT_PROPERTIES = [self::DATA_PROPERTY_REQUIRED => [], self::DATA_PROPERTY_DEFAULTS => []];
 
     //Overloads
     public function __construct(array $data = null, array $properties = [])
     {
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
-        if (!empty($properties)) {
-            foreach ($properties as $key => $value) {
-                $this->setProperty($key, $value);
-            }
+        foreach ($properties as $key => $value) {
+            $this->setProperty($key, $value);
         }
+
         $this->configureDefaultData();
         if (!empty($data)) {
             $this->set($data);
@@ -85,21 +80,23 @@ abstract class AbstractEndpointData implements DataInterface
         if ((is_array($key) && !empty($key)) || !is_array($key)) {
             $this->isNull = false;
         }
+
         return $this->setAttributes($key, $value);
     }
 
     /**
      * Set properties for data
-     * @param array $properties
      */
     public function setProperties(array $properties): void
     {
         if (!isset($properties[self::DATA_PROPERTY_REQUIRED])) {
             $properties[self::DATA_PROPERTY_REQUIRED] = [];
         }
+
         if (!isset($properties[self::DATA_PROPERTY_DEFAULTS])) {
             $properties[self::DATA_PROPERTY_DEFAULTS] = [];
         }
+
         $this->rawSetProperties($properties);
     }
 
@@ -126,9 +123,6 @@ abstract class AbstractEndpointData implements DataInterface
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isNull(): bool
     {
         return $this->isNull && empty($this->_attributes);
@@ -145,13 +139,12 @@ abstract class AbstractEndpointData implements DataInterface
             && !empty($this->_properties[self::DATA_PROPERTY_DEFAULTS])) {
             $this->set($this->_properties[self::DATA_PROPERTY_DEFAULTS]);
         }
+
         return $this;
     }
 
     /**
      * Verify data requirements when converting to Array
-     * @param bool $verify
-     * @return array
      * @throws InvalidData
      */
     public function toArray(bool $verify = false): array
@@ -159,19 +152,19 @@ abstract class AbstractEndpointData implements DataInterface
         if ($verify) {
             $this->verifyRequiredData();
         }
+
         return $this->_attributes;
     }
 
     /**
      * Validate Required Data for the Endpoint
-     * @return bool
      * @throws InvalidData
      */
     protected function verifyRequiredData(): bool
     {
         $errors = [
             'missing' => [],
-            'invalid' => []
+            'invalid' => [],
         ];
         $error = false;
         if (!empty($this->_properties[self::DATA_PROPERTY_REQUIRED])) {
@@ -181,22 +174,27 @@ abstract class AbstractEndpointData implements DataInterface
                     $error = true;
                     continue;
                 }
+
                 if ($type !== null && gettype($this->_attributes[$property]) !== $type) {
                     $errors['invalid'][] = $property;
                     $error = true;
                 }
             }
         }
+
         if ($error) {
             $errorMsg = '';
             if (!empty($errors['missing'])) {
                 $errorMsg .= "Missing [" . implode(",", $errors['missing']) . "] ";
             }
+
             if (!empty($errors['invalid'])) {
                 $errorMsg .= "Invalid [" . implode(",", $errors['invalid']) . "]";
             }
+
             throw new InvalidData(trim($errorMsg));
         }
+
         return $error;
     }
 }

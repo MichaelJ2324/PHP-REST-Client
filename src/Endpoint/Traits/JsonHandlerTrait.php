@@ -7,12 +7,8 @@ use GuzzleHttp\Psr7\Response;
 
 trait JsonHandlerTrait
 {
-    protected $respContent = null;
+    protected $respContent;
 
-    /**
-     * @param Request $request
-     * @return Request
-     */
     protected function configureJsonRequest(Request $request): Request
     {
         return $request->withHeader('Content-Type', 'application/json');
@@ -29,12 +25,14 @@ trait JsonHandlerTrait
             $this->respContent = $response->getBody()->getContents();
             $response->getBody()->rewind();
         }
+
         $body = null;
         try {
             $body = json_decode($this->respContent, $associative);
             // @codeCoverageIgnoreStart
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
         }
+
         // @codeCoverageIgnoreEnd
         return $body;
     }

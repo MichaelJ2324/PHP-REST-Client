@@ -5,9 +5,7 @@ namespace MRussell\REST\Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use MRussell\REST\Auth\AuthControllerInterface;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
-use MRussell\REST\Endpoint\Provider\EndpointProviderInterface;
 use MRussell\REST\Exception\Client\EndpointProviderMissing;
 use GuzzleHttp\Psr7\Request;
 
@@ -42,7 +40,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
     /**
      * @var string
      */
-    protected $version = null;
+    protected $version;
 
     /**
      * @var EndpointInterface
@@ -80,30 +78,25 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
         $this->guzzleHandlerStack = HandlerStack::create();
     }
 
-    /**
-     * @return Client
-     */
     public function getHttpClient(): Client
     {
-        if($this->httpClient == null) {
+        if ($this->httpClient == null) {
             $this->initHttpClient();
         }
+
         return $this->httpClient;
     }
 
-    /**
-     * @return HandlerStack
-     */
     public function getHandlerStack(): HandlerStack
     {
         if (!$this->guzzleHandlerStack) {
             $this->initHttpHandlerStack();
         }
+
         return $this->guzzleHandlerStack;
     }
 
     /**
-     * @param HandlerStack $stackHandler
      * @return $this
      */
     public function setHandlerStack(HandlerStack $stackHandler)
@@ -113,6 +106,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
         if ($this->Auth) {
             $this->configureAuth();
         }
+
         return $this;
     }
 
@@ -124,7 +118,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
     {
         $api = $this;
         $this->getHandlerStack()->remove('configureAuth');
-        $this->getHandlerStack()->push(Middleware::mapRequest(function (Request $request) use ($api) {
+        $this->getHandlerStack()->push(Middleware::mapRequest(function (Request $request) use ($api): Request {
             $Auth = $api->getAuth();
             if ($Auth) {
                 $EP = $api->current();
@@ -132,6 +126,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
                     return $Auth->configureRequest($request);
                 }
             }
+
             return $request;
         }), 'configureAuth');
     }
@@ -208,7 +203,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
     /**
      * @inheritdoc
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, $arguments)
     {
         $provider = $this->getEndpointProvider();
         if ($provider) {
@@ -224,7 +219,6 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
 
     /**
      * Rotates current Endpoint to Last Endpoint, and sets Current Endpoint with passed in Endpoint
-     * @param EndpointInterface $Endpoint
      * @return $this
      */
     protected function setCurrentEndpoint(EndpointInterface $Endpoint)
@@ -234,6 +228,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
             $this->lastEndPoint = $this->currentEndPoint;
             unset($this->currentEndPoint);
         }
+
         $this->currentEndPoint = $Endpoint;
         return $this;
     }
