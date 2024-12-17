@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Tests\Client;
 
+use MRussell\REST\Exception\Client\EndpointProviderMissing;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -40,13 +41,13 @@ class AbstractClientTest extends TestCase
 
     protected $version = '1.0';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->Client = new Client();
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -57,9 +58,8 @@ class AbstractClientTest extends TestCase
      * @covers ::initHttpHandlerStack
      * @covers ::getHttpClient
      * @covers ::getHandlerStack
-     * @return void
      */
-    public function testHttpClientConstructor()
+    public function testHttpClientConstructor(): void
     {
         $client = new Client();
         $this->assertInstanceOf(\GuzzleHttp\Client::class, $client->getHttpClient());
@@ -87,10 +87,9 @@ class AbstractClientTest extends TestCase
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
+
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, function ($item) {
-            return $item[1] == 'configureAuth';
-        });
+        $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -102,9 +101,8 @@ class AbstractClientTest extends TestCase
      * @covers ::configureAuth
      * @covers ::setHandlerStack
      * @depends testSetAuth
-     * @return void
      */
-    public function testAuthMiddleware()
+    public function testAuthMiddleware(): void
     {
         $Auth = new AuthController();
         $this->assertEquals($this->Client, $this->Client->setAuth($Auth));
@@ -114,10 +112,9 @@ class AbstractClientTest extends TestCase
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
+
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, function ($item) {
-            return $item[1] == 'configureAuth';
-        });
+        $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -128,10 +125,9 @@ class AbstractClientTest extends TestCase
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
         $stack->setAccessible(true);
+
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, function ($item) {
-            return $item[1] == 'configureAuth';
-        });
+        $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -141,9 +137,8 @@ class AbstractClientTest extends TestCase
      * Test the callable function that configures Auth on requests
      * @covers ::configureAuth
      * @group configureAuth
-     * @return void
      */
-    public function testConfigureAuth()
+    public function testConfigureAuth(): void
     {
         $Auth = new AuthController();
         $this->Client->setAuth($Auth);
@@ -151,6 +146,7 @@ class AbstractClientTest extends TestCase
         $Ping = new PingEndpoint();
         $Ping->setClient($this->Client);
         $Ping->setProperty(AbstractEndpoint::PROPERTY_AUTH, AbstractEndpoint::AUTH_NOAUTH);
+
         $this->Client->current($Ping);
         $Ping->execute();
         $this->assertEmpty(current($this->Client->container)['request']->getHeader('token'));
@@ -181,7 +177,7 @@ class AbstractClientTest extends TestCase
      * @covers ::setAPIUrl
      * @covers ::getAPIUrl
      */
-    public function testSetServer()
+    public function testSetServer(): void
     {
         $this->assertEquals($this->Client, $this->Client->setServer(null));
         $this->assertEquals(null, $this->Client->getServer());
@@ -195,27 +191,26 @@ class AbstractClientTest extends TestCase
      * @covers ::setVersion
      * @covers ::getVersion
      */
-    public function testSetVersion()
+    public function testSetVersion(): void
     {
         $this->assertEquals($this->Client, $this->Client->setVersion(1));
         $this->assertEquals(1, $this->Client->getVersion());
         $this->assertEquals($this->Client, $this->Client->setVersion(null));
         $this->assertEquals(null, $this->Client->getVersion());
-        $this->assertEquals($this->Client, $this->Client->setVersion(array()));
-        $this->assertEquals(array(), $this->Client->getVersion());
+        $this->assertEquals($this->Client, $this->Client->setVersion([]));
+        $this->assertEquals([], $this->Client->getVersion());
         $this->assertEquals($this->Client, $this->Client->setVersion($this->version));
         $this->assertEquals($this->version, $this->Client->getVersion());
     }
 
     /**
-     * @param Client $Client
      * @depends testSetEndpointProvider
      * @covers ::__call
      * @covers ::last
      * @covers ::current
      * @covers ::setCurrentEndpoint
      */
-    public function testCall(Client $Client)
+    public function testCall(Client $Client): void
     {
         $this->Client = $Client;
         $AuthEP = $this->Client->auth();
@@ -228,12 +223,12 @@ class AbstractClientTest extends TestCase
     }
 
     /**
-     * @throws MRussell\REST\Exception\Client\EndpointProviderMissing
+     * @throws EndpointProviderMissing
      */
-    public function testProviderMissingException()
+    public function testProviderMissingException(): void
     {
         $this->Client = new Client();
-        $this->expectException(\MRussell\REST\Exception\Client\EndpointProviderMissing::class);
+        $this->expectException(EndpointProviderMissing::class);
         $this->expectExceptionMessage("Endpoint Provider not configured on Client object.");
         $this->Client->auth();
     }

@@ -6,35 +6,28 @@ use Psr\SimpleCache\CacheInterface;
 
 class MemoryCache implements CacheInterface
 {
-    /**
-     * @var array
-     */
-    private $cache = [];
+    private array $cache = [];
 
-    /**
-     * @var MemoryCache
-     */
-    private static $instance;
+    private static self $instance;
 
     /**
      * Get the In Memory Cache Object
-     *
-     * @return MemoryCache
      */
-    public static function getInstance()
+    public static function getInstance(): MemoryCache
     {
-        if (empty(static::$instance)) {
+        if (!isset(static::$instance)) {
             // @codeCoverageIgnoreStart
             static::$instance = new static();
             // @codeCoverageIgnoreEnd
         }
+
         return static::$instance;
     }
 
     /**
      * @inheritDoc
      */
-    public function get(string $key, mixed $default = null): mixed
+    public function get($key, $default = null)
     {
         return $this->cache[$key] ?? $default;
     }
@@ -45,7 +38,7 @@ class MemoryCache implements CacheInterface
      * @param $ttl - Ignored since its in memory
      * @return bool|void
      */
-    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
+    public function set($key, $value, $ttl = null)
     {
         $this->cache[$key] = $value;
         return true;
@@ -54,20 +47,21 @@ class MemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function delete(string $key): bool
+    public function delete($key)
     {
         $return = false;
         if ($this->has($key)) {
             unset($this->cache[$key]);
             $return = true;
         }
+
         return $return;
     }
 
     /**
      * @inheritDoc
      */
-    public function clear(): bool
+    public function clear()
     {
         $this->cache = [];
         return true;
@@ -76,49 +70,53 @@ class MemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function getMultiple(iterable $keys, mixed $default = null): iterable
+    public function getMultiple($keys, $default = null)
     {
         $items = $default ?? [];
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             if ($this->has($key)) {
                 $items[$key] = $this->cache[$key];
             }
         }
+
         if (empty($items)) {
             $items = $default;
         }
+
         return $items ?? [];
     }
 
     /**
      * @inheritDoc
      */
-    public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
+    public function setMultiple($values, $ttl = null)
     {
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
             $this->set($key, $value, $ttl);
         }
+
         return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function deleteMultiple(iterable $keys): bool
+    public function deleteMultiple($keys)
     {
         $return = true;
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             if (!$this->delete($key)) {
                 $return = false;
             }
         }
+
         return $return;
     }
 
     /**
      * @inheritDoc
      */
-    public function has(string $key): bool
+    public function has($key)
     {
         return isset($this->cache[$key]);
     }

@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Endpoint\Abstracts;
 
+use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Data\AbstractEndpointData;
 use MRussell\REST\Endpoint\Data\DataInterface;
@@ -30,20 +31,27 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     use ParseResponseBodyToArrayTrait;
 
     public const PROPERTY_RESPONSE_PROP = 'response_prop';
+
     public const MODEL_ID_VAR = 'id';
 
     public const MODEL_ACTION_CREATE = 'create';
+
     public const MODEL_ACTION_RETRIEVE = 'retrieve';
+
     public const MODEL_ACTION_UPDATE = 'update';
+
     public const MODEL_ACTION_DELETE = 'delete';
 
     public const EVENT_BEFORE_SAVE = 'before_save';
+
     public const EVENT_AFTER_SAVE = 'after_save';
 
     public const EVENT_BEFORE_DELETE = 'before_delete';
+
     public const EVENT_AFTER_DELETE = 'after_delete';
 
     public const EVENT_BEFORE_RETRIEVE = 'before_retrieve';
+
     public const EVENT_AFTER_RETRIEVE = 'after_retrieve';
 
     public const EVENT_BEFORE_SYNC = 'before_sync';
@@ -64,18 +72,13 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      * List of actions
      * @var array
      */
-    protected static $_DEFAULT_ACTIONS = array(
-        self::MODEL_ACTION_CREATE => 'POST',
-        self::MODEL_ACTION_RETRIEVE => 'GET',
-        self::MODEL_ACTION_UPDATE => 'PUT',
-        self::MODEL_ACTION_DELETE => 'DELETE'
-    );
+    protected static $_DEFAULT_ACTIONS = [self::MODEL_ACTION_CREATE => 'POST', self::MODEL_ACTION_RETRIEVE => 'GET', self::MODEL_ACTION_UPDATE => 'PUT', self::MODEL_ACTION_DELETE => 'DELETE'];
 
     /**
      * List of available actions and their associated Request Method
      * @var array
      */
-    protected $actions = array();
+    protected $actions = [];
 
     /**
      * Current action being executed
@@ -84,20 +87,17 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     protected $action = self::MODEL_ACTION_RETRIEVE;
 
     //Static
-    /**
-     * @param null $id
-     * @return string
-     */
     public static function modelIdKey($id = null): string
     {
         if ($id !== null) {
             static::$_MODEL_ID_KEY = $id;
         }
+
         return static::$_MODEL_ID_KEY;
     }
 
     //Overloads
-    public function __construct(array $urlArgs = array(), array $properties = array())
+    public function __construct(array $urlArgs = [], array $properties = [])
     {
         parent::__construct($urlArgs, $properties);
         foreach (static::$_DEFAULT_ACTIONS as $action => $method) {
@@ -110,7 +110,8 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         if (array_key_exists($name, $this->actions)) {
             return $this->setCurrentAction($name, $arguments)->execute();
         }
-        throw new UnknownModelAction(array(get_class($this), $name));
+
+        throw new UnknownModelAction([get_class($this), $name]);
     }
 
     /**
@@ -124,20 +125,22 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     /**
      * @inheritdoc
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidRequest
+     * @throws InvalidRequest
      */
     public function retrieve($id = null): ModelInterface
     {
         $this->setCurrentAction(self::MODEL_ACTION_RETRIEVE);
-        $idKey = $this->modelIdKey();
+        $idKey = static::modelIdKey();
         if ($id !== null) {
             if (isset($this->_attributes[$idKey])) {
                 $this->clear();
             }
+
             $this->set($idKey, $id);
         } elseif (!isset($this->_attributes[$idKey])) {
-            throw new MissingModelId(array($this->action, get_class($this)));
+            throw new MissingModelId([$this->action, get_class($this)]);
         }
+
         $this->triggerEvent(self::EVENT_BEFORE_RETRIEVE);
         $this->execute();
         $this->triggerEvent(self::EVENT_AFTER_RETRIEVE);
@@ -146,15 +149,16 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     /**
      * @inheritdoc
-     * @throws \MRussell\REST\Exception\Endpoint\InvalidRequest
+     * @throws InvalidRequest
      */
     public function save(): ModelInterface
     {
-        if (isset($this->_attributes[$this->modelIdKey()])) {
+        if (isset($this->_attributes[static::modelIdKey()])) {
             $this->setCurrentAction(self::MODEL_ACTION_UPDATE);
         } else {
             $this->setCurrentAction(self::MODEL_ACTION_CREATE);
         }
+
         $this->triggerEvent(self::EVENT_BEFORE_SAVE);
         $this->execute();
         $this->triggerEvent(self::EVENT_AFTER_SAVE);
@@ -175,16 +179,14 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     /**
      * Set the current action taking place on the Model
-     * @param string $action
-     * @param array $actionArgs
-     * @return $this
      */
-    public function setCurrentAction(string $action, array $actionArgs = array()): AbstractModelEndpoint
+    public function setCurrentAction(string $action, array $actionArgs = []): AbstractModelEndpoint
     {
         if (array_key_exists($action, $this->actions)) {
             $this->action = $action;
             $this->configureAction($this->action, $actionArgs);
         }
+
         return $this;
     }
 
@@ -200,9 +202,8 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      * Update any properties or data based on the current action
      * - Called when setting the Current Action
      * @param $action
-     * @param array $arguments
      */
-    protected function configureAction($action, array $arguments = array())
+    protected function configureAction($action, array $arguments = [])
     {
         $this->setProperty(self::PROPERTY_HTTP_METHOD, $this->actions[$action]);
     }
@@ -222,26 +223,21 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
                 } elseif (is_array($data)) {
                     $data = array_replace($data, $this->toArray());
                 }
+
                 break;
         }
+
         $this->triggerEvent(self::EVENT_CONFIGURE_PAYLOAD, $data);
         return $data;
     }
 
-    /**
-     * @param Response $response
-     * @return EndpointInterface
-     */
-    public function setResponse(Response $response): EndpointInterface
+    protected function setResponse(Response $response): EndpointInterface
     {
         parent::setResponse($response);
         $this->parseResponse($response);
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getModelResponseProp(): string
     {
         return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? static::$_RESPONSE_PROP;
@@ -249,8 +245,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     /**
      * Parse the response for use by Model
-     * @param Response $response
-     * @return void
      */
     protected function parseResponse(Response $response): void
     {
@@ -278,10 +272,6 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         $this->set($model);
     }
 
-    /**
-     * @param array $urlArgs
-     * @return string
-     */
     protected function configureURL(array $urlArgs): string
     {
         if (empty($urlArgs[self::MODEL_ID_VAR])) {
@@ -290,11 +280,12 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
                     $urlArgs[self::MODEL_ID_VAR] = '';
                     break;
                 default:
-                    $idKey = $this->modelIdKey();
+                    $idKey = static::modelIdKey();
                     $id = $this->get($idKey);
                     $urlArgs[self::MODEL_ID_VAR] = (empty($id) ? '' : $id);
             }
         }
+
         return parent::configureURL($urlArgs);
     }
 }

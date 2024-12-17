@@ -26,25 +26,23 @@ trait FileUploadsTrait
 
     /**
      * Configure File Upload Request using Multipart Data
-     * @param Request $request
-     * @return Request
      */
     protected function configureFileUploadRequest(Request $request, array $filesData = []): Request
     {
         $uri = $request->getUri();
         $request = $request->withUri($uri->withQuery(\http_build_query($this->configureFileUploadQueryParams(), '', '&', \PHP_QUERY_RFC3986)));
         $multiPartOptions = [];
-        if (!empty($filesData)) {
-            foreach($filesData as $key => $fileData) {
-                if (is_string($key) && is_string($fileData)) {
-                    $fileData = [
-                        'name' => $key,
-                        'path' => $fileData
-                    ];
-                }
-                $multiPartOptions[] = $this->buildMultiPartFileData($fileData);
+        foreach ($filesData as $key => $fileData) {
+            if (is_string($key) && is_string($fileData)) {
+                $fileData = [
+                    'name' => $key,
+                    'path' => $fileData,
+                ];
             }
+
+            $multiPartOptions[] = $this->buildMultiPartFileData($fileData);
         }
+
         $data = new MultipartStream($multiPartOptions);
         $request = $request->withBody($data);
         return $request->withHeader('Content-Type', 'multipart/form-data; boundary=' . $data->getBoundary());
@@ -52,16 +50,14 @@ trait FileUploadsTrait
 
     /**
      * Method to override to
-     * @return array
      */
     abstract protected function configureFileUploadQueryParams(): array;
 
     /**
      * Array containing preformatted multipart options for file upload, or containing at least 'path'
-     * @param array $fileData
      * @return void\
      */
-    protected function buildMultiPartFileData(array $fileData)
+    protected function buildMultiPartFileData(array $fileData): array
     {
         if (!empty($fileData['name']) && (isset($fileData['path']) || isset($fileData['contents']))) {
             $data = [];
@@ -69,11 +65,14 @@ trait FileUploadsTrait
                 if (isset($fileData['contents'])) {
                     unset($fileData['contents']);
                 }
+
                 $data['contents'] = Utils::streamFor(fopen($fileData['path'], 'r', true));
                 unset($fileData['path']);
             }
+
             return array_merge($data, $fileData);
         }
+
         throw new InvalidFileData([print_r($fileData, true)]);
     }
 }

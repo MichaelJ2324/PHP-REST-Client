@@ -16,9 +16,8 @@ class FileUploadEndpointTest extends TestCase
 {
     /**
      * @covers ::buildMultiPartFileData
-     * @return void
      */
-    public function testBuildMultiPartFileData()
+    public function testBuildMultiPartFileData(): void
     {
         $Endpoint = new FileUploadEndpoint();
         $Reflection = new \ReflectionClass($Endpoint);
@@ -27,15 +26,15 @@ class FileUploadEndpointTest extends TestCase
 
         $this->assertEquals([
             'name' => 'foobar',
-            'contents' => 'foobar'
+            'contents' => 'foobar',
         ], $buildMultiPartFileData->invoke($Endpoint, [
             'name' => 'foobar',
-            'contents' => 'foobar'
+            'contents' => 'foobar',
         ]));
         $data = $buildMultiPartFileData->invoke($Endpoint, [
             'name' => 'foobar',
             'path' => __FILE__,
-            'contents' => ''
+            'contents' => '',
         ]);
         $this->assertInstanceOf(Stream::class, $data['contents']);
         $this->assertEquals('foobar', $data['name']);
@@ -43,7 +42,7 @@ class FileUploadEndpointTest extends TestCase
         $data = $buildMultiPartFileData->invoke($Endpoint, [
             'name' => 'foobar',
             'path' => __FILE__,
-            'filename' => 'foobar.txt'
+            'filename' => 'foobar.txt',
         ]);
         $this->assertInstanceOf(Stream::class, $data['contents']);
         $this->assertEquals('foobar', $data['name']);
@@ -53,7 +52,7 @@ class FileUploadEndpointTest extends TestCase
 
         $this->expectException(InvalidFileData::class);
         $buildMultiPartFileData->invoke($Endpoint, [
-            'contents' => 'foobar'
+            'contents' => 'foobar',
         ]);
     }
 
@@ -61,9 +60,8 @@ class FileUploadEndpointTest extends TestCase
      * @covers ::configureFileUploadRequest
      * @covers ::resetUpload
      * @depends testBuildMultiPartFileData
-     * @return void
      */
-    public function testConfigureFileUploadRequest()
+    public function testConfigureFileUploadRequest(): void
     {
         $Request = new Request('POST', 'localhost/foobar');
 
@@ -72,14 +70,15 @@ class FileUploadEndpointTest extends TestCase
         $upload = $Reflection->getProperty('_upload');
         $upload->setAccessible(true);
         $upload->setValue($Endpoint, true);
+
         $configureFileUploadRequest = $Reflection->getMethod('configureFileUploadRequest');
         $configureFileUploadRequest->setAccessible(true);
 
         $request = $configureFileUploadRequest->invoke($Endpoint, $Request, [
             [
                 'name' => 'foobar',
-                'contents' => 'foobar'
-            ]
+                'contents' => 'foobar',
+            ],
         ]);
         $this->assertInstanceOf(Request::class, $request);
         $this->assertEmpty($request->getUri()->getQuery());
@@ -88,12 +87,12 @@ class FileUploadEndpointTest extends TestCase
             'foo' => 'bar',
             'filter' => [
                 [
-                    'foo' => 'bar'
-                ]
-            ]
+                    'foo' => 'bar',
+                ],
+            ],
         ];
         $request = $configureFileUploadRequest->invoke($Endpoint, $Request, [
-            'foobar' => __FILE__
+            'foobar' => __FILE__,
         ]);
         $this->assertInstanceOf(Request::class, $request);
         $this->assertNotEmpty($request->getUri()->getQuery());

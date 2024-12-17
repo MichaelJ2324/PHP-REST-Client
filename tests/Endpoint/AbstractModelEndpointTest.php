@@ -2,7 +2,8 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
-use GuzzleHttp\Psr7\Request;
+use MRussell\REST\Exception\Endpoint\UnknownModelAction;
+use MRussell\REST\Exception\Endpoint\MissingModelId;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Tests\Stubs\Client\Client;
 use MRussell\REST\Tests\Stubs\Endpoint\ModelEndpoint;
@@ -34,12 +35,12 @@ class AbstractModelEndpointTest extends TestCase
         static::$client = null;
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         ModelEndpoint::modelIdKey('id');
         parent::tearDown();
@@ -48,7 +49,7 @@ class AbstractModelEndpointTest extends TestCase
     /**
      * @covers ::modelIdKey
      */
-    public function testModelIdKey()
+    public function testModelIdKey(): void
     {
         $this->assertEquals('id', ModelEndpoint::modelIdKey());
         $this->assertEquals('key', ModelEndpoint::modelIdKey('key'));
@@ -65,37 +66,26 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::__construct
      * @depends testModelIdKey
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $Model = new ModelEndpoint();
         $Class = new \ReflectionClass($Model);
         $actions = $Class->getProperty('actions');
         $actions->setAccessible(true);
-        $this->assertEquals(array(
-            'create' => "POST",
-            'retrieve' => "GET",
-            'update' => "PUT",
-            'delete' => "DELETE"
-        ), $actions->getValue($Model));
+        $this->assertEquals(['create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
     }
 
     /**
      * @covers ::__call
      * @covers ::configureAction
      */
-    public function testCall()
+    public function testCall(): void
     {
         $Model = new ModelEndpointWithActions();
         $Class = new \ReflectionClass($Model);
         $actions = $Class->getProperty('actions');
         $actions->setAccessible(true);
-        $this->assertEquals(array(
-            'foo' => "GET",
-            'create' => "POST",
-            'retrieve' => "GET",
-            'update' => "PUT",
-            'delete' => "DELETE"
-        ), $actions->getValue($Model));
+        $this->assertEquals(['foo' => "GET", 'create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
 
         static::$client->mockResponses->append(new Response(200));
         $Model->setClient(static::$client);
@@ -109,10 +99,10 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::__call
      * @expectedException MRussell\REST\Exception\Endpoint\UnknownModelAction
      */
-    public function testCallException()
+    public function testCallException(): void
     {
         $Model = new ModelEndpointWithActions();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\UnknownModelAction::class);
+        $this->expectException(UnknownModelAction::class);
         $this->expectExceptionMessage("Unregistered Action called on Model Endpoint [MRussell\REST\Tests\Stubs\Endpoint\ModelEndpointWithActions]: bar");
         $Model->bar();
     }
@@ -133,38 +123,28 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::clear
      * @covers ::set
      */
-    public function testDataAccess()
+    public function testDataAccess(): void
     {
         $Model = new ModelEndpoint();
         $this->assertEquals($Model, $Model->set('foo', 'bar'));
         $this->assertEquals(true, isset($Model['foo']));
         $this->assertEquals('bar', $Model['foo']);
-        $this->assertEquals(array(
-            'foo' => 'bar'
-        ), $Model->toArray());
+        $this->assertEquals(['foo' => 'bar'], $Model->toArray());
         $this->assertEquals($Model, $Model->clear());
-        $this->assertEquals(array(), $Model->toArray());
+        $this->assertEquals([], $Model->toArray());
         $Model['foo'] = 'bar';
         $this->assertEquals('bar', $Model->get('foo'));
         unset($Model['foo']);
         $this->assertEquals(false, isset($Model['foo']));
-        $this->assertEquals(array(), $Model->toArray());
+        $this->assertEquals([], $Model->toArray());
 
-        $Model[] = array(
-            'foo' => 'bar'
-        );
-        $this->assertEquals(array(array(
-            'foo' => 'bar'
-        )), $Model->toArray());
-        $this->assertEquals($Model, $Model->set(array(
-            'foo' => 'bar'
-        )));
+        $Model[] = ['foo' => 'bar'];
+        $this->assertEquals([['foo' => 'bar']], $Model->toArray());
+        $this->assertEquals($Model, $Model->set(['foo' => 'bar']));
         $this->assertEquals('bar', $Model->get('foo'));
-        $this->assertEquals(array(
-            'foo' => 'bar'
-        ), $Model[0]);
+        $this->assertEquals(['foo' => 'bar'], $Model[0]);
         $this->assertEquals($Model, $Model->reset());
-        $this->assertEquals(array(), $Model->toArray());
+        $this->assertEquals([], $Model->toArray());
 
         $Model->foo = 'bar';
         $Model['bar'] = 'foo';
@@ -179,7 +159,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::setCurrentAction
      * @covers ::getCurrentAction
      */
-    public function testCurrentAction()
+    public function testCurrentAction(): void
     {
         $Model = new ModelEndpoint();
         $this->assertEquals($Model, $Model->setCurrentAction(ModelEndpoint::MODEL_ACTION_CREATE));
@@ -199,7 +179,7 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::configureURL
      * @depends testModelIdKey
      */
-    public function testRetrieve()
+    public function testRetrieve(): void
     {
         $Model = new ModelEndpoint();
         $Model->setClient(static::$client);
@@ -232,10 +212,10 @@ class AbstractModelEndpointTest extends TestCase
      * @expectedException MRussell\REST\Exception\Endpoint\MissingModelId
      * @expectedExceptionMessageRegExp /Model ID missing for current action/
      */
-    public function testMissingModelId()
+    public function testMissingModelId(): void
     {
         $Model = new ModelEndpoint();
-        $this->expectException(\MRussell\REST\Exception\Endpoint\MissingModelId::class);
+        $this->expectException(MissingModelId::class);
         $this->expectExceptionMessage("Model ID missing for current action [retrieve] on Endpoint: MRussell\REST\Tests\Stubs\Endpoint\ModelEndpoint");
         $Model->retrieve();
     }
@@ -247,11 +227,12 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::configurePayload
      * @depends testModelIdKey
      */
-    public function testSave()
+    public function testSave(): void
     {
         $Model = new ModelEndpoint();
 
         $Model->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode(['id' => '1234'])));
         $Model->set('foo', 'bar');
@@ -298,10 +279,11 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::configureAction
      * @depends testModelIdKey
      */
-    public function testDelete()
+    public function testDelete(): void
     {
         $Model = new ModelEndpoint();
         $Model->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode([['id' => 1234]])));
         $Model->set('id', '1234');
@@ -319,14 +301,15 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::parseResponseBodyToArray
      * @depends testModelIdKey
      */
-    public function testGetResponse()
+    public function testGetResponse(): void
     {
         $Model = new ModelEndpoint();
         $Model->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode([
             'id' => '1234',
-            'name' => 'foo'
+            'name' => 'foo',
         ])));
         $Model->setData(['name' => 'foo']);
         $Model->save();
@@ -338,10 +321,10 @@ class AbstractModelEndpointTest extends TestCase
         static::$client->mockResponses->append(new Response(200, [], json_encode([
             'id' => '1234',
             'name' => 'foo',
-            'foo' => 'bar'
+            'foo' => 'bar',
         ])));
         $Model->set([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
         $Model->save();
         $this->assertEquals($Model->getResponse()->getStatusCode(), 200);
@@ -361,14 +344,15 @@ class AbstractModelEndpointTest extends TestCase
      * @covers ::getModelResponseProp
      * @covers ::getResponseBody
      */
-    public function testParseResponse()
+    public function testParseResponse(): void
     {
         $Model = new ModelEndpointWithActions();
         $Model->setClient(static::$client);
+
         static::$client->container = [];
         static::$client->mockResponses->append(new Response(200, [], json_encode(['account' => [
             'id' => '1234',
-            'name' => 'foo'
+            'name' => 'foo',
         ]])));
         $Model->setData(['name' => 'foo']);
         $Model->save();
@@ -378,11 +362,11 @@ class AbstractModelEndpointTest extends TestCase
         $parseModelFromResponseBody->setAccessible(true);
         $this->assertEquals([
             'id' => '1234',
-            'name' => 'foo'
+            'name' => 'foo',
         ], $parseModelFromResponseBody->invoke($Model, $Model->getResponseBody(false), $Model->getModelResponseProp()));
         $this->assertEquals([
             'id' => '1234',
-            'name' => 'foo'
+            'name' => 'foo',
         ], $parseModelFromResponseBody->invoke($Model, $Model->getResponseBody(true), $Model->getModelResponseProp()));
 
         $Model->setProperty('response_prop', 'foobar');

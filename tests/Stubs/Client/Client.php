@@ -2,7 +2,6 @@
 
 namespace MRussell\REST\Tests\Stubs\Client;
 
-use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -31,20 +30,21 @@ class Client extends AbstractClient
 
     public function current(EndpointInterface $endpoint = null)
     {
-        if ($endpoint) {
+        if ($endpoint instanceof EndpointInterface) {
             $this->setCurrentEndpoint($endpoint);
         }
+
         return parent::current();
     }
 
-    public function initHttpHandlerStack()
+    protected function initHttpHandlerStack()
     {
         $handler = HandlerStack::create($this->mockResponses);
         $handler->push(Middleware::history($this->container), 'history');
         $this->setHandlerStack($handler);
     }
 
-    protected function configureAuth()
+    protected function configureAuth(): self
     {
         parent::configureAuth();
         $this->getHandlerStack()->remove('history');

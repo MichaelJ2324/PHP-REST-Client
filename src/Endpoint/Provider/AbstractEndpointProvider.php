@@ -11,26 +11,24 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
     /**
      * @var array
      */
-    protected $registry = array();
+    protected $registry = [];
 
     /**
      * @inheritdoc
      * @throws InvalidRegistration
      */
-    public function registerEndpoint($name, $className, array $properties = array()): EndpointProviderInterface
+    public function registerEndpoint($name, $className, array $properties = []): EndpointProviderInterface
     {
         try {
             $implements = class_implements($className);
-            if (is_array($implements) && isset($implements['MRussell\REST\Endpoint\Interfaces\EndpointInterface'])) {
-                $this->registry[$name] = array(
-                    'class' => $className,
-                    'properties' => $properties
-                );
+            if (is_array($implements) && isset($implements[EndpointInterface::class])) {
+                $this->registry[$name] = ['class' => $className, 'properties' => $properties];
                 return $this;
             }
-        } catch (\Exception $ex) {
+        } catch (\Exception $exception) {
             //Class Implements failed to Load Class completely
         }
+
         throw new InvalidRegistration([$className]);
     }
 
@@ -57,8 +55,6 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
 
     /**
      * @param $name
-     * @param null $version
-     * @return EndpointInterface
      */
     protected function buildEndpoint($name, $version = null): EndpointInterface
     {
@@ -71,6 +67,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
                 $Endpoint->setProperty($prop, $value);
             }
         }
+
         return $Endpoint;
     }
 }

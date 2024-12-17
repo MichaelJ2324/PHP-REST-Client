@@ -6,12 +6,9 @@ use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 
 class Stack implements StackInterface
 {
-    private static $IN_EVENT = [];
+    private static array $IN_EVENT = [];
 
-    /**
-     * @var array
-     */
-    private $events = [];
+    private array $events = [];
 
     /**
      * @var string
@@ -24,7 +21,6 @@ class Stack implements StackInterface
     protected $endpoint;
 
     /**
-     * @param EndpointInterface $endpoint
      * @return $this
      */
     public function setEndpoint(EndpointInterface $endpoint): StackInterface
@@ -33,18 +29,13 @@ class Stack implements StackInterface
         return $this;
     }
 
-    /**
-     * @return EndpointInterface
-     */
     public function getEndpoint(): EndpointInterface
     {
         return $this->endpoint;
     }
 
     /**
-     * @param string $event
      * @param $data
-     * @return StackInterface
      */
     public function trigger(string $event, &$data = null): StackInterface
     {
@@ -54,17 +45,17 @@ class Stack implements StackInterface
             foreach ($this->events[$event] as $callable) {
                 $this->runEventHandler($callable, $data);
             }
+
             unset(self::$IN_EVENT[$event]);
         }
+
         return $this;
     }
 
     /**
-     * @param callable $handler
      * @param $data
-     * @return void
      */
-    private function runEventHandler(callable $handler, &$data = null)
+    private function runEventHandler(callable $handler, &$data = null): void
     {
         $handler($data, $this->getEndpoint());
     }
@@ -77,9 +68,11 @@ class Stack implements StackInterface
         if (!isset($this->events[$event])) {
             $this->events[$event] = [];
         }
+
         if (empty($id)) {
             $id = count($this->events);
         }
+
         $this->events[$event][$id] = $func;
         return $id;
     }
@@ -94,8 +87,10 @@ class Stack implements StackInterface
             if (empty($this->events[$event])) {
                 unset($this->events[$event]);
             }
+
             return true;
         }
+
         return false;
     }
 }

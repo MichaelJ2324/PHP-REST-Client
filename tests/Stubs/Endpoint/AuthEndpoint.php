@@ -8,7 +8,5 @@ class AuthEndpoint extends SmartEndpoint
 {
     protected static $_ENDPOINT_URL = 'authenticate';
 
-    protected static $_DEFAULT_PROPERTIES = array(
-        'httpMethod' => "POST"
-    );
+    protected static $_DEFAULT_PROPERTIES = ['httpMethod' => "POST"];
 }
