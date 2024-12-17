@@ -14,7 +14,7 @@ interface ModelInterface extends EndpointInterface, ClearableInterface, GetInter
      * @param $id
      * @return $this
      */
-    public function retrieve($id = null): self;
+    public function retrieve($id = null): static;
 
     /**
      * Save the current Model
@@ -22,10 +22,10 @@ interface ModelInterface extends EndpointInterface, ClearableInterface, GetInter
      * - Uses a PUT request if Model ID is set
      * @return $this
      */
-    public function save(): self;
+    public function save(): static;
 
     /**
      * Delete the current Model using a DELETE Request
      */
-    public function delete(): self;
+    public function delete(): static;
 }

@@ -10,8 +10,7 @@ interface SetInterface
     /**
      * Set a property or multiple attributes on an object
      * @param string|array $key
-     * @param mixed $value
      * @return $this
      */
-    public function set($key, $value = null);
+    public function set(string|array|\ArrayAccess $key, mixed $value = null): static;
 }

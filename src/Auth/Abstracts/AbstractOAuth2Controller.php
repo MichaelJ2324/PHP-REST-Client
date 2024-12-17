@@ -24,15 +24,12 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
 
     public const OAUTH_REFRESH_GRANT = 'refresh_token';
 
-    /**
-     * @var string
-     */
-    protected static $_DEFAULT_GRANT_TYPE = self::OAUTH_CLIENT_CREDENTIALS_GRANT;
+    protected static string $_DEFAULT_GRANT_TYPE = self::OAUTH_CLIENT_CREDENTIALS_GRANT;
 
     /**
-     * @inheritdoc
+     * The type of OAuth token we are receiving
      */
-    protected static $_AUTH_TYPE = self::DEFAULT_AUTH_TYPE;
+    protected static string $_AUTH_TYPE = self::DEFAULT_AUTH_TYPE;
 
     /**
      * @inheritdoc
@@ -43,12 +40,9 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
      * The OAuth2 Full token
      * @var array
      */
-    protected $token = [];
+    protected mixed $token;
 
-    /**
-     * @var
-     */
-    protected $grant_type;
+    protected string $grant_type;
 
     public function __construct()
     {
@@ -60,7 +54,7 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
      * @param $grant_type
      * @return $this
      */
-    public function setGrantType($grant_type): AuthControllerInterface
+    public function setGrantType(string $grant_type): AuthControllerInterface
     {
         $this->grant_type = $grant_type;
         return $this;
@@ -75,7 +69,7 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
      * Get/Set the OAuth Authorization header
      * @param $header
      */
-    public static function oauthHeader($header = null): string
+    public static function oauthHeader(string $header = null): string
     {
         if ($header !== null) {
             static::$_AUTH_HEADER = $header;
@@ -88,7 +82,7 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
      * @inheritdoc
      * @throws InvalidToken
      */
-    public function setToken($token)
+    public function setToken($token): static
     {
         if (is_array($token) && isset($token['access_token'])) {
             $token = $this->configureToken($token);
@@ -127,9 +121,9 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
      * @param $prop
      * @return mixed|null
      */
-    public function getTokenProp($prop)
+    public function getTokenProp(string $prop): mixed
     {
-        if ($this->token) {
+        if (isset($this->token)) {
             if (is_object($this->token) && $this->token->$prop) {
                 return $this->token->$prop;
             } elseif (is_array($this->token) && isset($this->token[$prop])) {
@@ -236,12 +230,10 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
      */
     protected function configureEndpoint(EndpointInterface $Endpoint, $action): EndpointInterface
     {
-        switch ($action) {
-            case self::ACTION_OAUTH_REFRESH:
-                return $this->configureRefreshEndpoint($Endpoint);
-            default:
-                return parent::configureEndpoint($Endpoint, $action);
-        }
+        return match ($action) {
+            self::ACTION_OAUTH_REFRESH => $this->configureRefreshEndpoint($Endpoint),
+            default => parent::configureEndpoint($Endpoint, $action),
+        };
     }
 
     /**
@@ -271,7 +263,7 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
     /**
      * @inheritDoc
      */
-    public function reset(): AuthControllerInterface
+    public function reset(): static
     {
         $this->setGrantType(static::$_DEFAULT_GRANT_TYPE);
         return parent::reset();
@@ -279,10 +271,8 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
 
     /**
      * Parse token responses as string
-     *
-     * @return mixed
      */
-    protected function parseResponseToToken(string $action, Response $response)
+    protected function parseResponseToToken(string $action, Response $response): mixed
     {
         $tokenStr = $response->getBody()->getContents();
         $response->getBody()->rewind();

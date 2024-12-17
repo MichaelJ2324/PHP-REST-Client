@@ -8,21 +8,20 @@ interface CollectionInterface extends EndpointInterface, ClearableInterface, Get
      * Retrieve the Endpoint Collection
      * @return $this
      */
-    public function fetch();
+    public function fetch(): static;
 
     /**
      * Set the Model Endpoint
      * @param mixed $model
      * @return $this
      */
-    public function setModelEndpoint($model);
+    public function setModelEndpoint(ModelInterface $model): static;
 
     /**
      * Get a Model Endpoint based on Id
      * @param $id
-     * @return ModelInterface|null
      */
-    public function get($id);
+    public function get(string|int $key): ModelInterface|array|\ArrayAccess|null;
 
     /**
      * Get a Model Endpoint based on numerical index

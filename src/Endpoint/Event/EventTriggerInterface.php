@@ -6,9 +6,8 @@ interface EventTriggerInterface
 {
     /**
      * Trigger a specific event to run
-     * @param mixed $data
      */
-    public function triggerEvent(string $event, &$data = null): void;
+    public function triggerEvent(string $event, mixed &$data = null): void;
 
     /**
      * Register a function to run when event is triggered

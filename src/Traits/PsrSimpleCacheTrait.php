@@ -10,7 +10,7 @@ trait PsrSimpleCacheTrait
     /**
      * @var
      */
-    protected $cache;
+    protected CacheInterface $cache;
 
     /**
      * Get the Simple Cache object
@@ -28,7 +28,7 @@ trait PsrSimpleCacheTrait
      * Set the Simple Cache object
      * @return $this
      */
-    public function setCache(CacheInterface $cache)
+    public function setCache(CacheInterface $cache): static
     {
         $this->cache = $cache;
         return $this;

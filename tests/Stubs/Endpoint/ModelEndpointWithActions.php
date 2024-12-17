@@ -4,7 +4,7 @@ namespace MRussell\REST\Tests\Stubs\Endpoint;
 
 class ModelEndpointWithActions extends ModelEndpoint
 {
-    protected static $_RESPONSE_PROP = 'account';
+    protected static string $_RESPONSE_PROP = 'account';
 
-    protected $actions = ['foo' => "GET"];
+    protected array $actions = ['foo' => "GET"];
 }

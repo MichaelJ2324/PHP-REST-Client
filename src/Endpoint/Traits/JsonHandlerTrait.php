@@ -30,7 +30,7 @@ trait JsonHandlerTrait
         try {
             $body = json_decode($this->respContent, $associative);
             // @codeCoverageIgnoreStart
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         // @codeCoverageIgnoreEnd

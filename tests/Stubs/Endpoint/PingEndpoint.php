@@ -6,7 +6,7 @@ use MRussell\REST\Endpoint\SmartEndpoint;
 
 class PingEndpoint extends SmartEndpoint
 {
-    protected static $_ENDPOINT_URL = 'ping';
+    protected static string $_ENDPOINT_URL = 'ping';
 
-    protected static $_DEFAULT_PROPERTIES = ['httpMethod' => "GET"];
+    protected static array $_DEFAULT_PROPERTIES = [self::PROPERTY_HTTP_METHOD => "GET"];
 }

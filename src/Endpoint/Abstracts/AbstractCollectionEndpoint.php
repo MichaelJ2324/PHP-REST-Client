@@ -6,7 +6,6 @@ use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Data\DataInterface;
 use MRussell\REST\Endpoint\Interfaces\CollectionInterface;
-use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 use MRussell\REST\Endpoint\Interfaces\ModelInterface;
 use MRussell\REST\Endpoint\Traits\ParseResponseBodyToArrayTrait;
 use MRussell\REST\Exception\Endpoint\UnknownEndpoint;
@@ -59,7 +58,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @param mixed $value - The value to set
      * @abstracting ArrayAccess
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet($offset, mixed $value): void
     {
         if (is_null($offset)) {
             $this->models[] = $value;
@@ -114,7 +113,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @return $this
      * @implements ResettableInterface
      */
-    public function reset()
+    public function reset(): static
     {
         parent::reset();
         return $this->clear();
@@ -125,7 +124,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @return $this
      * @implements ClearableInterface
      */
-    public function clear()
+    public function clear(): static
     {
         $this->models = [];
         return $this;
@@ -183,7 +182,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @inheritdoc
      * @throws InvalidRequest
      */
-    public function fetch()
+    public function fetch(): static
     {
         $this->setProperty(self::PROPERTY_HTTP_METHOD, "GET");
         return $this->execute();
@@ -192,11 +191,11 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     /**
      * @inheritdoc
      */
-    public function get($id)
+    public function get(string|int $key): ModelInterface|array|\ArrayAccess|null
     {
         $data = null;
-        if ($this->offsetExists($id)) {
-            $data = $this->models[$id];
+        if ($this->offsetExists($key)) {
+            $data = $this->models[$key];
             $Model = $this->buildModel($data);
             if ($Model !== null) {
                 $data = $Model;
@@ -288,19 +287,19 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @inheritdoc
      * @throws UnknownEndpoint
      */
-    public function setModelEndpoint($model): CollectionInterface
+    public function setModelEndpoint($model): static
     {
         try {
             $implements = class_implements($model);
             if (is_array($implements) && isset($implements[ModelInterface::class])) {
                 if (is_object($model)) {
-                    $model = get_class($model);
+                    $model = $model::class;
                 }
 
                 $this->setProperty(self::PROPERTY_MODEL_CLASS, $model);
                 return $this;
             }
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             //If class_implements cannot load class
         }
 
@@ -327,7 +326,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         return $epURL;
     }
 
-    protected function setResponse(Response $response): EndpointInterface
+    protected function setResponse(Response $response): static
     {
         parent::setResponse($response);
         $this->parseResponse($response);

@@ -15,7 +15,7 @@ interface EndpointProviderInterface
      *
      * @return $this
      */
-    public function registerEndpoint(string $name, string $className, array $properties = []): self;
+    public function registerEndpoint(string $name, string $className, array $properties = []): static;
 
     /**
      * Check if Endpoint is registered
