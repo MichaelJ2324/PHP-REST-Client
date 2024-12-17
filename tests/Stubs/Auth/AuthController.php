@@ -15,7 +15,7 @@ class AuthController extends AbstractAuthController
         return $Request->withHeader('token', $this->token);
     }
 
-    protected function parseResponseToToken(string $action, Response $response): string
+    protected function parseResponseToToken(string $action, Response $response)
     {
         return $response->getBody()->getContents();
     }
