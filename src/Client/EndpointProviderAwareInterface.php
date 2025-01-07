@@ -12,6 +12,6 @@ interface EndpointProviderAwareInterface
      */
     public function setEndpointProvider(EndpointProviderInterface $EndpointProvider): static;
 
-    
+
     public function getEndpointProvider(): EndpointProviderInterface;
 }

@@ -12,6 +12,6 @@ interface AuthControllerAwareInterface
      */
     public function setAuth(AuthControllerInterface $Auth): static;
 
-    
+
     public function getAuth(): AuthControllerInterface;
 }

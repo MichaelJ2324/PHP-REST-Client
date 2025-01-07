@@ -2,17 +2,19 @@
 
 namespace MRussell\REST\Endpoint\Data;
 
+use MRussell\REST\Endpoint\Interfaces\ResettableInterface;
 use MRussell\REST\Endpoint\Traits\ArrayObjectAttributesTrait;
 use MRussell\REST\Endpoint\Traits\ClearAttributesTrait;
 use MRussell\REST\Endpoint\Traits\GetAttributesTrait;
 use MRussell\REST\Endpoint\Traits\PropertiesTrait;
 use MRussell\REST\Endpoint\Traits\SetAttributesTrait;
-use MRussell\REST\Exception\Endpoint\InvalidData;
 
 abstract class AbstractEndpointData implements DataInterface
 {
     use GetAttributesTrait;
-    use ClearAttributesTrait;
+    use ClearAttributesTrait {
+        clear as private clearAttributes;
+    }
     use ArrayObjectAttributesTrait;
     use SetAttributesTrait {
         set as private setAttributes;
@@ -25,13 +27,16 @@ abstract class AbstractEndpointData implements DataInterface
      * A way to determine between Empty Array and Null
      * @var bool
      */
-    protected $isNull = true;
-
-    public const DATA_PROPERTY_REQUIRED = 'required';
+    protected bool $isNull = true;
 
     public const DATA_PROPERTY_DEFAULTS = 'defaults';
 
-    protected static $_DEFAULT_PROPERTIES = [self::DATA_PROPERTY_REQUIRED => [], self::DATA_PROPERTY_DEFAULTS => []];
+    public const DATA_PROPERTY_NULLABLE = 'nullable';
+
+    protected static array $_DEFAULT_PROPERTIES = [
+        self::DATA_PROPERTY_DEFAULTS => [],
+        self::DATA_PROPERTY_NULLABLE => true,
+    ];
 
     //Overloads
     public function __construct(array $data = null, array $properties = [])
@@ -89,13 +94,13 @@ abstract class AbstractEndpointData implements DataInterface
      */
     public function setProperties(array $properties): static
     {
-        if (!isset($properties[self::DATA_PROPERTY_REQUIRED])) {
-            $properties[self::DATA_PROPERTY_REQUIRED] = [];
-        }
-
         if (!isset($properties[self::DATA_PROPERTY_DEFAULTS])) {
             $properties[self::DATA_PROPERTY_DEFAULTS] = [];
         }
+        if (!isset($properties[self::DATA_PROPERTY_NULLABLE])) {
+            $properties[self::DATA_PROPERTY_NULLABLE] = true;
+        }
+        $properties[self::DATA_PROPERTY_NULLABLE] = !!$properties[self::DATA_PROPERTY_NULLABLE];
 
         return $this->rawSetProperties($properties);
     }
@@ -107,24 +112,33 @@ abstract class AbstractEndpointData implements DataInterface
     public function reset(): static
     {
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
-        $this->null();
-        return $this->configureDefaultData();
+        return $this->clear()->configureDefaultData();
     }
 
     /**
      * Set data to null
      * @return $this
      */
-    public function null(): static
+    public function clear(): static
     {
-        $this->clear();
+        $this->clearAttributes();
         $this->isNull = true;
         return $this;
     }
 
     public function isNull(): bool
     {
-        return $this->isNull && empty($this->_attributes);
+        return $this->isNullable() && $this->isNull && empty($this->_attributes);
+    }
+
+    public function isNullable(): bool
+    {
+        $default = true;
+        if (isset(static::$_DEFAULT_PROPERTIES[self::DATA_PROPERTY_NULLABLE]) && is_bool(static::$_DEFAULT_PROPERTIES[self::DATA_PROPERTY_NULLABLE])) {
+            $default = !!static::$_DEFAULT_PROPERTIES[self::DATA_PROPERTY_NULLABLE];
+        }
+        $nullable = $this->getProperty(self::DATA_PROPERTY_NULLABLE);
+        return $nullable !== null ? $nullable : $default;
     }
 
     /**
@@ -142,58 +156,8 @@ abstract class AbstractEndpointData implements DataInterface
         return $this;
     }
 
-    /**
-     * Verify data requirements when converting to Array
-     * @throws InvalidData
-     */
-    public function toArray(bool $verify = false): array
+    public function toArray(bool $validate = null): array
     {
-        if ($verify) {
-            $this->verifyRequiredData();
-        }
-
         return $this->_attributes;
-    }
-
-    /**
-     * Validate Required Data for the Endpoint
-     * @throws InvalidData
-     */
-    protected function verifyRequiredData(): bool
-    {
-        $errors = [
-            'missing' => [],
-            'invalid' => [],
-        ];
-        $error = false;
-        if (!empty($this->_properties[self::DATA_PROPERTY_REQUIRED])) {
-            foreach ($this->_properties[self::DATA_PROPERTY_REQUIRED] as $property => $type) {
-                if (!isset($this->_attributes[$property])) {
-                    $errors['missing'][] = $property;
-                    $error = true;
-                    continue;
-                }
-
-                if ($type !== null && gettype($this->_attributes[$property]) !== $type) {
-                    $errors['invalid'][] = $property;
-                    $error = true;
-                }
-            }
-        }
-
-        if ($error) {
-            $errorMsg = '';
-            if (!empty($errors['missing'])) {
-                $errorMsg .= "Missing [" . implode(",", $errors['missing']) . "] ";
-            }
-
-            if (!empty($errors['invalid'])) {
-                $errorMsg .= "Invalid [" . implode(",", $errors['invalid']) . "]";
-            }
-
-            throw new InvalidData(trim($errorMsg));
-        }
-
-        return $error;
     }
 }

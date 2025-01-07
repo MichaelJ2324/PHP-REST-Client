@@ -14,16 +14,16 @@ abstract class AbstractBasicController extends AbstractAuthController
 
     public const DEFAULT_AUTH_TYPE = 'Basic';
 
-    protected static string $_AUTH_HEADER = self::DEFAULT_AUTH_HEADER;
+    protected string $authHeader = self::DEFAULT_AUTH_HEADER;
 
-    protected static string $_AUTH_TYPE = self::DEFAULT_AUTH_TYPE;
+    protected string $authType = self::DEFAULT_AUTH_TYPE;
 
     /**
      * @inheritdoc
      */
     public function configureRequest(Request $Request): Request
     {
-        return $Request->withHeader(static::$_AUTH_HEADER, $this->getAuthHeaderValue());
+        return $Request->withHeader($this->authHeader, $this->getAuthHeaderValue());
     }
 
     /**
@@ -41,6 +41,6 @@ abstract class AbstractBasicController extends AbstractAuthController
             $value = $this->getToken();
         }
 
-        return static::$_AUTH_TYPE . " " . $value;
+        return $this->authType . " " . $value;
     }
 }

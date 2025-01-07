@@ -19,6 +19,11 @@ abstract class AbstractAuthController implements AuthControllerInterface
     public const ACTION_LOGOUT = 'logout';
 
     /**
+     * Configured Endpoints for configured actions
+     */
+    private array $endpoints = [];
+
+    /**
      * Auth Controller Actions, used to associate Endpoints
      */
     protected static array $_DEFAULT_AUTH_ACTIONS = [self::ACTION_AUTH, self::ACTION_LOGOUT];
@@ -27,11 +32,6 @@ abstract class AbstractAuthController implements AuthControllerInterface
      * Configured Actions on the Controlller
      */
     protected array $actions = [];
-
-    /**
-     * Configured Endpoints for configured actions
-     */
-    protected array $endpoints = [];
 
     /**
      * The credentials used for authentication
@@ -98,7 +98,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
     /**
      * @inheritDoc
      */
-    public function setToken($token): static
+    public function setToken(mixed $token): static
     {
         $this->token = $token;
         $this->cacheToken();

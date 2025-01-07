@@ -6,5 +6,8 @@ use MRussell\REST\Endpoint\Abstracts\AbstractCollectionEndpoint;
 
 class CollectionEndpointWithoutModel extends AbstractCollectionEndpoint
 {
-    protected static string $_ENDPOINT_URL = 'accounts';
+    protected static array $_DEFAULT_PROPERTIES = [
+        self::PROPERTY_HTTP_METHOD => "GET",
+        self::PROPERTY_URL => 'accounts',
+    ];
 }

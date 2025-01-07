@@ -13,7 +13,7 @@ trait FileUploadsTrait
      * Whether or not a file upload is occurring
      * @var bool
      */
-    protected $_upload = false;
+    protected bool $_upload = false;
 
     /**
      * @return $this
@@ -55,7 +55,6 @@ trait FileUploadsTrait
 
     /**
      * Array containing preformatted multipart options for file upload, or containing at least 'path'
-     * @return void\
      */
     protected function buildMultiPartFileData(array $fileData): array
     {

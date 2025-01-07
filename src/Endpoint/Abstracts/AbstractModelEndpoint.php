@@ -31,6 +31,10 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     public const PROPERTY_RESPONSE_PROP = 'response_prop';
 
+    public const PROPERTY_MODEL_KEY = 'id_key';
+
+    public const DEFAULT_MODEL_KEY = 'id';
+
     public const MODEL_ID_VAR = 'id';
 
     public const MODEL_ACTION_CREATE = 'create';
@@ -58,12 +62,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     /**
      * The ID Field used by the Model
      */
-    protected static string $_MODEL_ID_KEY = 'id';
-
-    /**
-     * The response property where the model data is located
-     */
-    protected static string $_RESPONSE_PROP = '';
+    protected static string $_DEFAULT_MODEL_KEY = self::DEFAULT_MODEL_KEY;
 
     /**
      * List of actions
@@ -80,20 +79,29 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      */
     protected string $action = self::MODEL_ACTION_RETRIEVE;
 
-    //Static
-    public static function modelIdKey($id = null): string
+    public static function defaultModelKey(string $key = null): string
     {
-        if ($id !== null) {
-            static::$_MODEL_ID_KEY = $id;
+        if (!empty($key)) {
+            static::$_DEFAULT_MODEL_KEY = $key;
         }
 
-        return static::$_MODEL_ID_KEY;
+        return static::$_DEFAULT_MODEL_KEY;
+    }
+
+    public function getKeyProperty(): string
+    {
+        return $this->getProperty(self::PROPERTY_MODEL_KEY) ?? static::defaultModelKey();
+    }
+
+    public function getId(): string|int|null
+    {
+        return $this->get($this->getKeyProperty()) ?? null;
     }
 
     //Overloads
-    public function __construct(array $urlArgs = [], array $properties = [])
+    public function __construct(array $properties = [], array $urlArgs = [])
     {
-        parent::__construct($urlArgs, $properties);
+        parent::__construct($properties, $urlArgs);
         foreach (static::$_DEFAULT_ACTIONS as $action => $method) {
             $this->actions[$action] = $method;
         }
@@ -124,7 +132,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     public function retrieve($id = null): static
     {
         $this->setCurrentAction(self::MODEL_ACTION_RETRIEVE);
-        $idKey = static::modelIdKey();
+        $idKey = $this->getKeyProperty();
         if ($id !== null) {
             if (isset($this->_attributes[$idKey])) {
                 $this->clear();
@@ -147,7 +155,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      */
     public function save(): static
     {
-        if (isset($this->_attributes[static::modelIdKey()])) {
+        if (!empty($this->getId())) {
             $this->setCurrentAction(self::MODEL_ACTION_UPDATE);
         } else {
             $this->setCurrentAction(self::MODEL_ACTION_CREATE);
@@ -208,16 +216,11 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      */
     protected function configurePayload()
     {
-        $data = $this->getData() ?? null;
+        $data = $this->getData();
         switch ($this->getCurrentAction()) {
             case self::MODEL_ACTION_CREATE:
             case self::MODEL_ACTION_UPDATE:
-                if (is_object($data)) {
-                    $data->set($this->toArray());
-                } elseif (is_array($data)) {
-                    $data = array_replace($data, $this->toArray());
-                }
-
+                $data->set($this->toArray());
                 break;
         }
 
@@ -234,7 +237,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     public function getModelResponseProp(): string
     {
-        return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? static::$_RESPONSE_PROP;
+        return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? "";
     }
 
     /**
@@ -274,7 +277,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
                     $urlArgs[self::MODEL_ID_VAR] = '';
                     break;
                 default:
-                    $idKey = static::modelIdKey();
+                    $idKey = $this->getKeyProperty();
                     $id = $this->get($idKey);
                     $urlArgs[self::MODEL_ID_VAR] = (empty($id) ? '' : $id);
             }

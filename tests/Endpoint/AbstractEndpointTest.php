@@ -14,7 +14,7 @@ use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Abstracts\AbstractEndpoint;
 use MRussell\REST\Tests\Stubs\Client\Client;
 use MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint;
-use MRussell\REST\Tests\Stubs\Endpoint\EndpointData;
+use MRussell\REST\Tests\Stubs\Endpoint\DefaultedNonNullableData;
 use MRussell\REST\Tests\Stubs\Endpoint\PingEndpoint;
 use PHPUnit\Framework\TestCase;
 
@@ -29,26 +29,15 @@ class AbstractEndpointTest extends TestCase
     /**
      * @var Client
      */
-    protected static $client;
+    protected Client $client;
 
+    protected array $urlArgs = ['foo', 'bar'];
 
-    public static function setUpBeforeClass(): void
-    {
-        //Add Setup for static properties here
-        self::$client = new Client();
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        //Add Tear Down for static properties here
-    }
-
-    protected $options = ['foo', 'bar'];
-
-    protected $properties = ['url' => '$foo/$bar/$:test'];
+    protected array $properties = ['url' => '$foo/$bar/$:test'];
 
     protected function setUp(): void
     {
+        $this->client = new Client();
         parent::setUp();
     }
 
@@ -64,7 +53,6 @@ class AbstractEndpointTest extends TestCase
      * @covers ::getUrlArgs
      * @covers ::getProperties
      * @covers ::getData
-     * @covers ::getRequest
      * @covers ::getResponse
      * @covers ::getBaseUrl
      * @covers ::getEndpointUrl
@@ -82,20 +70,20 @@ class AbstractEndpointTest extends TestCase
         $this->assertEmpty($Endpoint->getBaseUrl());
         $this->assertEquals('', $Endpoint->getEndPointUrl());
 
-        $Endpoint = new BasicEndpoint($this->options);
+        $Endpoint = new BasicEndpoint([], $this->urlArgs);
         $this->assertEquals(['url' => '', 'httpMethod' => '', 'auth' => 1], $Endpoint->getProperties());
-        $this->assertEquals($this->options, $Endpoint->getUrlArgs());
+        $this->assertEquals($this->urlArgs, $Endpoint->getUrlArgs());
         $this->assertEmpty($Endpoint->getData());
         $this->assertEmpty($Endpoint->getBaseUrl());
         $this->assertEquals('', $Endpoint->getEndPointUrl());
 
-        $Endpoint = new BasicEndpoint($this->options, $this->properties);
+        $Endpoint = new BasicEndpoint($this->properties, $this->urlArgs);
         $this->assertEquals([
             'url' => '$foo/$bar/$:test',
             'httpMethod' => '',
             'auth' => 1,
         ], $Endpoint->getProperties());
-        $this->assertEquals($this->options, $Endpoint->getUrlArgs());
+        $this->assertEquals($this->urlArgs, $Endpoint->getUrlArgs());
         $this->assertEmpty($Endpoint->getData());
         $this->assertEmpty($Endpoint->getBaseUrl());
         $this->assertEquals('$foo/$bar/$:test', $Endpoint->getEndPointUrl());
@@ -109,8 +97,8 @@ class AbstractEndpointTest extends TestCase
     {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals([], $Endpoint->getUrlArgs());
-        $this->assertEquals($Endpoint, $Endpoint->setUrlArgs($this->options));
-        $this->assertEquals($this->options, $Endpoint->getUrlArgs());
+        $this->assertEquals($Endpoint, $Endpoint->setUrlArgs($this->urlArgs));
+        $this->assertEquals($this->urlArgs, $Endpoint->getUrlArgs());
         $this->assertEquals($Endpoint, $Endpoint->setUrlArgs([]));
         $this->assertEquals([], $Endpoint->getUrlArgs());
     }
@@ -158,8 +146,8 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals('localhost', $Endpoint->getBaseUrl());
         $this->assertEquals('localhost/$foo/$bar/$:test', $Endpoint->getEndPointUrl(true));
         $this->assertEquals($Endpoint, $Endpoint->setBaseUrl(""));
-        $Endpoint->setClient(static::$client);
-        $this->assertEquals(static::$client->getAPIUrl(), $Endpoint->getBaseUrl());
+        $Endpoint->setClient($this->client);
+        $this->assertEquals($this->client->getAPIUrl(), $Endpoint->getBaseUrl());
     }
 
     /**
@@ -175,7 +163,7 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals(null, $Endpoint->getData());
         $this->assertEquals($Endpoint, $Endpoint->setData([]));
         $this->assertEquals([], $Endpoint->getData());
-        $data = new EndpointData();
+        $data = new DefaultedNonNullableData();
         $this->assertEquals($Endpoint, $Endpoint->setData($data));
         $this->assertEquals($data, $Endpoint->getData());
     }
@@ -219,14 +207,14 @@ class AbstractEndpointTest extends TestCase
      */
     public function testExecute(): void
     {
-        self::$client->mockResponses->append(new Response(200));
+        $this->client->mockResponses->append(new Response(200));
 
         $Endpoint = new BasicEndpoint();
-        $Endpoint->setClient(self::$client);
+        $Endpoint->setClient($this->client);
         $this->assertEquals($Endpoint, $Endpoint->setBaseUrl('http://localhost'));
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', 'basic'));
         $this->assertEquals($Endpoint, $Endpoint->execute());
-        $request = self::$client->mockResponses->getLastRequest();
+        $request = $this->client->mockResponses->getLastRequest();
         $this->assertEquals('http://localhost/basic', $request->getUri()->__toString());
         $this->assertEquals('application/json', $request->getHeader('Content-Type')[0]);
         $this->assertEquals('GET', $request->getMethod());
@@ -298,9 +286,9 @@ class AbstractEndpointTest extends TestCase
         $Ping = new PingEndpoint();
         $client = $Ping->getHttpClient();
         $this->assertInstanceOf(\GuzzleHttp\Client::class, $client);
-        $Ping->setClient(static::$client);
+        $Ping->setClient($this->client);
         $this->assertInstanceOf(\GuzzleHttp\Client::class, $Ping->getHttpClient());
-        $this->assertEquals(static::$client, $Ping->getClient());
+        $this->assertEquals($this->client, $Ping->getClient());
         $this->assertNotEquals($client, $Ping->getHttpClient());
     }
 
@@ -316,7 +304,7 @@ class AbstractEndpointTest extends TestCase
     public function testBuildRequest(): void
     {
         $Ping = new PingEndpoint();
-        $Ping->setClient(static::$client);
+        $Ping->setClient($this->client);
         $Ping->setData([
             'foo' => 'bar',
         ]);
@@ -330,7 +318,7 @@ class AbstractEndpointTest extends TestCase
 
         $Ping = new PingEndpoint();
         $Ping->setProperty(AbstractEndpoint::PROPERTY_HTTP_METHOD, 'POST');
-        $Ping->setClient(static::$client);
+        $Ping->setClient($this->client);
         $Ping->setData([
             'foo' => 'bar',
         ]);
@@ -354,8 +342,8 @@ class AbstractEndpointTest extends TestCase
     public function testInvalidArgumentException(): void
     {
         $Basic = new BasicEndpoint();
-        $Basic->setClient(static::$client);
-        $Basic->setData(new EndpointData());
+        $Basic->setClient($this->client);
+        $Basic->setData(new DefaultedNonNullableData());
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('query must be a string or array');
         $Basic->buildRequest();
@@ -368,7 +356,7 @@ class AbstractEndpointTest extends TestCase
     public function testInvalidQueryString(): void
     {
         $Ping = new PingEndpoint();
-        $Ping->setClient(static::$client);
+        $Ping->setClient($this->client);
         $Ping->onEvent(PingEndpoint::EVENT_CONFIGURE_PAYLOAD, function (&$data): void {
             $data = new \stdClass();
             $data->foo = 'bar';
@@ -388,12 +376,12 @@ class AbstractEndpointTest extends TestCase
     public function testGetResponse(): void
     {
         $Ping = new PingEndpoint();
-        $Ping->setClient(static::$client);
+        $Ping->setClient($this->client);
 
         $pong = ['pong' => time()];
         $respBody = json_encode($pong);
-        static::$client->mockResponses->append(new Response(200, [], $respBody));
-        static::$client->mockResponses->append(new Response(200, [], json_encode([])));
+        $this->client->mockResponses->append(new Response(200, [], $respBody));
+        $this->client->mockResponses->append(new Response(200, [], json_encode([])));
 
         $Ping->execute();
         $this->assertInstanceOf(Response::class, $Ping->getResponse());
@@ -413,12 +401,12 @@ class AbstractEndpointTest extends TestCase
     public function testAsyncExecute(): void
     {
         $Ping = new PingEndpoint();
-        $Ping->setClient(static::$client);
+        $Ping->setClient($this->client);
 
         $pong = ['pong' => time()];
         $respBody = json_encode($pong);
-        static::$client->mockResponses->append(new Response(200, [], $respBody));
-        static::$client->mockResponses->append(new Response(401, [], json_encode(['error' => 'invalid_data'])));
+        $this->client->mockResponses->append(new Response(200, [], $respBody));
+        $this->client->mockResponses->append(new Response(401, [], json_encode(['error' => 'invalid_data'])));
 
         $self = $this;
         $promises = [];

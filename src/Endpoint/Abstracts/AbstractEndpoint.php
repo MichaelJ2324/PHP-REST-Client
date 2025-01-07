@@ -56,7 +56,11 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     public const AUTH_REQUIRED = 2;
 
-    protected static array $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => self::AUTH_EITHER];
+    protected static array $_DEFAULT_PROPERTIES = [
+        self::PROPERTY_URL => '',
+        self::PROPERTY_HTTP_METHOD => '',
+        self::PROPERTY_AUTH => self::AUTH_EITHER,
+    ];
 
     private PromiseInterface $promise;
 
@@ -64,11 +68,6 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * The Variable Identifier to parse Endpoint URL
      */
     protected static string $_URL_VAR_CHARACTER = '$';
-
-    /**
-     * The Endpoint Relative URL to the API
-     */
-    protected static string $_ENDPOINT_URL = '';
 
     /**
      * The initial URL passed into the Endpoint
@@ -96,7 +95,9 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     protected Response $response;
 
-    public function __construct(array $urlArgs = [], array $properties = [])
+    protected bool $catchNon200Responses = false;
+
+    public function __construct(array $properties = [], array $urlArgs = [])
     {
         $this->eventStack = new Stack();
         $this->eventStack->setEndpoint($this);
@@ -108,6 +109,12 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         foreach ($properties as $key => $value) {
             $this->setProperty($key, $value);
         }
+    }
+    
+    public function catchNon200Responses(bool $catch = true): static
+    {
+        $this->catchNon200Responses = $catch;
+        return $this;
     }
 
     /**
@@ -153,10 +160,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function getEndPointUrl(bool $full = false): string
     {
-        $url = static::$_ENDPOINT_URL;
-        if (!empty($this->_properties[self::PROPERTY_URL])) {
-            $url = $this->_properties[self::PROPERTY_URL];
-        }
+        $url = $this->getProperty(self::PROPERTY_URL) ?? "";
 
         if ($full) {
             $url = rtrim($this->getBaseUrl(), '/') . ('/' . $url);
@@ -224,7 +228,18 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function execute(array $options = []): static
     {
-        $this->setResponse($this->getHttpClient()->send($this->buildRequest(), $options));
+        try {
+            $response = $this->getHttpClient()->send($this->buildRequest(), $options);
+            $this->setResponse($response);
+        } catch (RequestException $exception) {
+            $response = $exception->getResponse();
+            if ($response instanceof Response) {
+                $this->setResponse($exception->getResponse());
+            }
+            if (!$this->catchNon200Responses) {
+                throw $exception;
+            }
+        }
         return $this;
     }
 
@@ -237,15 +252,15 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     {
         $request = $this->buildRequest();
         $this->promise = $this->getHttpClient()->sendAsync($request, $options);
-        $endpoint = $this;
         $this->promise->then(
-            function (Response $res) use ($endpoint, $options): void {
-                $endpoint->setResponse($res);
+            function (Response $res) use ($options): void {
+                $this->setResponse($res);
                 if (isset($options['success']) && is_callable($options['success'])) {
                     $options['success']($res);
                 }
             },
             function (RequestException $e) use ($options): void {
+                $this->setResponse($e->getResponse());
                 if (isset($options['error']) && is_callable($options['error'])) {
                     $options['error']($e);
                 }

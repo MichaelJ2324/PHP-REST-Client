@@ -13,12 +13,12 @@ class Stack implements StackInterface
     /**
      * @var string
      */
-    protected $currentEvent;
+    protected string $currentEvent;
 
     /**
      * @var
      */
-    protected $endpoint;
+    protected EndpointInterface $endpoint;
 
     /**
      * @return $this

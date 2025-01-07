@@ -9,7 +9,7 @@ class FileUploadEndpoint extends SmartEndpoint
 {
     use FileUploadsTrait;
 
-    public $_queryParams = [];
+    public array $_queryParams = [];
 
     protected function configureFileUploadQueryParams(): array
     {

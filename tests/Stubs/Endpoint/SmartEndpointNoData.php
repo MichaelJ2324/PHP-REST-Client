@@ -8,11 +8,11 @@ use MRussell\REST\Endpoint\Abstracts\AbstractSmartEndpoint;
 
 class SmartEndpointNoData extends AbstractSmartEndpoint
 {
-    protected static string $_DATA_CLASS = EndpointData::class;
+    protected string $_dataInterface = EndpointData::class;
 
     //Override constructor to prevent building out of Data Object right away
-    public function __construct(array $urlArgs = [], array $properties = [])
+    public function __construct(array $properties = [], array $urlArgs = [])
     {
-        AbstractEndpoint::__construct($urlArgs, $properties);
+        AbstractEndpoint::__construct($properties, $urlArgs);
     }
 }

@@ -205,7 +205,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
      */
     public function __call(string $name, $arguments)
     {
-        if (!isset($this->endpointProvider)){
+        if (!isset($this->endpointProvider)) {
             throw new EndpointProviderMissing();
         }
 

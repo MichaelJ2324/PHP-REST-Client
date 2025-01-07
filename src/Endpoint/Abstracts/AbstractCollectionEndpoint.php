@@ -2,6 +2,9 @@
 
 namespace MRussell\REST\Endpoint\Abstracts;
 
+use MRussell\REST\Endpoint\Interfaces\ArrayableInterface;
+use MRussell\REST\Endpoint\Interfaces\ClearableInterface;
+use MRussell\REST\Endpoint\Interfaces\ResettableInterface;
 use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Data\DataInterface;
@@ -17,40 +20,35 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 {
     use ParseResponseBodyToArrayTrait;
 
-    public const PROPERTY_RESPONSE_PROP = 'response_prop';
+    public const PROPERTY_RESPONSE_PROP = AbstractModelEndpoint::PROPERTY_RESPONSE_PROP;
 
     public const PROPERTY_MODEL_CLASS = 'model';
 
-    public const PROPERTY_MODEL_ID_KEY = 'model_id';
+    public const PROPERTY_MODEL_ID_KEY = AbstractModelEndpoint::PROPERTY_MODEL_KEY;
 
     public const EVENT_BEFORE_SYNC = 'before_sync';
 
-    /**
-     * @var string
-     */
-    protected static $_MODEL_CLASS = '';
+    public const SETOPT_MERGE = 'merge';
+    public const SETOPT_RESET = 'reset';
+
+    protected string $_modelInterface = '';
 
     /**
-     * @var string
+     * The ID Field used by the Model
      */
-    protected static $_MODEL_ID_KEY = 'id';
-
-    /**
-     * @var string
-     */
-    protected static $_RESPONSE_PROP = '';
+    protected static string $_DEFAULT_MODEL_KEY = AbstractModelEndpoint::DEFAULT_MODEL_KEY;
 
     /**
      * The Collection of Models
      * @var array
      */
-    protected $models = [];
+    protected array $models = [];
 
     /**
      * The Class Name of the ModelEndpoint
      * @var string
      */
-    protected $model;
+    protected string $model;
 
     /**
      * Assigns a value to the specified offset
@@ -238,21 +236,20 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     {
         $model = $this->buildModel();
         if ($model) {
-            return $model->modelIdKey();
+            return $model->getKeyProperty();
         }
 
-        return $this->getProperty(self::PROPERTY_MODEL_ID_KEY) ?? static::$_MODEL_ID_KEY;
+        return $this->getProperty(self::PROPERTY_MODEL_ID_KEY) ?? static::$_DEFAULT_MODEL_KEY;
     }
 
     /**
      * Append models to the collection
-     * @return AbstractCollectionEndpoint
      */
-    public function set(array $models, array $options = [])
+    public function set(array $models, array $options = []): static
     {
         $modelIdKey = $this->getModelIdKey();
-        $reset = $options['reset'] ?? false;
-        $merge = $options['merge'] ?? false;
+        $reset = $options[self::SETOPT_RESET] ?? false;
+        $merge = $options[self::SETOPT_MERGE] ?? false;
         if ($reset) {
             $this->models = [];
         }
@@ -309,7 +306,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     /**
      * @param bool $full
      */
-    public function getEndPointUrl($full = false): string
+    public function getEndPointUrl(bool $full = false): string
     {
         $epURL = parent::getEndPointUrl();
         if ($epURL === '') {
@@ -335,7 +332,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     public function getCollectionResponseProp(): string
     {
-        return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? static::$_RESPONSE_PROP;
+        return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? '';
     }
 
     /**
@@ -352,7 +349,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     /**
      * Configures the collection based on the Response Body
      */
-    protected function syncFromApi(array $data)
+    protected function syncFromApi(array $data): void
     {
         $this->triggerEvent(self::EVENT_BEFORE_SYNC, $data);
         $this->set($data);
@@ -362,10 +359,10 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * Build the ModelEndpoint
      * @return AbstractModelEndpoint|null
      */
-    protected function buildModel(array $data = [])
+    protected function buildModel(array $data = []): ?AbstractModelEndpoint
     {
         $Model = null;
-        $class = $this->getProperty(self::PROPERTY_MODEL_CLASS) ?? static::$_MODEL_CLASS;
+        $class = $this->getProperty(self::PROPERTY_MODEL_CLASS) ?? $this->_modelInterface;
         if (!empty($class)) {
             $Model = new $class();
             if ($this->client) {
