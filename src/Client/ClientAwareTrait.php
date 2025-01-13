@@ -4,24 +4,18 @@ namespace MRussell\REST\Client;
 
 trait ClientAwareTrait
 {
-    /**
-     * @var ClientInterface
-     */
-    protected $client;
+    protected ClientInterface $client;
 
     /**
      * @return $this
      */
-    public function setClient(ClientInterface $client)
+    public function setClient(ClientInterface $client): static
     {
         $this->client = $client;
         return $this;
     }
 
-    /**
-     * @return ClientInterface
-     */
-    public function getClient()
+    public function getClient(): ClientInterface
     {
         return $this->client;
     }

@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Endpoint\Abstracts;
 
+use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Data\AbstractEndpointData;
@@ -107,7 +108,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         }
     }
 
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): EndpointInterface
     {
         if (array_key_exists($name, $this->actions)) {
             return $this->setCurrentAction($name, $arguments)->execute();
@@ -263,7 +264,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     /**
      * Called after Execute if a Request Object exists, and Request returned 200 response
      */
-    protected function syncFromApi(array $model)
+    protected function syncFromApi(array $model): void
     {
         $this->triggerEvent(self::EVENT_BEFORE_SYNC, $model);
         $this->set($model);

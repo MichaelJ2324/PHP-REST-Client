@@ -6,10 +6,7 @@ use MRussell\REST\Endpoint\Event\StackInterface;
 
 trait EventsTrait
 {
-    /**
-     * @var StackInterface
-     */
-    protected $eventStack;
+    protected StackInterface $eventStack;
 
     /**
      * @abstracting EventTriggerInterface
@@ -24,7 +21,7 @@ trait EventsTrait
      * @abstracting EventTriggerInterface
      * @codeCoverageIgnore
      */
-    public function onEvent(string $event, callable $func, string $id = null)
+    public function onEvent(string $event, callable $func, string $id = null): int|string
     {
         return $this->eventStack->register($event, $func, $id);
     }

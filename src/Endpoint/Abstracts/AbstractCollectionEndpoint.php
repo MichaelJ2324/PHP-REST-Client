@@ -201,13 +201,9 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     /**
      * Get a model based on numerical index
-     * @param int $index
-     * @return array|ModelInterface
      */
-    public function at($index)
+    public function at(int $index): ModelInterface|array|\ArrayAccess|null
     {
-        $return = null;
-        $index = intval($index);
         $this->rewind();
         if ($index < 0) {
             $index += $this->length();
@@ -221,7 +217,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
         $return = $this->current();
         $Model = $this->buildModel($return);
-        if ($Model instanceof AbstractModelEndpoint) {
+        if ($Model instanceof ModelInterface) {
             $return = $Model;
         }
 

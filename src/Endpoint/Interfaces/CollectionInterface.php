@@ -28,12 +28,12 @@ interface CollectionInterface extends EndpointInterface, ClearableInterface, Get
      * @param $index
      * @return ModelInterface|null
      */
-    public function at($index);
+    public function at(int $index): ModelInterface|array|\ArrayAccess|null;
 
     /**
      * Set the collection of models
      * @param array $options = []
      * @return $this
      */
-    public function set(array $models, array $options = []);
+    public function set(array $models, array $options = []): static;
 }

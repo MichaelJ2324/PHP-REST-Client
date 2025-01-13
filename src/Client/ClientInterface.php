@@ -53,10 +53,10 @@ interface ClientInterface
     /**
      * Get the Endpoint currently being used
      */
-    public function current(): EndpointInterface;
+    public function current(): EndpointInterface|null;
 
     /**
      * Get the last Endpoint Used
      */
-    public function last(): EndpointInterface;
+    public function last(): EndpointInterface|null;
 }

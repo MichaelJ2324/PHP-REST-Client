@@ -148,7 +148,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function getBaseUrl(): string
     {
-        if (empty($this->baseUrl) && $this->client) {
+        if (empty($this->baseUrl) && isset($this->client)) {
             return $this->getClient()->getAPIUrl();
         }
 
@@ -205,10 +205,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         return $this->response;
     }
 
-    /**
-     * @return mixed|null
-     */
-    public function getResponseBody(bool $associative = true)
+    public function getResponseBody(bool $associative = true): mixed
     {
         $response = $this->getResponse();
         return $response ? $this->getResponseContent($response, $associative) : null;
@@ -216,7 +213,11 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     public function getHttpClient(): Client
     {
-        return $this->client ? $this->getClient()->getHttpClient() : new Client();
+        if (isset($this->client)) {
+            return $this->getClient()->getHttpClient();
+        }
+
+        return new Client();
     }
 
     /**

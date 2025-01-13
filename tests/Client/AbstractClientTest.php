@@ -179,9 +179,9 @@ class AbstractClientTest extends TestCase
      */
     public function testSetServer(): void
     {
-        $this->assertEquals($this->Client, $this->Client->setServer(null));
-        $this->assertEquals(null, $this->Client->getServer());
-        $this->assertEquals(null, $this->Client->getAPIUrl());
+        $this->assertEquals($this->Client, $this->Client->setServer(""));
+        $this->assertEquals("", $this->Client->getServer());
+        $this->assertEquals("", $this->Client->getAPIUrl());
         $this->assertEquals($this->Client, $this->Client->setServer($this->server));
         $this->assertEquals($this->server, $this->Client->getServer());
         $this->assertEquals($this->server, $this->Client->getAPIUrl());
