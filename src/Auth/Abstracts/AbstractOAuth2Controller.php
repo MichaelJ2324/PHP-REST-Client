@@ -94,7 +94,6 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
     /**
      * Configure the Expiration property on the token, based on the 'expires_in' property
      * @param $token
-     * @return mixed
      */
     protected function configureToken(mixed &$token): mixed
     {
@@ -156,6 +155,7 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
         if (!empty($expiration)) {
             $ttl = $expiration - time();
         }
+
         return $this->getCache()->set($this->getCacheKey(), $this->token, $ttl);
     }
 

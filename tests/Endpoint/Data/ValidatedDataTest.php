@@ -2,10 +2,8 @@
 
 namespace MRussell\REST\Tests\Endpoint\Data;
 
-use MRussell\REST\Endpoint\Data\EndpointData;
 use MRussell\REST\Endpoint\Data\ValidatedEndpointData;
 use MRussell\REST\Exception\Endpoint\InvalidData;
-use MRussell\REST\Tests\Stubs\Endpoint\DefaultedNonNullableData;
 use MRussell\REST\Tests\Stubs\Endpoint\ValidatedData;
 use PHPUnit\Framework\TestCase;
 

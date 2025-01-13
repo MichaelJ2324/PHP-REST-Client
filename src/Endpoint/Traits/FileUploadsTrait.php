@@ -11,7 +11,6 @@ trait FileUploadsTrait
 {
     /**
      * Whether or not a file upload is occurring
-     * @var bool
      */
     protected bool $_upload = false;
 

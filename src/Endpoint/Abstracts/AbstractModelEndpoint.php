@@ -214,7 +214,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      * @param AbstractEndpointData $data
      * @inheritdoc
      */
-    protected function configurePayload()
+    protected function configurePayload(): mixed
     {
         $data = $this->getData();
         switch ($this->getCurrentAction()) {

@@ -21,9 +21,6 @@ use ColinODell\PsrTestLogger\TestLogger;
  */
 class AbstractOAuth2ControllerTest extends TestCase
 {
-    /**
-     * @var Client
-     */
     protected Client $client;
 
     protected array $token = ['access_token' => '12345', 'refresh_token' => '67890', 'expires_in' => 3600];
@@ -161,6 +158,7 @@ class AbstractOAuth2ControllerTest extends TestCase
         $RefreshEndpoint = new RefreshEndpoint();
         //        $this->client->mockResponses->append(new Response(200));
         $RefreshEndpoint->setClient($this->client);
+
         $Auth->setActionEndpoint(OAuth2Controller::ACTION_OAUTH_REFRESH, $RefreshEndpoint);
         //        $this->assertEquals(false, $Auth->refresh());
         //        $this->assertEquals(true, $Logger->hasErrorThatContains("An Invalid Token was attempted to be set on the Auth Controller"));

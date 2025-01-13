@@ -3,7 +3,6 @@
 namespace MRussell\REST\Endpoint\Abstracts;
 
 use GuzzleHttp\Psr7\Request;
-use MRussell\REST\Endpoint\Data\AbstractEndpointData;
 use MRussell\REST\Endpoint\Data\DataInterface;
 use MRussell\REST\Endpoint\Data\EndpointData;
 use MRussell\REST\Exception\Endpoint\InvalidData;

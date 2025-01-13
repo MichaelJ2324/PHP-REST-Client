@@ -231,15 +231,17 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         try {
             $response = $this->getHttpClient()->send($this->buildRequest(), $options);
             $this->setResponse($response);
-        } catch (RequestException $exception) {
-            $response = $exception->getResponse();
+        } catch (RequestException $requestException) {
+            $response = $requestException->getResponse();
             if ($response instanceof Response) {
-                $this->setResponse($exception->getResponse());
+                $this->setResponse($requestException->getResponse());
             }
+
             if (!$this->catchNon200Responses) {
-                throw $exception;
+                throw $requestException;
             }
         }
+
         return $this;
     }
 
@@ -322,7 +324,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * Configures Data on the Endpoint to be set on the Request.
      * @return string|array|DataInterface|null|Stream
      */
-    protected function configurePayload()
+    protected function configurePayload(): mixed
     {
         $data = $this->getData() ?? null;
         $this->triggerEvent(self::EVENT_CONFIGURE_PAYLOAD, $data);

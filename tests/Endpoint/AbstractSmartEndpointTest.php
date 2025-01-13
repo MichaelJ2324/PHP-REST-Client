@@ -187,6 +187,7 @@ class AbstractSmartEndpointTest extends TestCase
 
         $DataClass = $Reflected->getProperty('_dataInterface');
         $DataClass->setAccessible(true);
+
         $oldValue = $DataClass->getValue($Endpoint);
         $DataClass->setValue($Endpoint, PingEndpoint::class);
 

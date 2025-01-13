@@ -18,9 +18,6 @@ use PHPUnit\Framework\TestCase;
  */
 class AbstractModelEndpointTest extends TestCase
 {
-    /**
-     * @var Client
-     */
     protected Client $client;
 
 

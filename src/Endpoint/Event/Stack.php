@@ -10,9 +10,6 @@ class Stack implements StackInterface
 
     private array $events = [];
 
-    /**
-     * @var string
-     */
     protected string $currentEvent;
 
     /**

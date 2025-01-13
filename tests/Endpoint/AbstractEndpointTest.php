@@ -26,9 +26,6 @@ use PHPUnit\Framework\TestCase;
  */
 class AbstractEndpointTest extends TestCase
 {
-    /**
-     * @var Client
-     */
     protected Client $client;
 
     protected array $urlArgs = ['foo', 'bar'];

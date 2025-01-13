@@ -17,6 +17,7 @@ trait ArrayObjectAttributesTrait
         if (property_exists($this, $key)) {
             return $this->{$key};
         }
+
         return $this->_attributes[$key];
     }
 

@@ -23,9 +23,6 @@ use ColinODell\PsrTestLogger\TestLogger;
  */
 class AbstractAuthControllerTest extends TestCase
 {
-    /**
-     * @var Client
-     */
     protected Client $client;
 
     protected array $authActions = [AuthController::ACTION_AUTH, AuthController::ACTION_LOGOUT];

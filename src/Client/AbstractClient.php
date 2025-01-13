@@ -184,6 +184,16 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
         return $this->version ?? "";
     }
 
+    public function hasEndpoint(string $endpoint): bool
+    {
+        return $this->getEndpointProvider()->hasEndpoint($endpoint, $this->getVersion());
+    }
+
+    public function getEndpoint(string $endpoint): EndpointInterface
+    {
+        return $this->getEndpointProvider()->getEndpoint($endpoint, $this->getVersion());
+    }
+
     /**
      * @inheritdoc
      */
@@ -209,8 +219,7 @@ abstract class AbstractClient implements ClientInterface, AuthControllerAwareInt
             throw new EndpointProviderMissing();
         }
 
-        $provider = $this->getEndpointProvider();
-        $this->setCurrentEndpoint($provider->getEndpoint($name, $this->version))
+        $this->setCurrentEndpoint($this->getEndpoint($name))
             ->current()
             ->setClient($this)
             ->setUrlArgs($arguments);

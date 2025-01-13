@@ -2,7 +2,6 @@
 
 namespace MRussell\REST\Endpoint\Data;
 
-use MRussell\REST\Endpoint\Interfaces\ResettableInterface;
 use MRussell\REST\Endpoint\Traits\ArrayObjectAttributesTrait;
 use MRussell\REST\Endpoint\Traits\ClearAttributesTrait;
 use MRussell\REST\Endpoint\Traits\GetAttributesTrait;
@@ -25,7 +24,6 @@ abstract class AbstractEndpointData implements DataInterface
 
     /**
      * A way to determine between Empty Array and Null
-     * @var bool
      */
     protected bool $isNull = true;
 
@@ -97,10 +95,12 @@ abstract class AbstractEndpointData implements DataInterface
         if (!isset($properties[self::DATA_PROPERTY_DEFAULTS])) {
             $properties[self::DATA_PROPERTY_DEFAULTS] = [];
         }
+
         if (!isset($properties[self::DATA_PROPERTY_NULLABLE])) {
             $properties[self::DATA_PROPERTY_NULLABLE] = true;
         }
-        $properties[self::DATA_PROPERTY_NULLABLE] = !!$properties[self::DATA_PROPERTY_NULLABLE];
+
+        $properties[self::DATA_PROPERTY_NULLABLE] = (bool) $properties[self::DATA_PROPERTY_NULLABLE];
 
         return $this->rawSetProperties($properties);
     }
@@ -135,8 +135,9 @@ abstract class AbstractEndpointData implements DataInterface
     {
         $default = true;
         if (isset(static::$_DEFAULT_PROPERTIES[self::DATA_PROPERTY_NULLABLE]) && is_bool(static::$_DEFAULT_PROPERTIES[self::DATA_PROPERTY_NULLABLE])) {
-            $default = !!static::$_DEFAULT_PROPERTIES[self::DATA_PROPERTY_NULLABLE];
+            $default = static::$_DEFAULT_PROPERTIES[self::DATA_PROPERTY_NULLABLE];
         }
+
         $nullable = $this->getProperty(self::DATA_PROPERTY_NULLABLE);
         return $nullable !== null ? $nullable : $default;
     }

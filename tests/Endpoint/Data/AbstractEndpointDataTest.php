@@ -3,7 +3,6 @@
 namespace MRussell\REST\Tests\Endpoint\Data;
 
 use MRussell\REST\Endpoint\Data\EndpointData as StockData;
-use MRussell\REST\Exception\Endpoint\InvalidData;
 use MRussell\REST\Tests\Stubs\Endpoint\DefaultedNonNullableData;
 use PHPUnit\Framework\TestCase;
 

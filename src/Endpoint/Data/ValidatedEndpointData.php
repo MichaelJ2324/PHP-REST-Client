@@ -13,6 +13,7 @@ class ValidatedEndpointData extends EndpointData implements ValidatedInterface
     public const DATA_PROPERTY_AUTO_VALIDATE = 'auto_validate';
 
     public const VALIDATION_MISSING = 'missing';
+
     public const VALIDATION_INVALID = 'invalid';
 
     protected static array $_DEFAULT_PROPERTIES = [
@@ -25,10 +26,12 @@ class ValidatedEndpointData extends EndpointData implements ValidatedInterface
         if (!isset($properties[self::DATA_PROPERTY_REQUIRED])) {
             $properties[self::DATA_PROPERTY_REQUIRED] = [];
         }
+
         if (!isset($properties[self::DATA_PROPERTY_AUTO_VALIDATE])) {
             $properties[self::DATA_PROPERTY_AUTO_VALIDATE] = false;
         }
-        $properties[self::DATA_PROPERTY_AUTO_VALIDATE] = !!$properties[self::DATA_PROPERTY_AUTO_VALIDATE];
+
+        $properties[self::DATA_PROPERTY_AUTO_VALIDATE] = (bool) $properties[self::DATA_PROPERTY_AUTO_VALIDATE];
         return parent::setProperties($properties);
     }
 
@@ -39,10 +42,8 @@ class ValidatedEndpointData extends EndpointData implements ValidatedInterface
     public function toArray(bool $validate = null): array
     {
         $validate = is_null($validate) ? $this->getProperty(self::DATA_PROPERTY_AUTO_VALIDATE) : $validate;
-        if (!!$validate) {
-            if (!$this->validate()) {
-                throw new InvalidData();
-            }
+        if ((bool) $validate && !$this->validate()) {
+            throw new InvalidData();
         }
 
         return $this->_attributes;

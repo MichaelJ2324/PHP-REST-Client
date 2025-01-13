@@ -40,6 +40,17 @@ interface ClientInterface
     public function getVersion(): string;
 
     /**
+     * Check if Client has a given Endpoint
+     */
+    public function hasEndpoint(string $endpoint): bool;
+
+    /**
+     * Get an Endpoint Interface for the REST Api
+     * @param string $name
+     */
+    public function getEndpoint(string $endpoint): EndpointInterface;
+
+    /**
      * Get the Endpoint currently being used
      */
     public function current(): EndpointInterface;

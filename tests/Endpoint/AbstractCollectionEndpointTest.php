@@ -23,9 +23,6 @@ class AbstractCollectionEndpointTest extends TestCase
 
     protected $collection = ['abc123' => ['id' => 'abc123', 'name' => 'foo', 'foo' => 'bar'], 'efg234' => ['id' => 'efg234', 'name' => 'test', 'foo' => '']];
 
-    /**
-     * @var Client
-     */
     protected Client $client;
 
     protected function setUp(): void

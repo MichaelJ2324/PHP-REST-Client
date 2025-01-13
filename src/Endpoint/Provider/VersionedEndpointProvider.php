@@ -2,7 +2,7 @@
 
 namespace MRussell\REST\Endpoint\Provider;
 
-class DefaultEndpointProvider extends AbstractEndpointProvider
+class VersionedEndpointProvider extends AbstractMultiVersionEndpointProvider
 {
     /**
      * List of default endpoints to load
@@ -12,7 +12,7 @@ class DefaultEndpointProvider extends AbstractEndpointProvider
     public function __construct()
     {
         foreach (static::$_DEFAULT_ENDPOINTS as $name => $epData) {
-            $this->registerEndpoint($name, $epData[self::ENDPOINT_CLASS], $epData[self::ENDPOINT_PROPERTIES] ?? []);
+            $this->registerEndpoint($name, $epData['class'], $epData['properties'] ?? []);
         }
     }
 }
