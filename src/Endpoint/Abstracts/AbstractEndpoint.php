@@ -110,7 +110,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
             $this->setProperty($key, $value);
         }
     }
-    
+
     public function catchNon200Responses(bool $catch = true): static
     {
         $this->catchNon200Responses = $catch;

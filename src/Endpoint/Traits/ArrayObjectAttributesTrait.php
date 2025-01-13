@@ -13,6 +13,10 @@ trait ArrayObjectAttributesTrait
      */
     public function &__get($key)
     {
+        //Due to use of unset on Class properties for certain scenarios, we need to accommodate
+        if (property_exists($this, $key)) {
+            return $this->{$key};
+        }
         return $this->_attributes[$key];
     }
 
@@ -23,7 +27,12 @@ trait ArrayObjectAttributesTrait
      */
     public function __set($key, mixed $value)
     {
-        $this->_attributes[$key] = $value;
+        //Due to use of unset on Class properties for certain scenarios, we need to accommodate
+        if (property_exists($this, $key)) {
+            $this->{$key} = $value;
+        } else {
+            $this->_attributes[$key] = $value;
+        }
     }
 
     /**
