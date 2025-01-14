@@ -30,7 +30,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run test suite
-      run: composer run coverage
+      run: composer run test:coverage
 
     - name: Coveralls
       uses: coverallsapp/github-action@v2
