@@ -6,5 +6,7 @@ use MRussell\REST\Endpoint\Abstracts\AbstractModelEndpoint;
 
 class ModelEndpoint extends AbstractModelEndpoint
 {
-    protected static $_ENDPOINT_URL = 'account/$:id';
+    protected static array $_DEFAULT_PROPERTIES = [
+        self::PROPERTY_URL => 'account/$:id',
+    ];
 }

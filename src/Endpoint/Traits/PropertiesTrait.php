@@ -4,10 +4,7 @@ namespace MRussell\REST\Endpoint\Traits;
 
 trait PropertiesTrait
 {
-    /**
-     * @var array
-     */
-    protected $_properties = [];
+    protected array $_properties = [];
 
     /**
      * Get the current Data Properties
@@ -23,7 +20,7 @@ trait PropertiesTrait
      * @return $this
      * @implements PropertiesInterface
      */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): static
     {
         $this->_properties = $properties;
         return $this;
@@ -35,7 +32,7 @@ trait PropertiesTrait
      * @return $this
      * @implements PropertiesInterface
      */
-    public function setProperty(string $name, $value)
+    public function setProperty(string $name, $value): static
     {
         $properties = $this->getProperties();
         $properties[$name] = $value;
@@ -44,11 +41,10 @@ trait PropertiesTrait
 
     /**
      * Get a specific property from properties array
-     * @return mixed
      * @implements PropertiesInterface
      */
-    public function getProperty(string $name)
+    public function getProperty(string $name): mixed
     {
-        return $this->_properties[$name] ?? null;
+        return isset($this->_properties[$name]) ? $this->_properties[$name] : null;
     }
 }

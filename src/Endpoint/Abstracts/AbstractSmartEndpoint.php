@@ -3,10 +3,8 @@
 namespace MRussell\REST\Endpoint\Abstracts;
 
 use GuzzleHttp\Psr7\Request;
-use MRussell\REST\Endpoint\Data\AbstractEndpointData;
 use MRussell\REST\Endpoint\Data\DataInterface;
 use MRussell\REST\Endpoint\Data\EndpointData;
-use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 use MRussell\REST\Exception\Endpoint\InvalidData;
 use MRussell\REST\Exception\Endpoint\InvalidDataType;
 
@@ -17,20 +15,27 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
     /**
      * @inheritdoc
      */
-    protected static $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => false, self::PROPERTY_DATA => ['required' => [], 'defaults' => []]];
+    protected static array $_DEFAULT_PROPERTIES = [
+        self::PROPERTY_URL => '',
+        self::PROPERTY_HTTP_METHOD => '',
+        self::PROPERTY_AUTH => false,
+        self::PROPERTY_DATA => [
+            EndpointData::DATA_PROPERTY_DEFAULTS => [],
+            EndpointData::DATA_PROPERTY_NULLABLE => [],
+        ],
+    ];
 
-    protected static $_DATA_CLASS = EndpointData::class;
+    protected string $_dataInterface = EndpointData::class;
 
     /**
      * The data being passed to the API Endpoint.
      * Uses the DataInterface to provide a more robust way of configuring data and an automation API
-     * @var DataInterface
      */
-    protected $data;
+    protected string|array|\ArrayAccess|null $data;
 
-    public function __construct(array $urlArgs = [], array $properties = [])
+    public function __construct(array $properties = [], array $urlArgs = [])
     {
-        parent::__construct($urlArgs, $properties);
+        parent::__construct($properties, $urlArgs);
         $this->setData($this->buildDataObject());
     }
 
@@ -39,13 +44,10 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
      * Passes through the data properties on the Data Object
      * @return $this
      */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): static
     {
         if (!isset($properties[self::PROPERTY_DATA])) {
-            $properties[self::PROPERTY_DATA] = [
-                'required' => [],
-                'defaults' => [],
-            ];
+            $properties[self::PROPERTY_DATA] = [];
         }
 
         parent::setProperties($properties);
@@ -56,7 +58,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
     /**
      * @inheritdoc
      */
-    public function setProperty(string $name, $value)
+    public function setProperty(string $name, $value): static
     {
         parent::setProperty($name, $value);
         if ($name === self::PROPERTY_DATA && isset($this->data)) {
@@ -69,17 +71,17 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
     /**
      * @inheritdoc
      */
-    public function setData($data): EndpointInterface
+    public function setData(string|array|\ArrayAccess|null $data): static
     {
-        if ($data instanceof AbstractEndpointData) {
+        if ($data instanceof DataInterface) {
             $this->data = $data;
         } elseif (is_array($data)) {
             $this->getData()->reset();
             $this->getData()->set($data);
         } elseif (is_null($data)) {
-            $this->data = $this->buildDataObject();
+            $this->getData()->clear();
         } else {
-            throw new InvalidDataType(get_class($this));
+            throw new InvalidDataType(static::class);
         }
 
         return $this;
@@ -87,22 +89,27 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
 
     /**
      * Get the current data object, or build out a new one if one is not set
-     * @return DataInterface
      */
-    public function getData()
+    public function getData(): DataInterface
     {
-        if (!$this->data) {
+        if (!isset($this->data)) {
             $this->data = $this->buildDataObject();
         }
 
-        return parent::getData();
+        $data = parent::getData();
+        if (!($data instanceof DataInterface)) {
+            $di = $this->buildDataObject();
+            $this->data = $di->set($data);
+        }
+
+        return $this->data;
     }
 
     /**
      * Passes Data properties to Endpoint Data object
      * @return $this
      */
-    protected function configureDataProperties(): EndpointInterface
+    protected function configureDataProperties(): static
     {
         $dataProps = $this->getProperty(self::PROPERTY_DATA);
         if (!empty($dataProps)) {
@@ -134,7 +141,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
      * Reset data
      * @return $this
      */
-    public function reset()
+    public function reset(): static
     {
         $this->getData()->reset();
         return parent::reset();
@@ -146,11 +153,11 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
      */
     protected function buildDataObject(): DataInterface
     {
-        $implements = class_implements(static::$_DATA_CLASS);
+        $implements = class_implements($this->_dataInterface);
         if (is_array($implements) && isset($implements[DataInterface::class])) {
-            return new static::$_DATA_CLASS([], $this->getProperty(self::PROPERTY_DATA) ?? []);
+            return new $this->_dataInterface([], $this->getProperty(self::PROPERTY_DATA) ?? []);
         }
 
-        throw new InvalidData(static::$_DATA_CLASS . " does not implement MRussell\\REST\\Endpoint\\Data\\DataInterface");
+        throw new InvalidData($this->_dataInterface . " does not implement MRussell\\REST\\Endpoint\\Data\\DataInterface");
     }
 }

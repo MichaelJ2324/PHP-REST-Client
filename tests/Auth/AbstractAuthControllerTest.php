@@ -23,29 +23,15 @@ use ColinODell\PsrTestLogger\TestLogger;
  */
 class AbstractAuthControllerTest extends TestCase
 {
-    /**
-     * @var Client
-     */
-    protected static $client;
+    protected Client $client;
 
-    public static function setUpBeforeClass(): void
-    {
-        //Add Setup for static properties here
-        self::$client = new Client();
-    }
+    protected array $authActions = [AuthController::ACTION_AUTH, AuthController::ACTION_LOGOUT];
 
-    public static function tearDownAfterClass(): void
-    {
-        //Add Tear Down for static properties here
-    }
-
-
-    protected $authActions = [AuthController::ACTION_AUTH, AuthController::ACTION_LOGOUT];
-
-    protected $credentials = ['user' => 'foo', 'password' => 'bar'];
+    protected array $credentials = ['user' => 'foo', 'password' => 'bar'];
 
     protected function setUp(): void
     {
+        $this->client = new Client();
         parent::setUp();
     }
 
@@ -150,9 +136,8 @@ class AbstractAuthControllerTest extends TestCase
 
     /**
      * @depends testSetActions
-     * @return void
      */
-    public function testInvalidActionException(AuthController $Auth)
+    public function testInvalidActionException(AuthController $Auth): void
     {
         $this->expectExceptionMessage("Unknown Auth Action [test] requested on Controller: MRussell\REST\Auth\Abstracts\AbstractAuthController");
         $this->expectException(InvalidAuthenticationAction::class);
@@ -168,9 +153,8 @@ class AbstractAuthControllerTest extends TestCase
      * @covers ::getCachedToken
      * @covers ::removeCachedToken
      * @covers ::setCredentials
-     * @return AuthController
      */
-    public function testCaching(AuthController $Auth)
+    public function testCaching(AuthController $Auth): void
     {
         $cache = MemoryCache::getInstance();
         $ReflectedAuth = new \ReflectionClass($Auth);
@@ -247,11 +231,11 @@ class AbstractAuthControllerTest extends TestCase
     public function testAuthenticate(AuthController $Auth): AuthController
     {
         $Endpoint = new AuthEndpoint();
-        self::$client->mockResponses->append(new Response(404));
-        $Endpoint->setClient(self::$client);
+        $this->client->mockResponses->append(new Response(404));
+        $Endpoint->setClient($this->client);
         $Auth->setActionEndpoint(AbstractAuthController::ACTION_AUTH, $Endpoint);
         $this->assertEquals(false, $Auth->authenticate());
-        self::$client->mockResponses->append(new Response(200, [], "12345"));
+        $this->client->mockResponses->append(new Response(200, [], "12345"));
         $this->assertEquals(true, $Auth->authenticate());
         $this->assertEquals("12345", $Auth->getToken());
         $this->assertEquals($Auth, $Auth->reset());
@@ -269,22 +253,19 @@ class AbstractAuthControllerTest extends TestCase
     {
         $Endpoint = new LogoutEndpoint();
         $Logger = new TestLogger();
-        self::$client->mockResponses->append(new Response(200));
-        $Endpoint->setClient(self::$client);
+        $this->client->mockResponses->append(new Response(200));
+        $Endpoint->setClient($this->client);
         $this->assertInstanceOf(NullLogger::class, $Auth->getLogger());
         $Auth->setLogger($Logger);
         $Auth->setActionEndpoint(AbstractAuthController::ACTION_LOGOUT, $Endpoint);
         $this->assertEquals(true, $Auth->logout());
-        self::$client->mockResponses->append(new Response(404));
+        $this->client->mockResponses->append(new Response(404));
         $this->assertEquals(false, $Auth->logout());
         $this->assertEquals(true, $Logger->hasErrorThatContains("[REST] Logout Exception"));
         return $Auth;
     }
 
-    /**
-     * @return void
-     */
-    public function testNoLogoutAction()
+    public function testNoLogoutAction(): void
     {
         $Auth = new AuthController();
         $Logger = new TestLogger();

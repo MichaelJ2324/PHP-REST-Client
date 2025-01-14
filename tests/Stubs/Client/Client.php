@@ -20,7 +20,7 @@ class Client extends AbstractClient
      */
     public $container = [];
 
-    public $apiURL = 'http://phpunit.tests/';
+    public string $apiURL = 'http://phpunit.tests/';
 
     public function __construct()
     {
@@ -28,7 +28,7 @@ class Client extends AbstractClient
         parent::__construct();
     }
 
-    public function current(EndpointInterface $endpoint = null)
+    public function current(EndpointInterface $endpoint = null): EndpointInterface
     {
         if ($endpoint instanceof EndpointInterface) {
             $this->setCurrentEndpoint($endpoint);
@@ -37,18 +37,17 @@ class Client extends AbstractClient
         return parent::current();
     }
 
-    protected function initHttpHandlerStack()
+    protected function initHttpHandlerStack(): void
     {
         $handler = HandlerStack::create($this->mockResponses);
         $handler->push(Middleware::history($this->container), 'history');
         $this->setHandlerStack($handler);
     }
 
-    protected function configureAuth()
+    protected function configureAuth(): void
     {
         parent::configureAuth();
         $this->getHandlerStack()->remove('history');
         $this->getHandlerStack()->after('configureAuth', Middleware::history($this->container), 'history');
-        return $this;
     }
 }

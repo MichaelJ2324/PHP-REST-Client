@@ -10,7 +10,6 @@ interface GetInterface
     /**
      * Get a specific attribute from the object
      * @param $key
-     * @return mixed
      */
-    public function get($key);
+    public function get(string|int $key): mixed;
 }

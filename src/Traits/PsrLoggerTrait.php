@@ -9,25 +9,22 @@ trait PsrLoggerTrait
 {
     /**
      * The logger instance.
-     *
-     * @var LoggerInterface|null
      */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     /**
      * Sets a logger.
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): static
     {
         $this->logger = $logger;
+        return $this;
     }
 
     /**
      * Get the Logger instance
-     *
-     * @return LoggerInterface
      */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         if (!isset($this->logger)) {
             $this->setLogger(new NullLogger());

@@ -6,7 +6,6 @@ use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Data\DataInterface;
 use MRussell\REST\Endpoint\Interfaces\CollectionInterface;
-use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 use MRussell\REST\Endpoint\Interfaces\ModelInterface;
 use MRussell\REST\Endpoint\Traits\ParseResponseBodyToArrayTrait;
 use MRussell\REST\Exception\Endpoint\UnknownEndpoint;
@@ -18,40 +17,34 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 {
     use ParseResponseBodyToArrayTrait;
 
-    public const PROPERTY_RESPONSE_PROP = 'response_prop';
+    public const PROPERTY_RESPONSE_PROP = AbstractModelEndpoint::PROPERTY_RESPONSE_PROP;
 
-    public const PROPERTY_MODEL_CLASS = 'model';
+    public const PROPERTY_MODEL_ENDPOINT = 'model';
 
-    public const PROPERTY_MODEL_ID_KEY = 'model_id';
+    public const PROPERTY_MODEL_ID_KEY = AbstractModelEndpoint::PROPERTY_MODEL_KEY;
 
     public const EVENT_BEFORE_SYNC = 'before_sync';
 
-    /**
-     * @var string
-     */
-    protected static $_MODEL_CLASS = '';
+    public const SETOPT_MERGE = 'merge';
+
+    public const SETOPT_RESET = 'reset';
+
+    protected string $_modelInterface = '';
 
     /**
-     * @var string
+     * The ID Field used by the Model
      */
-    protected static $_MODEL_ID_KEY = 'id';
-
-    /**
-     * @var string
-     */
-    protected static $_RESPONSE_PROP = '';
+    protected static string $_DEFAULT_MODEL_KEY = AbstractModelEndpoint::DEFAULT_MODEL_KEY;
 
     /**
      * The Collection of Models
-     * @var array
      */
-    protected $models = [];
+    protected array $models = [];
 
     /**
      * The Class Name of the ModelEndpoint
-     * @var string
      */
-    protected $model;
+    protected string $model;
 
     /**
      * Assigns a value to the specified offset
@@ -59,7 +52,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @param mixed $value - The value to set
      * @abstracting ArrayAccess
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet($offset, mixed $value): void
     {
         if (is_null($offset)) {
             $this->models[] = $value;
@@ -114,7 +107,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @return $this
      * @implements ResettableInterface
      */
-    public function reset()
+    public function reset(): static
     {
         parent::reset();
         return $this->clear();
@@ -125,7 +118,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @return $this
      * @implements ClearableInterface
      */
-    public function clear()
+    public function clear(): static
     {
         $this->models = [];
         return $this;
@@ -183,7 +176,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @inheritdoc
      * @throws InvalidRequest
      */
-    public function fetch()
+    public function fetch(): static
     {
         $this->setProperty(self::PROPERTY_HTTP_METHOD, "GET");
         return $this->execute();
@@ -192,13 +185,13 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     /**
      * @inheritdoc
      */
-    public function get($id)
+    public function get(string|int $key): ModelInterface|array|\ArrayAccess|null
     {
         $data = null;
-        if ($this->offsetExists($id)) {
-            $data = $this->models[$id];
+        if ($this->offsetExists($key)) {
+            $data = $this->models[$key];
             $Model = $this->buildModel($data);
-            if ($Model !== null) {
+            if ($Model instanceof ModelInterface) {
                 $data = $Model;
             }
         }
@@ -208,13 +201,9 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     /**
      * Get a model based on numerical index
-     * @param int $index
-     * @return array|ModelInterface
      */
-    public function at($index)
+    public function at(int $index): ModelInterface|array|\ArrayAccess|null
     {
-        $return = null;
-        $index = intval($index);
         $this->rewind();
         if ($index < 0) {
             $index += $this->length();
@@ -228,7 +217,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
         $return = $this->current();
         $Model = $this->buildModel($return);
-        if ($Model !== null) {
+        if ($Model instanceof ModelInterface) {
             $return = $Model;
         }
 
@@ -238,22 +227,21 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     protected function getModelIdKey(): string
     {
         $model = $this->buildModel();
-        if ($model) {
-            return $model->modelIdKey();
+        if ($model instanceof ModelInterface) {
+            return $model->getKeyProperty();
         }
 
-        return $this->getProperty(self::PROPERTY_MODEL_ID_KEY) ?? static::$_MODEL_ID_KEY;
+        return $this->getProperty(self::PROPERTY_MODEL_ID_KEY) ?? static::$_DEFAULT_MODEL_KEY;
     }
 
     /**
      * Append models to the collection
-     * @return AbstractCollectionEndpoint
      */
-    public function set(array $models, array $options = [])
+    public function set(array $models, array $options = []): static
     {
         $modelIdKey = $this->getModelIdKey();
-        $reset = $options['reset'] ?? false;
-        $merge = $options['merge'] ?? false;
+        $reset = $options[self::SETOPT_RESET] ?? false;
+        $merge = $options[self::SETOPT_MERGE] ?? false;
         if ($reset) {
             $this->models = [];
         }
@@ -288,34 +276,37 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
      * @inheritdoc
      * @throws UnknownEndpoint
      */
-    public function setModelEndpoint($model): CollectionInterface
+    public function setModelEndpoint(string|ModelInterface $model): static
     {
         try {
+            $interface = $model;
+            if (is_string($model)) {
+                if (!class_exists($model) && (!empty($this->client) && $this->client->hasEndpoint($model))) {
+                    $model = $this->client->getEndpoint($model);
+                    $interface = $model::class;
+                }
+            } else {
+                $interface = $model::class;
+            }
+
             $implements = class_implements($model);
             if (is_array($implements) && isset($implements[ModelInterface::class])) {
-                if (is_object($model)) {
-                    $model = get_class($model);
-                }
-
-                $this->setProperty(self::PROPERTY_MODEL_CLASS, $model);
+                $this->setProperty(self::PROPERTY_MODEL_ENDPOINT, $interface);
                 return $this;
             }
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             //If class_implements cannot load class
         }
 
         throw new UnknownEndpoint($model);
     }
 
-    /**
-     * @param bool $full
-     */
-    public function getEndPointUrl($full = false): string
+    public function getEndPointUrl(bool $full = false): string
     {
         $epURL = parent::getEndPointUrl();
         if ($epURL === '') {
             $model = $this->buildModel();
-            if ($model) {
+            if ($model instanceof ModelInterface) {
                 $epURL = $model->getEndPointUrl();
             }
         }
@@ -327,7 +318,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         return $epURL;
     }
 
-    protected function setResponse(Response $response): EndpointInterface
+    protected function setResponse(Response $response): static
     {
         parent::setResponse($response);
         $this->parseResponse($response);
@@ -336,7 +327,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     public function getCollectionResponseProp(): string
     {
-        return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? static::$_RESPONSE_PROP;
+        return $this->getProperty(self::PROPERTY_RESPONSE_PROP) ?? '';
     }
 
     /**
@@ -353,7 +344,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     /**
      * Configures the collection based on the Response Body
      */
-    protected function syncFromApi(array $data)
+    protected function syncFromApi(array $data): void
     {
         $this->triggerEvent(self::EVENT_BEFORE_SYNC, $data);
         $this->set($data);
@@ -361,15 +352,21 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
 
     /**
      * Build the ModelEndpoint
-     * @return AbstractModelEndpoint|null
      */
-    protected function buildModel(array $data = [])
+    protected function buildModel(array $data = []): ModelInterface|null
     {
         $Model = null;
-        $class = $this->getProperty(self::PROPERTY_MODEL_CLASS) ?? static::$_MODEL_CLASS;
-        if (!empty($class)) {
-            $Model = new $class();
-            if ($this->client) {
+        $endpoint = $this->getProperty(self::PROPERTY_MODEL_ENDPOINT) ?? $this->_modelInterface;
+        if (!empty($endpoint)) {
+            if (class_exists($endpoint)) {
+                $Model = new $endpoint();
+            } elseif (!empty($this->client)) {
+                if ($this->client->hasEndpoint($endpoint)) {
+                    $Model = $this->client->getEndpoint($endpoint);
+                }
+            }
+
+            if (!empty($this->client)) {
                 $Model->setClient($this->getClient());
             } else {
                 $Model->setBaseUrl($this->getBaseUrl());

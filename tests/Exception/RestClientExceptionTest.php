@@ -37,7 +37,7 @@ class RestClientExceptionTest extends TestCase
     /**
      * @covers ::__construct
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $Exception = new RestClientException();
         $this->assertEquals('An Unknown Exception occurred in the REST Client Framework', $Exception->getMessage());

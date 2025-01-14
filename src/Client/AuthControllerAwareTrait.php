@@ -6,17 +6,14 @@ use MRussell\REST\Auth\AuthControllerInterface;
 
 trait AuthControllerAwareTrait
 {
-    /**
-     * @var AuthControllerInterface
-     */
-    protected $Auth;
+    protected AuthControllerInterface $auth;
 
     /**
      * @inheritdoc
      */
-    public function setAuth(AuthControllerInterface $Auth)
+    public function setAuth(AuthControllerInterface $auth): static
     {
-        $this->Auth = $Auth;
+        $this->auth = $auth;
         $this->configureAuth();
         return $this;
     }
@@ -31,6 +28,6 @@ trait AuthControllerAwareTrait
      */
     public function getAuth(): AuthControllerInterface
     {
-        return $this->Auth;
+        return $this->auth;
     }
 }

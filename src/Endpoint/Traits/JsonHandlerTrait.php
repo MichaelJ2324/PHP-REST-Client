@@ -16,10 +16,8 @@ trait JsonHandlerTrait
 
     /**
      * Return JSON Decoded response body
-     * @param $associative
-     * @return mixed
      */
-    public function getResponseContent(Response $response, bool $associative = true)
+    public function getResponseContent(Response $response, bool $associative = true): mixed
     {
         if (!$this->respContent) {
             $this->respContent = $response->getBody()->getContents();
@@ -30,7 +28,7 @@ trait JsonHandlerTrait
         try {
             $body = json_decode($this->respContent, $associative);
             // @codeCoverageIgnoreStart
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         // @codeCoverageIgnoreEnd

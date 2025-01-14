@@ -4,6 +4,7 @@ namespace MRussell\REST\Endpoint\Traits;
 
 trait SetAttributesTrait
 {
+    use ProtectedAttributesTrait;
     /**
      * Set 1 or many attributes
      * @param $key
@@ -11,7 +12,7 @@ trait SetAttributesTrait
      * @return $this
      * @implements SetInterface
      */
-    public function set($key, $value = null)
+    public function set(string|array|\ArrayAccess $key, mixed $value = null): static
     {
         if (is_array($key) || $key instanceof \stdClass) {
             foreach ($key as $k => $value) {

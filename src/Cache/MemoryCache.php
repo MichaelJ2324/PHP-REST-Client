@@ -8,17 +8,14 @@ class MemoryCache implements CacheInterface
 {
     private array $cache = [];
 
-    /**
-     * @var MemoryCache
-     */
-    private static $instance;
+    private static self $instance;
 
     /**
      * Get the In Memory Cache Object
      */
     public static function getInstance(): MemoryCache
     {
-        if (empty(static::$instance)) {
+        if (!isset(static::$instance)) {
             // @codeCoverageIgnoreStart
             static::$instance = new static();
             // @codeCoverageIgnoreEnd

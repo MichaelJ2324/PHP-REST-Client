@@ -44,7 +44,7 @@ class AbstractBasicControllerTest extends TestCase
      * @covers ::configureRequest
      * @covers ::getAuthHeaderValue
      */
-    public function testConfigureRequest()
+    public function testConfigureRequest(): void
     {
         $Auth = new BasicAuthController();
         $Request = $Auth->configureRequest(new Request("GET", ""));

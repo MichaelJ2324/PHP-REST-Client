@@ -9,5 +9,5 @@ interface ClientAwareInterface
     /**
      * @return $this
      */
-    public function setClient(ClientInterface $client);
+    public function setClient(ClientInterface $client): static;
 }
