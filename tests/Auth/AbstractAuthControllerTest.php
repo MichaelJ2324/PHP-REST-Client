@@ -231,10 +231,14 @@ class AbstractAuthControllerTest extends TestCase
     public function testAuthenticate(AuthController $Auth): AuthController
     {
         $Endpoint = new AuthEndpoint();
-        $this->client->mockResponses->append(new Response(404));
+        $this->client->mockResponses->append(new Response(404, [], json_encode(["error" => "Not Found"])));
         $Endpoint->setClient($this->client);
         $Auth->setActionEndpoint(AbstractAuthController::ACTION_AUTH, $Endpoint);
+        $Logger = new TestLogger();
+        $Auth->setLogger($Logger);
         $this->assertEquals(false, $Auth->authenticate());
+        $this->assertEquals(true, $Logger->hasErrorThatContains("[REST] Authenticate Failed [404]"));
+        $this->assertEquals(true, $Logger->hasErrorThatContains("Not Found"));
         $this->client->mockResponses->append(new Response(200, [], "12345"));
         $this->assertEquals(true, $Auth->authenticate());
         $this->assertEquals("12345", $Auth->getToken());
@@ -255,13 +259,13 @@ class AbstractAuthControllerTest extends TestCase
         $Logger = new TestLogger();
         $this->client->mockResponses->append(new Response(200));
         $Endpoint->setClient($this->client);
-        $this->assertInstanceOf(NullLogger::class, $Auth->getLogger());
         $Auth->setLogger($Logger);
         $Auth->setActionEndpoint(AbstractAuthController::ACTION_LOGOUT, $Endpoint);
         $this->assertEquals(true, $Auth->logout());
-        $this->client->mockResponses->append(new Response(404));
+        $this->client->mockResponses->append(new Response(404, [], json_encode(["error" => "Not Found"])));
         $this->assertEquals(false, $Auth->logout());
-        $this->assertEquals(true, $Logger->hasErrorThatContains("[REST] Logout Exception"));
+        $this->assertEquals(true, $Logger->hasErrorThatContains("[REST] Logout Failed [404]"));
+        $this->assertEquals(true, $Logger->hasErrorThatContains("Not Found"));
         return $Auth;
     }
 

@@ -68,6 +68,7 @@ class AbstractOAuth2ControllerTest extends TestCase
      * @covers ::setToken
      * @covers ::cacheToken
      * @covers ::getTokenProp
+     * @covers ::setTokenProp
      * @covers ::configureToken
      * @covers ::isAuthenticated
      * @covers ::isTokenExpired
@@ -156,12 +157,15 @@ class AbstractOAuth2ControllerTest extends TestCase
         $this->assertEquals(true, $Logger->hasDebugThatContains("Unknown Auth Action [refresh] requested on Controller"));
 
         $RefreshEndpoint = new RefreshEndpoint();
-        //        $this->client->mockResponses->append(new Response(200));
         $RefreshEndpoint->setClient($this->client);
 
         $Auth->setActionEndpoint(OAuth2Controller::ACTION_OAUTH_REFRESH, $RefreshEndpoint);
-        //        $this->assertEquals(false, $Auth->refresh());
-        //        $this->assertEquals(true, $Logger->hasErrorThatContains("An Invalid Token was attempted to be set on the Auth Controller"));
+
+        $this->client->mockResponses->append(new Response(400, [], json_encode(['error' => 'Invalid Credentials'])));
+        $Auth->setToken($this->token);
+        $this->assertEquals(false, $Auth->refresh());
+        $this->assertEquals(true, $Logger->hasErrorThatContains("[REST] OAuth Refresh Failed [400]"));
+        $this->assertEquals(true, $Logger->hasErrorThatContains("Invalid Credentials"));
 
         $this->client->mockResponses->append(new Response(200, [], json_encode($this->token)));
         $Auth->setToken($this->token);
@@ -221,4 +225,5 @@ class AbstractOAuth2ControllerTest extends TestCase
         $this->assertEmpty($Auth->getToken());
         $this->assertEquals(OAuth2Controller::OAUTH_CLIENT_CREDENTIALS_GRANT, $Auth->getGrantType());
     }
+
 }

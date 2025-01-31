@@ -201,10 +201,17 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
             } catch (RequestException $exception) {
                 $response = $exception->getResponse();
                 $statusCode = $response->getStatusCode();
-                $this->getLogger()->error("[REST] OAuth Refresh Failed [" . $response->getStatusCode() . "] - " . $exception->getMessage());
+                $message = $exception->getMessage();
+                $content = $response->getBody()->getContents();
+                if (!empty($content)) {
+                    $message .= "RESPONSE: $content";
+                }
+                $this->getLogger()->error("[REST] OAuth Refresh Failed [$statusCode] - " . $message);
+                // @codeCoverageIgnoreStart
             } catch (\Exception $exception) {
                 $this->getLogger()->error("[REST] Unknown OAuth Refresh Exception - " . $exception->getMessage());
             }
+            // @codeCoverageIgnoreEnd
         }
 
         return $res;

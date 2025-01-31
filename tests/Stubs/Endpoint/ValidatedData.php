@@ -15,4 +15,14 @@ class ValidatedData extends ValidatedEndpointData
         ],
         self::DATA_PROPERTY_NULLABLE => true,
     ];
+
+    public bool $invalid;
+
+    public function validate(): bool
+    {
+        if (isset($this->invalid)) {
+            return !$this->invalid;
+        }
+        return parent::validate();
+    }
 }

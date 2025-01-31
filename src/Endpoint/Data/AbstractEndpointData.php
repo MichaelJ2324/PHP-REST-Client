@@ -14,7 +14,9 @@ abstract class AbstractEndpointData implements DataInterface
     use ClearAttributesTrait {
         clear as private clearAttributes;
     }
-    use ArrayObjectAttributesTrait;
+    use ArrayObjectAttributesTrait {
+        __set as private magicSet;
+    }
     use SetAttributesTrait {
         set as private setAttributes;
     }
@@ -53,7 +55,7 @@ abstract class AbstractEndpointData implements DataInterface
     public function __set($key, $value)
     {
         $this->isNull = false;
-        $this->_attributes[$key] = $value;
+        $this->magicSet($key, $value);
     }
 
     //Array Access

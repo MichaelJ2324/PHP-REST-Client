@@ -281,8 +281,8 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         try {
             $interface = $model;
             if (is_string($model)) {
-                if (!class_exists($model) && (!empty($this->client) && $this->client->hasEndpoint($model))) {
-                    $model = $this->client->getEndpoint($model);
+                if (!class_exists($model) && (!empty($this->_client) && $this->_client->hasEndpoint($model))) {
+                    $model = $this->_client->getEndpoint($model);
                     $interface = $model::class;
                 }
             } else {
@@ -360,13 +360,13 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         if (!empty($endpoint)) {
             if (class_exists($endpoint)) {
                 $Model = new $endpoint();
-            } elseif (!empty($this->client)) {
-                if ($this->client->hasEndpoint($endpoint)) {
-                    $Model = $this->client->getEndpoint($endpoint);
+            } elseif (!empty($this->_client)) {
+                if ($this->_client->hasEndpoint($endpoint)) {
+                    $Model = $this->_client->getEndpoint($endpoint);
                 }
             }
 
-            if (!empty($this->client)) {
+            if (!empty($this->_client)) {
                 $Model->setClient($this->getClient());
             } else {
                 $Model->setBaseUrl($this->getBaseUrl());
