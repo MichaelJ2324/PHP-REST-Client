@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class AbstractModelEndpointTest
  * @package MRussell\REST\Tests\Endpoint
- * @coversDefaultClass MRussell\REST\Endpoint\Abstracts\AbstractModelEndpoint
+ * @coversDefaultClass \MRussell\REST\Endpoint\Abstracts\AbstractModelEndpoint
  * @group AbstractModelEndpointTest
  */
 class AbstractModelEndpointTest extends TestCase
@@ -60,7 +60,7 @@ class AbstractModelEndpointTest extends TestCase
     {
         $Model = new ModelEndpoint();
         $Class = new \ReflectionClass($Model);
-        $actions = $Class->getProperty('actions');
+        $actions = $Class->getProperty('_actions');
         $actions->setAccessible(true);
         $this->assertEquals(['create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
     }
@@ -73,7 +73,7 @@ class AbstractModelEndpointTest extends TestCase
     {
         $Model = new ModelEndpointWithActions();
         $Class = new \ReflectionClass($Model);
-        $actions = $Class->getProperty('actions');
+        $actions = $Class->getProperty('_actions');
         $actions->setAccessible(true);
         $this->assertEquals(['foo' => "GET", 'create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
 
@@ -241,7 +241,7 @@ class AbstractModelEndpointTest extends TestCase
         $this->client->container = [];
         $this->client->mockResponses->append(new Response(200, [], json_encode(['id' => '1234'])));
         $Reflected = new \ReflectionClass($Model);
-        $dataProp = $Reflected->getProperty('data');
+        $dataProp = $Reflected->getProperty('_data');
         $dataProp->setAccessible(true);
         $dataProp->setValue($Model, null);
         $this->assertEquals($Model, $Model->save());

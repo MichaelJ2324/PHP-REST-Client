@@ -31,7 +31,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
      * The data being passed to the API Endpoint.
      * Uses the DataInterface to provide a more robust way of configuring data and an automation API
      */
-    protected string|array|\ArrayAccess|null $data;
+    protected string|array|\ArrayAccess|null $_data;
 
     public function __construct(array $properties = [], array $urlArgs = [])
     {
@@ -61,7 +61,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
     public function setProperty(string $name, $value): static
     {
         parent::setProperty($name, $value);
-        if ($name === self::PROPERTY_DATA && isset($this->data)) {
+        if ($name === self::PROPERTY_DATA && isset($this->_data)) {
             $this->configureDataProperties();
         }
 
@@ -74,7 +74,7 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
     public function setData(string|array|\ArrayAccess|null $data): static
     {
         if ($data instanceof DataInterface) {
-            $this->data = $data;
+            $this->_data = $data;
         } elseif (is_array($data)) {
             $this->getData()->reset();
             $this->getData()->set($data);
@@ -92,17 +92,17 @@ abstract class AbstractSmartEndpoint extends AbstractEndpoint
      */
     public function getData(): DataInterface
     {
-        if (!isset($this->data)) {
-            $this->data = $this->buildDataObject();
+        if (!isset($this->_data)) {
+            $this->_data = $this->buildDataObject();
         }
 
         $data = parent::getData();
         if (!($data instanceof DataInterface)) {
             $di = $this->buildDataObject();
-            $this->data = $di->set($data);
+            $this->_data = $di->set($data);
         }
 
-        return $this->data;
+        return $this->_data;
     }
 
     /**

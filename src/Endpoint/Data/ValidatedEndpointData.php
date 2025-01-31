@@ -43,7 +43,7 @@ class ValidatedEndpointData extends EndpointData implements ValidatedInterface
     {
         $validate = is_null($validate) ? $this->getProperty(self::DATA_PROPERTY_AUTO_VALIDATE) : $validate;
         if ((bool) $validate && !$this->validate()) {
-            throw new InvalidData();
+            throw new InvalidData("Validation failed");
         }
 
         return $this->_attributes;

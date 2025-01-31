@@ -146,6 +146,7 @@ class AbstractEndpointDataTest extends TestCase
 
     /**
      * @covers ::isNull
+     * @covers ::isNullable
      * @covers ::clear
      */
     public function testNullable(): void
@@ -155,6 +156,16 @@ class AbstractEndpointDataTest extends TestCase
         $Data['foobar'] = 'test';
         $this->assertEquals(false, $Data->isNull());
         $this->assertEquals($Data, $Data->clear());
+        $this->assertEquals(true, $Data->isNullable());
         $this->assertEquals(true, $Data->isNull());
+
+        $Data->setProperty(StockData::DATA_PROPERTY_NULLABLE, false);
+        $this->assertEquals(false, $Data->isNullable());
+        $this->assertEquals(false, $Data->isNull());
+        $Data['foobar'] = 'test';
+        $this->assertEquals(false, $Data->isNull());
+        $this->assertEquals($Data, $Data->clear());
+        $this->assertEquals(false, $Data->isNull());
+        $this->assertEmpty($Data->toArray());
     }
 }

@@ -2,6 +2,8 @@
 
 namespace MRussell\REST\Endpoint\Traits;
 
+use MRussell\REST\Endpoint\Interfaces\PropertiesInterface;
+
 trait PropertiesTrait
 {
     protected array $_properties = [];
@@ -45,6 +47,6 @@ trait PropertiesTrait
      */
     public function getProperty(string $name): mixed
     {
-        return isset($this->_properties[$name]) ? $this->_properties[$name] : null;
+        return $this->_properties[$name] ?? null;
     }
 }

@@ -72,35 +72,35 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * The initial URL passed into the Endpoint
      */
-    protected string $baseUrl = '';
+    protected string $_baseUrl = '';
 
     /**
      * The passed in Options for the Endpoint, mainly used for parsing URL Variables
      */
-    protected array $urlArgs = [];
+    protected array $_urlArgs = [];
 
     /**
      * The data being passed to the API Endpoint.
      * Defaults to Array, but can be mixed based on how you want to use Endpoint.
      */
-    protected string|array|\ArrayAccess|null $data;
+    protected string|array|\ArrayAccess|null $_data;
 
     /**
      * The Request Object used by the Endpoint to submit the data
      */
-    protected Request $request;
+    protected Request $_request;
 
     /**
      * The Response Object used by the Endpoint
      */
-    protected Response $response;
+    protected Response $_response;
 
-    protected bool $catchNon200Responses = false;
+    protected bool $_catchNon200Responses = false;
 
     public function __construct(array $properties = [], array $urlArgs = [])
     {
-        $this->eventStack = new Stack();
-        $this->eventStack->setEndpoint($this);
+        $this->_eventStack = new Stack();
+        $this->_eventStack->setEndpoint($this);
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
         if (!empty($urlArgs)) {
             $this->setUrlArgs($urlArgs);
@@ -113,7 +113,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     public function catchNon200Responses(bool $catch = true): static
     {
-        $this->catchNon200Responses = $catch;
+        $this->_catchNon200Responses = $catch;
         return $this;
     }
 
@@ -122,7 +122,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function setUrlArgs(array $args): static
     {
-        $this->urlArgs = $args;
+        $this->_urlArgs = $args;
         return $this;
     }
 
@@ -131,7 +131,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function getUrlArgs(): array
     {
-        return $this->urlArgs;
+        return $this->_urlArgs;
     }
 
     /**
@@ -139,7 +139,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function setBaseUrl($url): static
     {
-        $this->baseUrl = $url;
+        $this->_baseUrl = $url;
         return $this;
     }
 
@@ -148,11 +148,11 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function getBaseUrl(): string
     {
-        if (empty($this->baseUrl) && isset($this->client)) {
+        if (empty($this->_baseUrl) && isset($this->_client)) {
             return $this->getClient()->getAPIUrl();
         }
 
-        return $this->baseUrl;
+        return $this->_baseUrl;
     }
 
     /**
@@ -174,7 +174,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function setData(string|array|\ArrayAccess|null $data): static
     {
-        $this->data = $data;
+        $this->_data = $data;
         return $this;
     }
 
@@ -183,17 +183,17 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function getData(): string|array|\ArrayAccess|null
     {
-        return $this->data ?? null;
+        return $this->_data ?? null;
     }
 
     /**
      * @return $this|EndpointInterface
      */
-    protected function setResponse(Response $response): static
+    protected function setResponse(Response $_response): static
     {
-        $this->response = $response;
-        $this->respContent = null;
-        $this->triggerEvent(self::EVENT_AFTER_RESPONSE, $response);
+        $this->_response = $_response;
+        $this->_respContent = null;
+        $this->triggerEvent(self::EVENT_AFTER_RESPONSE, $_response);
         return $this;
     }
 
@@ -202,7 +202,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function getResponse(): Response
     {
-        return $this->response;
+        return $this->_response;
     }
 
     public function getResponseBody(bool $associative = true): mixed
@@ -213,7 +213,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     public function getHttpClient(): Client
     {
-        if (isset($this->client)) {
+        if (isset($this->_client)) {
             return $this->getClient()->getHttpClient();
         }
 
@@ -238,7 +238,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                 $this->setResponse($requestException->getResponse());
             }
 
-            if (!$this->catchNon200Responses) {
+            if (!$this->_catchNon200Responses) {
                 throw $requestException;
             }
         }
@@ -317,8 +317,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         $data = $this->configurePayload();
         $request = new Request($method, $url);
         $request = $this->configureJsonRequest($request);
-        $this->request = $this->configureRequest($request, $data);
-        return $this->request;
+        $this->_request = $this->configureRequest($request, $data);
+        return $this->_request;
     }
 
     /**
@@ -472,9 +472,9 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function reset(): static
     {
-        unset($this->request);
-        unset($this->response);
-        $this->urlArgs = [];
+        unset($this->_request);
+        unset($this->_response);
+        $this->_urlArgs = [];
         $this->setData(null);
         $this->setProperties([]);
         return $this;

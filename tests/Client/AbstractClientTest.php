@@ -200,6 +200,8 @@ class AbstractClientTest extends TestCase
     /**
      * @depends testSetEndpointProvider
      * @covers ::__call
+     * @covers ::hasEndpoint
+     * @covers ::getEndpoint
      * @covers ::last
      * @covers ::current
      * @covers ::setCurrentEndpoint
@@ -207,6 +209,7 @@ class AbstractClientTest extends TestCase
     public function testCall(Client $Client): void
     {
         $this->Client = $Client;
+        $this->assertEquals(true, $this->Client->hasEndpoint('auth'));
         $AuthEP = $this->Client->auth();
         $this->assertNotEmpty($AuthEP);
         $this->assertEquals($AuthEP, $this->Client->current());

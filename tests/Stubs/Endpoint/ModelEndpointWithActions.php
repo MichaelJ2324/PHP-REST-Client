@@ -9,5 +9,5 @@ class ModelEndpointWithActions extends ModelEndpoint
         self::PROPERTY_RESPONSE_PROP => 'account',
     ];
 
-    protected array $actions = ['foo' => "GET"];
+    protected array $_actions = ['foo' => "GET"];
 }

@@ -182,7 +182,7 @@ class AbstractSmartEndpointTest extends TestCase
     {
         $Endpoint = new SmartEndpointNoData();
         $Reflected = new \ReflectionClass($Endpoint);
-        $data = $Reflected->getProperty('data');
+        $data = $Reflected->getProperty('_data');
         $data->setAccessible(true);
 
         $DataClass = $Reflected->getProperty('_dataInterface');

@@ -73,12 +73,12 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     /**
      * List of available actions and their associated Request Method
      */
-    protected array $actions = [];
+    protected array $_actions = [];
 
     /**
      * Current action being executed
      */
-    protected string $action = self::MODEL_ACTION_RETRIEVE;
+    protected string $_action = self::MODEL_ACTION_RETRIEVE;
 
     public static function defaultModelKey(string $key = null): string
     {
@@ -104,13 +104,13 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     {
         parent::__construct($properties, $urlArgs);
         foreach (static::$_DEFAULT_ACTIONS as $action => $method) {
-            $this->actions[$action] = $method;
+            $this->_actions[$action] = $method;
         }
     }
 
     public function __call($name, $arguments): EndpointInterface
     {
-        if (array_key_exists($name, $this->actions)) {
+        if (array_key_exists($name, $this->_actions)) {
             return $this->setCurrentAction($name, $arguments)->execute();
         }
 
@@ -141,7 +141,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
             $this->set($idKey, $id);
         } elseif (!isset($this->_attributes[$idKey])) {
-            throw new MissingModelId([$this->action, static::class]);
+            throw new MissingModelId([$this->_action, static::class]);
         }
 
         $this->triggerEvent(self::EVENT_BEFORE_RETRIEVE);
@@ -185,9 +185,9 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      */
     public function setCurrentAction(string $action, array $actionArgs = []): static
     {
-        if (array_key_exists($action, $this->actions)) {
-            $this->action = $action;
-            $this->configureAction($this->action, $actionArgs);
+        if (array_key_exists($action, $this->_actions)) {
+            $this->_action = $action;
+            $this->configureAction($this->_action, $actionArgs);
         }
 
         return $this;
@@ -198,7 +198,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      */
     public function getCurrentAction(): string
     {
-        return $this->action;
+        return $this->_action;
     }
 
     /**
@@ -208,7 +208,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      */
     protected function configureAction(string $action, array $arguments = []): void
     {
-        $this->setProperty(self::PROPERTY_HTTP_METHOD, $this->actions[$action]);
+        $this->setProperty(self::PROPERTY_HTTP_METHOD, $this->_actions[$action]);
     }
 
     /**

@@ -6,6 +6,7 @@ use MRussell\REST\Endpoint\Data\ValidatedEndpointData;
 use MRussell\REST\Exception\Endpoint\InvalidData;
 use MRussell\REST\Tests\Stubs\Endpoint\ValidatedData;
 use PHPUnit\Framework\TestCase;
+use MRussell\REST\Endpoint\Traits\ArrayObjectAttributesTrait;
 
 /**
  * Class AbstractEndpointDataTest
@@ -139,5 +140,44 @@ class ValidatedDataTest extends TestCase
         $Data['foo'] = 1234;
         $Data['bar'] = 'test';
         $Data->validate();
+    }
+
+    /**
+     * @covers ::toArray
+     */
+    public function testCustomInvalidData(): void
+    {
+        $Data = new ValidatedData();
+        $this->expectException(InvalidData::class);
+        $this->expectExceptionMessage("Missing or Invalid data on Endpoint Data. Errors: Validation failed");
+        $Data['foo'] = 1234;
+        $Data['bar'] = 'test';
+        $Data->invalid = true;
+        $Data->toArray(true);
+    }
+
+    /**
+     * Testing changes to ArrayObjectAttributesTrait that consider existing properties due to Unset
+     * @covers ::__set
+     * @covers MRussell\REST\Endpoint\Traits\ArrayObjectAttributesTrait::__set
+     * @covers MRussell\REST\Endpoint\Traits\ArrayObjectAttributesTrait::__get
+     */
+    public function testArrayAccessOnProperty(): void
+    {
+        $Data = new ValidatedData();
+        $Data->invalid = true;
+        $this->assertEmpty($Data['invalid']);
+        $this->assertTrue($Data->invalid);
+        unset($Data->invalid);
+        $this->assertTrue(!isset($Data->invalid));
+        $Data->invalid = true;
+        $this->assertEmpty($Data['invalid']);
+        $this->assertTrue($Data->invalid);
+        unset($Data->invalid);
+        $this->assertTrue(!isset($Data->invalid));
+        $Data->__set('invalid', true);
+        $this->assertEmpty($Data['invalid']);
+        $this->assertTrue($Data->invalid);
+        $this->assertTrue($Data->__get('invalid'));
     }
 }
