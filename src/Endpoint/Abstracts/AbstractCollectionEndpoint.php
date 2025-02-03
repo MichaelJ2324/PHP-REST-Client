@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Endpoint\Abstracts;
 
+use MRussell\REST\Endpoint\Traits\GenerateEndpointTrait;
 use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\Data\DataInterface;
@@ -16,6 +17,7 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
     \Iterator
 {
     use ParseResponseBodyToArrayTrait;
+    use GenerateEndpointTrait;
 
     public const PROPERTY_RESPONSE_PROP = AbstractModelEndpoint::PROPERTY_RESPONSE_PROP;
 
@@ -358,21 +360,9 @@ abstract class AbstractCollectionEndpoint extends AbstractSmartEndpoint implemen
         $Model = null;
         $endpoint = $this->getProperty(self::PROPERTY_MODEL_ENDPOINT) ?? $this->_modelInterface;
         if (!empty($endpoint)) {
-            if (class_exists($endpoint)) {
-                $Model = new $endpoint();
-            } elseif (!empty($this->_client)) {
-                if ($this->_client->hasEndpoint($endpoint)) {
-                    $Model = $this->_client->getEndpoint($endpoint);
-                }
-            }
+            $Model = $this->generateEndpoint($endpoint);
 
-            if (!empty($this->_client)) {
-                $Model->setClient($this->getClient());
-            } else {
-                $Model->setBaseUrl($this->getBaseUrl());
-            }
-
-            if (!empty($data)) {
+            if (!empty($data) && $Model instanceof ModelInterface) {
                 $Model->set($data);
             }
         }

@@ -46,6 +46,7 @@ class AbstractCollectionEndpointTest extends TestCase
      * @covers ::toArray
      * @covers ::get
      * @covers ::buildModel
+     * @covers MRussell\REST\Endpoint\Traits\GenerateEndpointTrait::generateEndpoint
      * @covers ::clear
      * @covers ::reset
      * @covers ::at
