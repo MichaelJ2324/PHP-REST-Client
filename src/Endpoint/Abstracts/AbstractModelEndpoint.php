@@ -78,7 +78,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     /**
      * Current action being executed
      */
-    protected string $_action = self::MODEL_ACTION_RETRIEVE;
+    protected string $_action = '';
 
     public static function defaultModelKey(string $key = null): string
     {
@@ -124,6 +124,18 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
     {
         parent::reset();
         return $this->clear();
+    }
+
+    public function execute(array $options = []): static
+    {
+        if (empty($this->_action)) {
+            if (!empty($this->getId())) {
+                $this->setCurrentAction(self::MODEL_ACTION_RETRIEVE);
+            } else {
+                $this->setCurrentAction(self::MODEL_ACTION_CREATE);
+            }
+        }
+        return parent::execute($options);
     }
 
     /**
