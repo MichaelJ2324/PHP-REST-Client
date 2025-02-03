@@ -53,7 +53,7 @@ interface EndpointInterface extends PropertiesInterface, ResettableInterface
     /**
      * Get the Response Object being used by the Endpoint
      */
-    public function getResponse(): Response;
+    public function getResponse(): Response|null;
 
     /**
      * Check if authentication should be applied

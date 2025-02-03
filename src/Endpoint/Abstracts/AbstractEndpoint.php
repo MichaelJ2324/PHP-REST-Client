@@ -200,9 +200,9 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function getResponse(): Response
+    public function getResponse(): Response|null
     {
-        return $this->_response;
+        return $this->_response ?? null;
     }
 
     public function getResponseBody(bool $associative = true): mixed
@@ -263,7 +263,10 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                 }
             },
             function (RequestException $e) use ($options): void {
-                $this->setResponse($e->getResponse());
+                $response = $e->getResponse();
+                if ($response instanceof Response) {
+                    $this->setResponse($response);
+                }
                 if (isset($options['error']) && is_callable($options['error'])) {
                     $options['error']($e);
                 }
