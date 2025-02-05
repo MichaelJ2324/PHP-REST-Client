@@ -22,7 +22,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
      * @inheritdoc
      * @throws InvalidRegistration
      */
-    public function registerEndpoint($name, $className, array $properties = []): static
+    public function registerEndpoint(string $name, string $className, array $properties = []): static
     {
         try {
             $implements = class_implements($className);
@@ -48,7 +48,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
 
     protected function addEndpointRegistry(string $name, array $properties): void
     {
-        if (isset($properties[self::ENDPOINT_NAME])) {
+        if (!isset($properties[self::ENDPOINT_NAME])) {
             $properties[self::ENDPOINT_NAME] = $name;
         }
 

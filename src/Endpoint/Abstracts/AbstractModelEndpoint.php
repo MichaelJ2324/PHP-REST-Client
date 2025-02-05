@@ -128,6 +128,12 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     public function execute(array $options = []): static
     {
+        $this->setDefaultAction();
+        return parent::execute($options);
+    }
+
+    protected function setDefaultAction(): void
+    {
         if (empty($this->_action)) {
             if (!empty($this->getId())) {
                 $this->setCurrentAction(self::MODEL_ACTION_RETRIEVE);
@@ -135,7 +141,16 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
                 $this->setCurrentAction(self::MODEL_ACTION_CREATE);
             }
         }
-        return parent::execute($options);
+    }
+
+    /**
+     * @inheritdoc
+     * @codeCoverageIgnore
+     */
+    public function asyncExecute(array $options = []): static
+    {
+        $this->setDefaultAction();
+        return parent::asyncExecute($options);
     }
 
     /**

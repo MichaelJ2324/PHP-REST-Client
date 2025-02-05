@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class AbstractEndpointProviderTest
  * @package MRussell\REST\Tests\Endpoint
- * @coversDefaultClass MRussell\REST\Endpoint\Provider\AbstractEndpointProvider
+ * @coversDefaultClass \MRussell\REST\Endpoint\Provider\AbstractEndpointProvider
  * @group AbstractEndpointProviderTest
  */
 class AbstractEndpointProviderTest extends TestCase
@@ -40,7 +40,8 @@ class AbstractEndpointProviderTest extends TestCase
     }
 
     /**
-     * @covers MRussell\REST\Endpoint\Provider\DefaultEndpointProvider::__construct
+     * @covers \MRussell\REST\Endpoint\Provider\DefaultEndpointProvider::__construct
+     * @covers \MRussell\REST\Endpoint\Provider\DefaultEndpointsTrait::registerDefaultEndpoints
      * @covers ::registerEndpoint
      */
     public function testConstructor(): void
@@ -61,13 +62,25 @@ class AbstractEndpointProviderTest extends TestCase
 
     /**
      * @covers ::registerEndpoint
+     * @covers ::addEndpointRegistry
      * @return EndpointProviderInterface
      */
     public function testRegisterEndpoint(): EndpointProvider
     {
         $Provider = new EndpointProvider();
         $this->assertEquals($Provider, $Provider->registerEndpoint('auth', AuthEndpoint::class));
-        $this->assertEquals($Provider, $Provider->registerEndpoint('foo', Endpoint::class, ['url' => 'foo', 'httpMethod' => "GET"]));
+        $this->assertEquals($Provider, $Provider->registerEndpoint('foo', Endpoint::class, ['url' => 'foobar', 'httpMethod' => "GET"]));
+        $Class = new \ReflectionClass(EndpointProvider::class);
+        $property = $Class->getProperty('registry');
+        $property->setAccessible(true);
+        $register = $property->getValue($Provider);
+        $this->assertNotEmpty($register);
+        $this->assertEquals( 'auth', $register['auth']['name']);
+        $this->assertTrue(isset($register['auth']['versions']));
+        $this->assertTrue(isset($register['auth']['properties']));
+        $this->assertEquals( 'foo', $register['foo']['name']);
+        $this->assertTrue(isset($register['auth']['class']));
+        $this->assertEquals( 'foobar', $register['foo']['properties']['url']);
         return $Provider;
     }
 
@@ -88,6 +101,7 @@ class AbstractEndpointProviderTest extends TestCase
      * @covers ::hasEndpoint
      * @covers ::getEndpoint
      * @covers ::buildEndpoint
+     * @covers ::getEndpointDefinition
      */
     public function testGetEndpoint(EndpointProviderInterface $Provider): void
     {
@@ -98,8 +112,8 @@ class AbstractEndpointProviderTest extends TestCase
         $this->assertEquals($Auth, $Provider->getEndpoint('auth'));
         $FooEP = $Provider->getEndpoint('foo');
         $this->assertNotEmpty($FooEP);
-        $this->assertEquals('foo', $FooEP->getEndPointUrl());
-        $this->assertEquals(['url' => 'foo', 'httpMethod' => "GET", 'auth' => 1], $FooEP->getProperties());
+        $this->assertEquals('foobar', $FooEP->getEndPointUrl());
+        $this->assertEquals(['url' => 'foobar', 'httpMethod' => "GET", 'auth' => 1], $FooEP->getProperties());
     }
 
     /**
