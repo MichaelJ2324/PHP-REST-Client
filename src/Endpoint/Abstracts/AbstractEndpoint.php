@@ -251,7 +251,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @param null $data - short form data for Endpoint, which is configure by configureData method
      * @return $this
      */
-    public function asyncExecute(array $options = []): EndpointInterface
+    public function asyncExecute(array $options = []): static
     {
         $request = $this->buildRequest();
         $this->promise = $this->getHttpClient()->sendAsync($request, $options);

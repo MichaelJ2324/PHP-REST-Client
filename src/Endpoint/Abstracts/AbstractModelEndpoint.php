@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Endpoint\Abstracts;
 
+use GuzzleHttp\Psr7\Request;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 use MRussell\REST\Exception\Endpoint\InvalidRequest;
 use GuzzleHttp\Psr7\Response;
@@ -126,7 +127,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         return $this->clear();
     }
 
-    public function execute(array $options = []): static
+    protected function setDefaultAction(): void
     {
         if (empty($this->_action)) {
             if (!empty($this->getId())) {
@@ -135,7 +136,12 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
                 $this->setCurrentAction(self::MODEL_ACTION_CREATE);
             }
         }
-        return parent::execute($options);
+    }
+
+    public function buildRequest(): Request
+    {
+        $this->setDefaultAction();
+        return parent::buildRequest();
     }
 
     /**
