@@ -87,8 +87,7 @@ class AbstractModelEndpointTest extends TestCase
 
     /**
      * @covers ::setDefaultAction
-     * @covers ::execute
-     * @covers ::asyncExecute
+     * @covers ::buildRequest
      */
     public function testSetDefaultAction(): void
     {

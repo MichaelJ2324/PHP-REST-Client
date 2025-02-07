@@ -29,6 +29,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
             if (is_array($implements) && isset($implements[EndpointInterface::class])) {
                 if (isset($properties[self::ENDPOINT_VERSIONS])) {
                     $versions = $properties[self::ENDPOINT_VERSIONS];
+                    unset($properties[self::ENDPOINT_VERSIONS]);
                 }
 
                 $this->addEndpointRegistry($name, [
@@ -48,6 +49,9 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
 
     protected function addEndpointRegistry(string $name, array $properties): void
     {
+        if (!isset($properties[self::ENDPOINT_CLASS])) {
+            throw new InvalidRegistration([$name]);
+        }
         if (!isset($properties[self::ENDPOINT_NAME])) {
             $properties[self::ENDPOINT_NAME] = $name;
         }
@@ -111,22 +115,28 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
 
     protected function isInVersionRange(string $version, array $ranges): bool
     {
-        $is = false;
-        foreach ($ranges as $range) {
+        $is = true;
+        foreach ($ranges as $compare => $range) {
+            if (is_numeric($compare)) {
+                $compare = "==";
+            }
             $internalComp = true;
             if (is_array($range)) {
-                foreach ($range as $compare => $v) {
-                    if (!version_compare($version, $v, $compare)) {
+                foreach ($range as $c => $v) {
+                    if (is_array($v)) {
+                        continue;
+                    }
+                    if (!$this->isInVersionRange($version, [$c => $v])) {
                         $internalComp = false;
                         break;
                     }
                 }
             } else {
-                $internalComp = $range == $version;
+                $internalComp = version_compare($version, $range, $compare);
             }
 
-            if ($internalComp) {
-                $is = true;
+            if (!$internalComp) {
+                $is = false;
                 break;
             }
         }
