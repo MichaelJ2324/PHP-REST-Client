@@ -75,14 +75,43 @@ class AbstractModelEndpointTest extends TestCase
         $Class = new \ReflectionClass($Model);
         $actions = $Class->getProperty('_actions');
         $actions->setAccessible(true);
-        $this->assertEquals(['foo' => "GET", 'create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
+        $this->assertEquals(['foo' => "HEAD", 'create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
 
         $this->client->mockResponses->append(new Response(200));
         $Model->setClient($this->client);
 
         $this->assertEquals($Model, $Model->foo());
         $props = $Model->getProperties();
-        $this->assertEquals("GET", $props['httpMethod']);
+        $this->assertEquals("HEAD", $props['httpMethod']);
+    }
+
+    /**
+     * @covers ::setDefaultAction
+     * @covers ::buildRequest
+     */
+    public function testSetDefaultAction(): void
+    {
+        $Model = new ModelEndpoint();
+        $Class = new \ReflectionClass($Model);
+        $action = $Class->getProperty('_action');
+        $action->setAccessible(true);
+        $this->assertEmpty($action->getValue($Model));
+
+        $this->client->mockResponses->append(new Response(200));
+        $Model->setClient($this->client);
+
+        $this->assertEquals($Model, $Model->execute());
+        $this->assertEquals('create', $Model->getCurrentAction());
+        $this->assertEquals("POST", $this->client->mockResponses->getLastRequest()->getMethod());
+
+        $this->client->mockResponses->append(new Response(200));
+
+        $Model = new ModelEndpoint();
+        $Model->setClient($this->client);
+        $Model['id'] = '12345';
+        $this->assertEquals($Model, $Model->execute());
+        $this->assertEquals('retrieve', $Model->getCurrentAction());
+        $this->assertEquals("GET", $this->client->mockResponses->getLastRequest()->getMethod());
     }
 
     /**
