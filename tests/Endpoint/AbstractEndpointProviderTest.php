@@ -70,8 +70,11 @@ class AbstractEndpointProviderTest extends TestCase
         $Provider = new EndpointProvider();
         $this->assertEquals($Provider, $Provider->registerEndpoint('auth', AuthEndpoint::class));
         $this->assertEquals($Provider, $Provider->registerEndpoint('foo', Endpoint::class, ['url' => 'foobar', 'httpMethod' => "GET"]));
-        $this->assertEquals($Provider, $Provider->registerEndpoint('versioned', Endpoint::class,
-            ['url' => 'v2/test', 'httpMethod' => "GET", 'versions' => [ '>=' => '2.0']]));
+        $this->assertEquals($Provider, $Provider->registerEndpoint(
+            'versioned',
+            Endpoint::class,
+            ['url' => 'v2/test', 'httpMethod' => "GET", 'versions' => [ '>=' => '2.0']],
+        ));
         $Class = new \ReflectionClass(EndpointProvider::class);
         $addEndpointRegistry = $Class->getMethod('addEndpointRegistry');
         $addEndpointRegistry->setAccessible(true);
@@ -80,14 +83,15 @@ class AbstractEndpointProviderTest extends TestCase
 
         $property = $Class->getProperty('registry');
         $property->setAccessible(true);
+
         $register = $property->getValue($Provider);
         $this->assertNotEmpty($register);
-        $this->assertEquals( 'auth', $register['auth']['name']);
+        $this->assertEquals('auth', $register['auth']['name']);
         $this->assertTrue(isset($register['auth']['versions']));
         $this->assertTrue(isset($register['auth']['properties']));
-        $this->assertEquals( 'foo', $register['foo']['name']);
+        $this->assertEquals('foo', $register['foo']['name']);
         $this->assertTrue(isset($register['auth']['class']));
-        $this->assertEquals( 'foobar', $register['foo']['properties']['url']);
+        $this->assertEquals('foobar', $register['foo']['properties']['url']);
         $this->assertFalse(isset($register['versioned']['properties']['versions']));
         $this->assertEquals('bulk', $register['bulk']['name']);
 
@@ -166,11 +170,11 @@ class AbstractEndpointProviderTest extends TestCase
         $isInVersionRange = $reflection->getMethod('isInVersionRange');
         $isInVersionRange->setAccessible(true);
 
-        $this->assertTrue($isInVersionRange->invoke($Provider,'1.0',['1.0']));
-        $this->assertTrue($isInVersionRange->invoke($Provider,'1.1',[ '>=' => '1.0' ]));
-        $this->assertTrue($isInVersionRange->invoke($Provider,'1.9.1',[ ['>=' => '1.0'], ["<" => "2.0"] ]));
-        $this->assertFalse($isInVersionRange->invoke($Provider,'2.1',[ ['>=' => '1.0'], ["<" => "2.0"] ]));
-        $this->assertFalse($isInVersionRange->invoke($Provider,'2.0.1',[ '>=' => '1.0', "<" => "2.0" ]));
-        $this->assertTrue($isInVersionRange->invoke($Provider,'1.9',[ ['>=' => ['1.0','1.1']], "<" => "2.0" ]));
+        $this->assertTrue($isInVersionRange->invoke($Provider, '1.0', ['1.0']));
+        $this->assertTrue($isInVersionRange->invoke($Provider, '1.1', [ '>=' => '1.0' ]));
+        $this->assertTrue($isInVersionRange->invoke($Provider, '1.9.1', [ ['>=' => '1.0'], ["<" => "2.0"] ]));
+        $this->assertFalse($isInVersionRange->invoke($Provider, '2.1', [ ['>=' => '1.0'], ["<" => "2.0"] ]));
+        $this->assertFalse($isInVersionRange->invoke($Provider, '2.0.1', [ '>=' => '1.0', "<" => "2.0" ]));
+        $this->assertTrue($isInVersionRange->invoke($Provider, '1.9', [ ['>=' => ['1.0','1.1']], "<" => "2.0" ]));
     }
 }

@@ -52,6 +52,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
         if (!isset($properties[self::ENDPOINT_CLASS])) {
             throw new InvalidRegistration([$name]);
         }
+
         if (!isset($properties[self::ENDPOINT_NAME])) {
             $properties[self::ENDPOINT_NAME] = $name;
         }
@@ -120,12 +121,14 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
             if (is_numeric($compare)) {
                 $compare = "==";
             }
+
             $internalComp = true;
             if (is_array($range)) {
                 foreach ($range as $c => $v) {
                     if (is_array($v)) {
                         continue;
                     }
+
                     if (!$this->isInVersionRange($version, [$c => $v])) {
                         $internalComp = false;
                         break;

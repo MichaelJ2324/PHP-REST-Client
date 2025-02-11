@@ -36,6 +36,7 @@ class AbstractModelEndpointTest extends TestCase
     /**
      * @covers ::defaultModelKey
      * @covers ::getKeyProperty
+     * @covers ::getId
      */
     public function testModelIdKey(): void
     {
@@ -43,13 +44,21 @@ class AbstractModelEndpointTest extends TestCase
         $this->assertEquals('key', ModelEndpoint::defaultModelKey('key'));
         $this->assertEquals('key', ModelEndpoint::defaultModelKey());
         $Model = new ModelEndpoint();
+        $Model->set([
+            'key' => 'key_value',
+            'id' => 'id_value',
+        ]);
         $this->assertEquals('key', $Model->getKeyProperty());
+        $this->assertEquals('key_value', $Model->getId());
         $this->assertEquals('id', ModelEndpoint::defaultModelKey('id'));
         $this->assertEquals('id', $Model->getKeyProperty());
+        $this->assertEquals('id_value', $Model->getId());
         $this->assertEquals('key', ModelEndpoint::defaultModelKey('key'));
+        $this->assertEquals('key_value', $Model->getId());
         $this->assertEquals('key', $Model->getKeyProperty());
         $this->assertEquals($Model, $Model->setProperty(ModelEndpoint::PROPERTY_MODEL_KEY, 'id'));
         $this->assertEquals('id', $Model->getKeyProperty());
+        $this->assertEquals('id_value', $Model->getId());
         ModelEndpoint::defaultModelKey('id');
     }
 

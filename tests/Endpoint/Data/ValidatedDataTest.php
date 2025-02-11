@@ -6,7 +6,6 @@ use MRussell\REST\Endpoint\Data\ValidatedEndpointData;
 use MRussell\REST\Exception\Endpoint\InvalidData;
 use MRussell\REST\Tests\Stubs\Endpoint\ValidatedData;
 use PHPUnit\Framework\TestCase;
-use MRussell\REST\Endpoint\Traits\ArrayObjectAttributesTrait;
 
 /**
  * Class AbstractEndpointDataTest

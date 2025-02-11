@@ -159,6 +159,12 @@ class AbstractSmartEndpointTest extends TestCase
         ], $Endpoint->getData()->toArray());
         $this->assertEquals('bar', $Endpoint->getData()->foo);
 
+        $Endpoint = new SmartEndpointNoData();
+        $reflection = new \ReflectionClass($Endpoint);
+        $data = $reflection->getProperty('_data');
+        $data->setAccessible(true);
+        $data->setValue($Endpoint, ['foo' => 'bar']);
+        $this->assertInstanceOf(DataInterface::class, $Endpoint->getData());
     }
 
     /**
