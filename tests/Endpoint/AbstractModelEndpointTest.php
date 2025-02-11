@@ -75,6 +75,25 @@ class AbstractModelEndpointTest extends TestCase
     }
 
     /**
+     * @covers ::setUrlArgs
+     * @covers ::setIdFromUrlArgs
+     */
+    public function testSetUrlArgs(): void
+    {
+        $Model = new ModelEndpoint();
+        $Model->setProperty('url', 'Accounts/$:id');
+        $Model->setUrlArgs(['12345']);
+        $this->assertEquals([], $Model->getUrlArgs());
+        $this->assertEquals('12345', $Model->getId());
+        $Model['foo'] = 'bar';
+
+        $Model->setUrlArgs(['id' => '56789']);
+        $this->assertEquals([], $Model->getUrlArgs());
+        $this->assertEquals('56789', $Model->getId());
+        $this->assertEmpty($Model['foo']);
+    }
+
+    /**
      * @covers ::__call
      * @covers ::configureAction
      */
