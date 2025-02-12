@@ -56,6 +56,10 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     public const AUTH_REQUIRED = 2;
 
+    public const URL_VAR_CHAR = '$';
+
+    public const URL_OPTIONAL_VAR_CHAR = ':';
+
     protected static array $_DEFAULT_PROPERTIES = [
         self::PROPERTY_URL => '',
         self::PROPERTY_HTTP_METHOD => '',
@@ -122,8 +126,42 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function setUrlArgs(array $args): static
     {
+        if (!empty($args) && $this->needsUrlArgs()) {
+            $args = $this->normalizeUrlArgs($args);
+        }
+
         $this->_urlArgs = $args;
         return $this;
+    }
+
+    protected function normalizeUrlArgs(array $urlArgs): array
+    {
+        $vars = $this->extractUrlVariables();
+        $argNum = 0;
+        $normalized = [];
+        foreach ($urlArgs as $key => $value) {
+            if (isset($vars[$key])) {
+                $normalized[$key] = $value;
+                if ($vars[$key]['index'] == $argNum) {
+                    $argNum++;
+                }
+            } elseif (is_numeric($key) && !empty($value)) {
+                foreach ($vars as $var => $varProps) {
+                    if (!isset($normalized[$var]) && !isset($urlArgs[$var])) {
+                        if ($varProps['index'] == $key) {
+                            $normalized[$var] = $value;
+                            break;
+                        } elseif ($varProps['index'] == $argNum) {
+                            $normalized[$var] = $value;
+                            break;
+                        }
+                    }
+                }
+                $argNum++;
+            }
+        }
+
+        return $normalized;
     }
 
     /**
@@ -208,7 +246,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     public function getResponseBody(bool $associative = true): mixed
     {
         $response = $this->getResponse();
-        return $response ? $this->getResponseContent($response, $associative) : null;
+        return $response instanceof Response ? $this->getResponseContent($response, $associative) : null;
     }
 
     public function getHttpClient(): Client
@@ -267,6 +305,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                 if ($response instanceof Response) {
                     $this->setResponse($response);
                 }
+
                 if (isset($options['error']) && is_callable($options['error'])) {
                     $options['error']($e);
                 }
@@ -320,6 +359,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         $data = $this->configurePayload();
         $request = new Request($method, $url);
         $request = $this->configureJsonRequest($request);
+
         $this->_request = $this->configureRequest($request, $data);
         return $this->_request;
     }
@@ -381,53 +421,39 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     {
         $url = $this->getEndPointUrl();
         $this->triggerEvent(self::EVENT_CONFIGURE_URL, $urlArgs);
-        if ($this->hasUrlArgs()) {
-            $urlArr = explode("/", $url);
-            $optional = false;
-            $optionNum = 0;
-            $keys = array_keys($urlArgs);
-            sort($keys);
-            foreach ($keys as $key) {
-                if (is_numeric($key)) {
-                    $optionNum = $key;
-                    break;
-                }
-            }
-
-            foreach ($urlArr as $key => $urlPart) {
-                $replace = null;
-                if (str_contains($urlPart, static::$_URL_VAR_CHARACTER)) {
-                    if (str_contains($urlPart, ':')) {
-                        $optional = true;
-                        $replace = '';
-                    }
-
-                    $opt = str_replace([static::$_URL_VAR_CHARACTER, ':'], '', $urlPart);
-                    if (isset($urlArgs[$opt])) {
-                        $replace = $urlArgs[$opt];
-                    }
-
-                    if (isset($urlArgs[$optionNum]) && ($replace == '' || $replace == null)) {
-                        $replace = $urlArgs[$optionNum];
-                        $optionNum += 1;
-                    }
-
-                    if ($optional && $replace == '') {
-                        $urlArr = array_slice($urlArr, 0, $key);
-                        break;
-                    }
-
-                    if ($replace !== null) {
-                        $urlArr[$key] = $replace;
-                    }
-                }
-            }
-
-            $url = implode("/", $urlArr);
-            $url = rtrim($url, "/");
+        if ($this->needsUrlArgs()) {
+            $url = $this->populateUrlWithArgs($url, $urlArgs);
         }
 
         return $url;
+    }
+
+    protected function populateUrlWithArgs(string $url, array $urlArgs): string
+    {
+        $urlArgs = $this->normalizeUrlArgs($urlArgs);
+        $variables = $this->extractUrlVariables($url);
+        $urlArr = explode("/", trim($url, "/"));
+        foreach ($variables as $variable => $props) {
+            $index = $props['index'];
+            $replace = $urlArgs[$index] ?? "";
+            if (isset($urlArgs[$variable])) {
+                $replace = $urlArgs[$variable];
+            }
+
+            $pattern = preg_quote(static::URL_VAR_CHAR . static::URL_OPTIONAL_VAR_CHAR, "/") . "?" . preg_quote($variable, "/");
+            if (empty($replace) && $props['optional']) {
+                foreach ($urlArr as $i => $urlPart) {
+                    if (preg_match(sprintf('/%s/', $pattern), $urlPart)) {
+                        $urlArr = array_slice($urlArr, 0, $i);
+                        break;
+                    }
+                }
+            } elseif (!empty($replace)) {
+                $urlArr = preg_replace(sprintf('/%s/', $pattern), $replace, $urlArr);
+            }
+        }
+
+        return rtrim(implode("/", $urlArr), "/");
     }
 
     /**
@@ -436,7 +462,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     private function verifyUrl(string $url): bool
     {
-        if (str_contains($url, static::$_URL_VAR_CHARACTER)) {
+        if (str_contains($url, static::URL_VAR_CHAR)) {
             throw new InvalidUrl([static::class, $url]);
         }
 
@@ -446,7 +472,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * Checks if Endpoint URL requires Arguments
      */
-    protected function hasUrlArgs(): bool
+    protected function needsUrlArgs(): bool
     {
         $url = $this->getEndPointUrl();
         $variables = $this->extractUrlVariables($url);
@@ -455,15 +481,30 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     /**
      * Helper method for extracting variables via Regex from a passed in URL
-     * @param $url
      */
-    protected function extractUrlVariables($url): array
+    protected function extractUrlVariables(string $url = null): array
     {
+        $url = $url ?? $this->getEndPointUrl();
         $variables = [];
-        $pattern = "/(" . preg_quote(static::$_URL_VAR_CHARACTER) . ".*?[^\\/]*)/";
-        if (preg_match_all($pattern, $url, $matches)) {
-            foreach ($matches as $match) {
-                $variables[] = $match[0];
+        $varChar = preg_quote(static::URL_VAR_CHAR, "/");
+        $urlArr = explode("/", trim($url, "/"));
+        $varIndex = 0;
+        foreach ($urlArr as $pathPart) {
+            $pattern = "/(" . $varChar . sprintf('[^%s]+)/', $varChar);
+            if (preg_match_all($pattern, $pathPart, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $optional = str_contains($match[0], static::URL_OPTIONAL_VAR_CHAR);
+                    $var = str_replace([static::URL_VAR_CHAR, static::URL_OPTIONAL_VAR_CHAR], '', $match[0]);
+                    if (!isset($variables[$var])) {
+                        $variables[$var] = [
+                            'index' => $varIndex,
+                            'optional' => $optional,
+                        ];
+                        $varIndex++;
+                    } else {
+                        $variables[$var]['optional'] = $optional ? $variables[$var]['optional'] : $optional;
+                    }
+                }
             }
         }
 

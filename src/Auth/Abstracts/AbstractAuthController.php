@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Auth\Abstracts;
 
+use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Auth\AuthControllerInterface;
@@ -189,21 +190,24 @@ abstract class AbstractAuthController implements AuthControllerInterface
             }
         } catch (RequestException $exception) {
             $response = $exception->getResponse();
-            if ($response) {
+            if ($response instanceof ResponseInterface) {
                 $statusCode = $response->getStatusCode();
                 $message = $exception->getMessage();
                 $content = $response->getBody()->getContents();
                 if (!empty($content)) {
-                    $message .= "RESPONSE: $content";
+                    $message .= 'RESPONSE: ' . $content;
                 }
-                $this->getLogger()->error("[REST] Authenticate Failed [$statusCode] - " . $message);
+
+                $this->getLogger()->error(sprintf('[REST] Authenticate Failed [%d] - ', $statusCode) . $message);
             } else {
                 $this->getLogger()->error("[REST] Authenticate Request Exception - " . $exception->getMessage());
             }
+
             // @codeCoverageIgnoreStart
         } catch (\Exception $exception) {
             $this->getLogger()->error("[REST] Authenticate Exception - " . $exception->getMessage());
         }
+
         // @codeCoverageIgnoreEnd
         return $ret;
     }
@@ -226,21 +230,24 @@ abstract class AbstractAuthController implements AuthControllerInterface
             $this->getLogger()->debug($exception->getMessage());
         } catch (RequestException $exception) {
             $response = $exception->getResponse();
-            if ($response) {
+            if ($response instanceof ResponseInterface) {
                 $statusCode = $response->getStatusCode();
                 $message = $exception->getMessage();
                 $content = $response->getBody()->getContents();
                 if (!empty($content)) {
-                    $message .= "RESPONSE: $content";
+                    $message .= 'RESPONSE: ' . $content;
                 }
-                $this->getLogger()->error("[REST] Logout Failed [$statusCode] - " . $message);
+
+                $this->getLogger()->error(sprintf('[REST] Logout Failed [%d] - ', $statusCode) . $message);
             } else {
                 $this->getLogger()->error("[REST] Logout Request Exception - " . $exception->getMessage());
             }
+
             // @codeCoverageIgnoreStart
         } catch (\Exception $exception) {
             $this->getLogger()->error("[REST] Logout Exception - " . $exception->getMessage());
         }
+
         // @codeCoverageIgnoreEnd
         return $ret;
     }

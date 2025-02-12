@@ -9,8 +9,8 @@ abstract class AbstractMultiVersionEndpointProvider extends AbstractEndpointProv
         if (isset($properties[self::ENDPOINT_NAME])) {
             $properties[self::ENDPOINT_NAME] = $name;
         }
-
-        $this->registry[] = $properties;
+        $next = count($this->registry);
+        parent::addEndpointRegistry("$next", $properties);
     }
 
     protected function getEndpointDefinition(string $name, string $version = null): array

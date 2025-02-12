@@ -36,6 +36,7 @@ class AbstractModelEndpointTest extends TestCase
     /**
      * @covers ::defaultModelKey
      * @covers ::getKeyProperty
+     * @covers ::getId
      */
     public function testModelIdKey(): void
     {
@@ -43,13 +44,21 @@ class AbstractModelEndpointTest extends TestCase
         $this->assertEquals('key', ModelEndpoint::defaultModelKey('key'));
         $this->assertEquals('key', ModelEndpoint::defaultModelKey());
         $Model = new ModelEndpoint();
+        $Model->set([
+            'key' => 'key_value',
+            'id' => 'id_value',
+        ]);
         $this->assertEquals('key', $Model->getKeyProperty());
+        $this->assertEquals('key_value', $Model->getId());
         $this->assertEquals('id', ModelEndpoint::defaultModelKey('id'));
         $this->assertEquals('id', $Model->getKeyProperty());
+        $this->assertEquals('id_value', $Model->getId());
         $this->assertEquals('key', ModelEndpoint::defaultModelKey('key'));
+        $this->assertEquals('key_value', $Model->getId());
         $this->assertEquals('key', $Model->getKeyProperty());
         $this->assertEquals($Model, $Model->setProperty(ModelEndpoint::PROPERTY_MODEL_KEY, 'id'));
         $this->assertEquals('id', $Model->getKeyProperty());
+        $this->assertEquals('id_value', $Model->getId());
         ModelEndpoint::defaultModelKey('id');
     }
 
@@ -63,6 +72,25 @@ class AbstractModelEndpointTest extends TestCase
         $actions = $Class->getProperty('_actions');
         $actions->setAccessible(true);
         $this->assertEquals(['create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
+    }
+
+    /**
+     * @covers ::setUrlArgs
+     * @covers ::setIdFromUrlArgs
+     */
+    public function testSetUrlArgs(): void
+    {
+        $Model = new ModelEndpoint();
+        $Model->setProperty('url', 'Accounts/$:id');
+        $Model->setUrlArgs(['12345']);
+        $this->assertEquals([], $Model->getUrlArgs());
+        $this->assertEquals('12345', $Model->getId());
+        $Model['foo'] = 'bar';
+
+        $Model->setUrlArgs(['id' => '56789']);
+        $this->assertEquals([], $Model->getUrlArgs());
+        $this->assertEquals('56789', $Model->getId());
+        $this->assertEmpty($Model['foo']);
     }
 
     /**

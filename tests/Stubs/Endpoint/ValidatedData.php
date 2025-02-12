@@ -23,6 +23,7 @@ class ValidatedData extends ValidatedEndpointData
         if (isset($this->invalid)) {
             return !$this->invalid;
         }
+
         return parent::validate();
     }
 }

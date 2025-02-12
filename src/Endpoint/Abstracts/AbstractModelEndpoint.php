@@ -118,6 +118,26 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
         throw new UnknownModelAction([static::class, $name]);
     }
 
+    public function setUrlArgs(array $args): static
+    {
+        parent::setUrlArgs($args);
+        $this->setIdFromUrlArgs();
+        return $this;
+    }
+
+    protected function setIdFromUrlArgs(): void
+    {
+        if (!empty($this->_urlArgs[static::MODEL_ID_VAR])) {
+            $id = $this->getId();
+            if ($id != $this->_urlArgs[static::MODEL_ID_VAR] && !empty($id)) {
+                $this->clear();
+            }
+            $prop = $this->getKeyProperty();
+            $this->set($prop, $this->_urlArgs[static::MODEL_ID_VAR]);
+            unset($this->_urlArgs[static::MODEL_ID_VAR]);
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -290,14 +310,13 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
 
     protected function configureURL(array $urlArgs): string
     {
-        if (empty($urlArgs[self::MODEL_ID_VAR])) {
+        if (empty($urlArgs[static::MODEL_ID_VAR])) {
             switch ($this->getCurrentAction()) {
                 case self::MODEL_ACTION_CREATE:
                     $urlArgs[self::MODEL_ID_VAR] = '';
                     break;
                 default:
-                    $idKey = $this->getKeyProperty();
-                    $id = $this->get($idKey);
+                    $id = $this->getId();
                     $urlArgs[self::MODEL_ID_VAR] = (empty($id) ? '' : $id);
             }
         }

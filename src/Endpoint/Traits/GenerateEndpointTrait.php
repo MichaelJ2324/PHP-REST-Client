@@ -24,6 +24,7 @@ trait GenerateEndpointTrait
                 $EP->setBaseUrl($this->getBaseUrl());
             }
         }
+
         return $EP;
     }
 }

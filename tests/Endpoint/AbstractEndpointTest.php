@@ -17,11 +17,12 @@ use MRussell\REST\Tests\Stubs\Endpoint\BasicEndpoint;
 use MRussell\REST\Tests\Stubs\Endpoint\DefaultedNonNullableData;
 use MRussell\REST\Tests\Stubs\Endpoint\PingEndpoint;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * Class AbstractEndpointTest
  * @package MRussell\REST\Tests\Endpoint
- * @coversDefaultClass MRussell\REST\Endpoint\Abstracts\AbstractEndpoint
+ * @coversDefaultClass \MRussell\REST\Endpoint\Abstracts\AbstractEndpoint
  * @group AbstractEndpointTest
  */
 class AbstractEndpointTest extends TestCase
@@ -86,11 +87,26 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals('$foo/$bar/$:test', $Endpoint->getEndPointUrl());
     }
 
+    public function testCatchNon200Responses(): void
+    {
+        $Endpoint = new BasicEndpoint();
+        $reflection = new ReflectionClass($Endpoint);
+        $catchNon200Responses = $reflection->getProperty('_catchNon200Responses');
+        $catchNon200Responses->setAccessible(true);
+        $this->assertFalse($catchNon200Responses->getValue($Endpoint));
+        $this->assertEquals($Endpoint, $Endpoint->catchNon200Responses());
+        $this->assertTrue($catchNon200Responses->getValue($Endpoint));
+        $this->assertEquals($Endpoint, $Endpoint->catchNon200Responses(false));
+        $this->assertFalse($catchNon200Responses->getValue($Endpoint));
+        $this->assertEquals($Endpoint, $Endpoint->catchNon200Responses(true));
+        $this->assertTrue($catchNon200Responses->getValue($Endpoint));
+    }
+
     /**
      * @covers ::setUrlArgs
      * @covers ::getUrlArgs
      */
-    public function testSetOptions(): void
+    public function testSetUrlArgs(): void
     {
         $Endpoint = new BasicEndpoint();
         $this->assertEquals([], $Endpoint->getUrlArgs());
@@ -98,6 +114,66 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals($this->urlArgs, $Endpoint->getUrlArgs());
         $this->assertEquals($Endpoint, $Endpoint->setUrlArgs([]));
         $this->assertEquals([], $Endpoint->getUrlArgs());
+    }
+
+    /**
+     * @covers ::setUrlArgs
+     * @covers ::normalizeUrlArgs
+     */
+    public function testNormalizeUrlArgs(): void
+    {
+        $Endpoint = new BasicEndpoint();
+        $Endpoint->setProperties($this->properties);
+        $Endpoint->setUrlArgs($this->urlArgs);
+
+        $normalized = $Endpoint->getUrlArgs();
+        $this->assertNotEquals($this->urlArgs, $normalized);
+        $this->assertEquals([
+            'foo' => 'foo',
+            'bar' => 'bar',
+        ], $normalized);
+
+        //Verify that appending an arg, maps to last variable
+        $normalized[] = 'test';
+        $urlArgs = $normalized;
+        $Endpoint->setUrlArgs($normalized);
+        $normalized = $Endpoint->getUrlArgs();
+        $this->assertNotEquals($urlArgs, $normalized);
+        $this->assertEquals([
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'test' => 'test',
+        ], $normalized);
+
+        $urlArgs = [
+            'first',
+            'test' => 'last',
+            'middle',
+        ];
+        $Endpoint->setUrlArgs($urlArgs);
+        $normalized = $Endpoint->getUrlArgs();
+        $this->assertNotEquals($urlArgs, $normalized);
+        $this->assertEquals([
+            'foo' => 'first',
+            'bar' => 'middle',
+            'test' => 'last',
+        ], $normalized);
+
+        //Test ignoring blank args
+        $urlArgs = [
+            '',
+            'first',
+            'test' => 'last',
+            'middle',
+        ];
+        $Endpoint->setUrlArgs($urlArgs);
+        $normalized = $Endpoint->getUrlArgs();
+        $this->assertNotEquals($urlArgs, $normalized);
+        $this->assertEquals([
+            'foo' => 'first',
+            'bar' => 'middle',
+            'test' => 'last',
+        ], $normalized);
     }
 
     /**
@@ -215,14 +291,19 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals('http://localhost/basic', $request->getUri()->__toString());
         $this->assertEquals('application/json', $request->getHeader('Content-Type')[0]);
         $this->assertEquals('GET', $request->getMethod());
+
+        $this->client->mockResponses->append(new Response(400));
+        $Endpoint->catchNon200Responses();
+        $this->assertEquals($Endpoint, $Endpoint->execute());
+        $this->assertNotEmpty($Endpoint->getResponse());
+        $this->assertEquals(400, $Endpoint->getResponse()->getStatusCode());
     }
 
-    /**
-     * @expectedException MRussell\REST\Exception\Endpoint\InvalidUrl
-     */
     public function testInvalidUrl(): void
     {
+        $this->client->mockResponses->append(new Response(200));
         $Endpoint = new BasicEndpoint();
+        $Endpoint->setClient($this->client);
         $this->assertEquals($Endpoint, $Endpoint->setBaseUrl('http://localhost'));
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
         $this->assertEquals('$foo', $Endpoint->getEndPointUrl());
@@ -232,7 +313,39 @@ class AbstractEndpointTest extends TestCase
     }
 
     /**
+     * @covers ::needsUrlArgs
+     * @covers ::extractUrlVariables
+     */
+    public function testUrlVariables(): void
+    {
+        $Endpoint = new BasicEndpoint();
+        $Class = new \ReflectionClass(BasicEndpoint::class);
+        $needsUrlArgs = $Class->getMethod('needsUrlArgs');
+        $extractUrlVariables = $Class->getMethod('extractUrlVariables');
+        $needsUrlArgs->setAccessible(true);
+        $extractUrlVariables->setAccessible(true);
+
+        $Endpoint->setProperty('url', 'test/$module/$:id/action/$:actionArg');
+        $this->assertEquals(true, $needsUrlArgs->invoke($Endpoint));
+        $variables = $extractUrlVariables->invoke($Endpoint);
+        $this->assertEquals([
+            'module',
+            'id',
+            'actionArg',
+        ], array_keys($variables));
+
+        $Endpoint->setProperty('url', 'test/$:module/$:id/$module');
+        $this->assertEquals(true, $needsUrlArgs->invoke($Endpoint));
+        $variables = $extractUrlVariables->invoke($Endpoint);
+        $this->assertEquals([
+            'module',
+            'id',
+        ], array_keys($variables));
+    }
+
+    /**
      * @covers ::configureUrl
+     * @covers ::populateUrlWithArgs
      *
      */
     public function testConfigureUrl(): void
@@ -253,7 +366,7 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo/$bar/$:baz'));
         $this->assertEquals('bar/foo/1234', $method->invoke(
             $Endpoint,
-            ['foo' => 'bar', 0 => 'foo', 1 => 1234],
+            ['foo' => 'bar', 1 => 'foo', 2 => 1234],
         ));
         $this->assertEquals('bar/foo/1234', $method->invoke(
             $Endpoint,
@@ -270,6 +383,12 @@ class AbstractEndpointTest extends TestCase
         $this->assertEquals('bar/foo/foz/1234', $method->invoke(
             $Endpoint,
             ['foo' => 'bar', 'bar' => 'foo', 'baz' => 'foz', 0 => 1234],
+        ));
+
+        $this->assertEquals($Endpoint, $Endpoint->setProperty('url', 'test/$:module/$:id/$module'));
+        $this->assertEquals('test/Accounts/1234/Accounts', $method->invoke(
+            $Endpoint,
+            ['Accounts','1234'],
         ));
     }
 

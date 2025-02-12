@@ -2,6 +2,7 @@
 
 namespace MRussell\REST\Auth\Abstracts;
 
+use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
 use Psr\SimpleCache\InvalidArgumentException;
 use GuzzleHttp\Psr7\Response;
@@ -200,21 +201,24 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
                 $this->getLogger()->debug($exception->getMessage());
             } catch (RequestException $exception) {
                 $response = $exception->getResponse();
-                if ($response) {
+                if ($response instanceof ResponseInterface) {
                     $statusCode = $response->getStatusCode();
                     $message = $exception->getMessage();
                     $content = $response->getBody()->getContents();
                     if (!empty($content)) {
-                        $message .= "RESPONSE: $content";
+                        $message .= 'RESPONSE: ' . $content;
                     }
-                    $this->getLogger()->error("[REST] OAuth Refresh Failed [$statusCode] - " . $message);
+
+                    $this->getLogger()->error(sprintf('[REST] OAuth Refresh Failed [%d] - ', $statusCode) . $message);
                 } else {
                     $this->getLogger()->error("[REST] OAuth Refresh Request Exception - " . $exception->getMessage());
                 }
+
                 // @codeCoverageIgnoreStart
             } catch (\Exception $exception) {
                 $this->getLogger()->error("[REST] Unknown OAuth Refresh Exception - " . $exception->getMessage());
             }
+
             // @codeCoverageIgnoreEnd
         }
 

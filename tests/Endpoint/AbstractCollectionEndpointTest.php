@@ -2,12 +2,14 @@
 
 namespace MRussell\REST\Tests\Endpoint;
 
+use MRussell\REST\Endpoint\Interfaces\ModelInterface;
 use MRussell\REST\Exception\Endpoint\UnknownEndpoint;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Endpoint\CollectionEndpoint;
 use MRussell\REST\Endpoint\ModelEndpoint;
 use MRussell\REST\Tests\Stubs\Client\Client;
 use MRussell\REST\Tests\Stubs\Endpoint\CollectionEndpointWithoutModel;
+use MRussell\REST\Tests\Stubs\Endpoint\EndpointProvider;
 use MRussell\REST\Tests\Stubs\Endpoint\ModelEndpointWithActions;
 use PHPUnit\Framework\TestCase;
 
@@ -28,6 +30,7 @@ class AbstractCollectionEndpointTest extends TestCase
     protected function setUp(): void
     {
         $this->client = new Client();
+        $this->client->setEndpointProvider(new EndpointProvider());
         parent::setUp();
     }
 
@@ -46,7 +49,7 @@ class AbstractCollectionEndpointTest extends TestCase
      * @covers ::toArray
      * @covers ::get
      * @covers ::buildModel
-     * @covers MRussell\REST\Endpoint\Traits\GenerateEndpointTrait::generateEndpoint
+     * @covers \MRussell\REST\Endpoint\Traits\GenerateEndpointTrait::generateEndpoint
      * @covers ::clear
      * @covers ::reset
      * @covers ::at
@@ -84,9 +87,10 @@ class AbstractCollectionEndpointTest extends TestCase
         $this->assertEquals(false, is_object($Model));
         $Collection->setModelEndpoint(ModelEndpoint::class);
         $Model = $Collection->get('abc123');
-        $this->assertEquals(true, is_object($Model));
+        $this->assertInstanceOf(ModelInterface::class, $Model);
         $this->assertEquals('bar', $Model->get('foo'));
         $this->assertEquals($this->client, $Model->getClient());
+
         $Model = $Collection->at(1);
         $this->assertEquals(['id' => 'efg234', 'name' => 'test', 'foo' => ''], $Model->toArray());
         $Model = $Collection->at(-1);
@@ -117,6 +121,28 @@ class AbstractCollectionEndpointTest extends TestCase
         $this->assertEquals(ModelEndpoint::class, $Collection->getProperty('model'));
         $Collection->setModelEndpoint(\MRussell\REST\Tests\Stubs\Endpoint\ModelEndpoint::class);
         $this->assertEquals(\MRussell\REST\Tests\Stubs\Endpoint\ModelEndpoint::class, $Collection->getProperty('model'));
+
+        $Collection->setClient($this->client);
+        $this->client->setEndpointProvider(new EndpointProvider());
+        $this->client->getEndpointProvider()->registerEndpoint('testModel', ModelEndpoint::class);
+        $Collection->setModelEndpoint('testModel');
+        $this->assertEquals(ModelEndpoint::class, $Collection->getProperty('model'));
+    }
+
+    /**
+     * @covers \MRussell\REST\Endpoint\Traits\GenerateEndpointTrait::generateEndpoint
+     */
+    public function testGenerateEndpoint(): void
+    {
+        $Collection = new CollectionEndpointWithoutModel();
+        $Collection->setClient($this->client);
+        $this->client->getEndpointProvider()->registerEndpoint('model', ModelEndpoint::class);
+        $reflection = new \ReflectionClass($Collection);
+        $method = $reflection->getMethod('generateEndpoint');
+        $method->setAccessible(true);
+
+        $endpoint = $method->invoke($Collection, 'model');
+        $this->assertInstanceOf(ModelEndpoint::class, $endpoint);
     }
 
     /**
