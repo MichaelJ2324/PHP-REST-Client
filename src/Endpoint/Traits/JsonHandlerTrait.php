@@ -19,7 +19,7 @@ trait JsonHandlerTrait
      */
     public function getResponseContent(Response $response, bool $associative = true): mixed
     {
-        if (!$this->_respContent) {
+        if (empty($this->_respContent)) {
             $this->_respContent = $response->getBody()->getContents();
             $response->getBody()->rewind();
         }
