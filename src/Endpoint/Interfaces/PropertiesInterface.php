@@ -11,14 +11,13 @@ interface PropertiesInterface
      * Set the properties that control the object
      * @return $this
      */
-    public function setProperties(array $properties);
+    public function setProperties(array $properties): static;
 
     /**
      * Set a specific property on an object
-     * @param mixed $value
      * @return $this
      */
-    public function setProperty(string $name, $value);
+    public function setProperty(string $name, mixed $value): static;
 
     /**
      * Get the properties configured on the Data
@@ -27,7 +26,6 @@ interface PropertiesInterface
 
     /**
      * Get the properties configured on the Data
-     * @return mixed
      */
-    public function getProperty(string $name);
+    public function getProperty(string $name): mixed;
 }

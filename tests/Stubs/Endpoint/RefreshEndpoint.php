@@ -6,7 +6,8 @@ use MRussell\REST\Endpoint\Endpoint;
 
 class RefreshEndpoint extends Endpoint
 {
-    protected static $_ENDPOINT_URL = 'refresh';
-
-    protected static $_DEFAULT_PROPERTIES = ['httpMethod' => "POST"];
+    protected static array $_DEFAULT_PROPERTIES = [
+        self::PROPERTY_HTTP_METHOD => "POST",
+        self::PROPERTY_URL => 'refresh',
+    ];
 }

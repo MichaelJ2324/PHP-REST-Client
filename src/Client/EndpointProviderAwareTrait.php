@@ -6,18 +6,15 @@ use MRussell\REST\Endpoint\Provider\EndpointProviderInterface;
 
 trait EndpointProviderAwareTrait
 {
-    /**
-     * @var EndpointProviderInterface
-     */
-    protected $EndpointProvider;
+    protected EndpointProviderInterface $endpointProvider;
 
     /**
      * @inheritdoc
      * @implements EndpointProviderAwareInterface
      */
-    public function setEndpointProvider(EndpointProviderInterface $EndpointProvider)
+    public function setEndpointProvider(EndpointProviderInterface $endpointProvider): static
     {
-        $this->EndpointProvider = $EndpointProvider;
+        $this->endpointProvider = $endpointProvider;
         return $this;
     }
 
@@ -25,8 +22,8 @@ trait EndpointProviderAwareTrait
      * @inheritdoc
      * @implements EndpointProviderAwareInterface
      */
-    public function getEndpointProvider()
+    public function getEndpointProvider(): EndpointProviderInterface
     {
-        return $this->EndpointProvider;
+        return $this->endpointProvider;
     }
 }

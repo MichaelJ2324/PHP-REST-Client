@@ -8,5 +8,5 @@ interface ResettableInterface
      * Reset Object back to initial state
      * @return $this
      */
-    public function reset();
+    public function reset(): static;
 }

@@ -58,9 +58,8 @@ class AbstractClientTest extends TestCase
      * @covers ::initHttpHandlerStack
      * @covers ::getHttpClient
      * @covers ::getHandlerStack
-     * @return void
      */
-    public function testHttpClientConstructor()
+    public function testHttpClientConstructor(): void
     {
         $client = new Client();
         $this->assertInstanceOf(\GuzzleHttp\Client::class, $client->getHttpClient());
@@ -90,7 +89,7 @@ class AbstractClientTest extends TestCase
         $stack->setAccessible(true);
 
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
+        $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -102,9 +101,8 @@ class AbstractClientTest extends TestCase
      * @covers ::configureAuth
      * @covers ::setHandlerStack
      * @depends testSetAuth
-     * @return void
      */
-    public function testAuthMiddleware()
+    public function testAuthMiddleware(): void
     {
         $Auth = new AuthController();
         $this->assertEquals($this->Client, $this->Client->setAuth($Auth));
@@ -116,7 +114,7 @@ class AbstractClientTest extends TestCase
         $stack->setAccessible(true);
 
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
+        $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -129,7 +127,7 @@ class AbstractClientTest extends TestCase
         $stack->setAccessible(true);
 
         $value = $stack->getValue($handlerStack);
-        $middleware = array_filter($value, fn($item) => $item[1] == 'configureAuth');
+        $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');
         $this->assertNotEmpty($middleware);
         $middleware = current($middleware);
         $this->assertIsCallable($middleware[0]);
@@ -139,9 +137,8 @@ class AbstractClientTest extends TestCase
      * Test the callable function that configures Auth on requests
      * @covers ::configureAuth
      * @group configureAuth
-     * @return void
      */
-    public function testConfigureAuth()
+    public function testConfigureAuth(): void
     {
         $Auth = new AuthController();
         $this->Client->setAuth($Auth);
@@ -180,11 +177,11 @@ class AbstractClientTest extends TestCase
      * @covers ::setAPIUrl
      * @covers ::getAPIUrl
      */
-    public function testSetServer()
+    public function testSetServer(): void
     {
-        $this->assertEquals($this->Client, $this->Client->setServer(null));
-        $this->assertEquals(null, $this->Client->getServer());
-        $this->assertEquals(null, $this->Client->getAPIUrl());
+        $this->assertEquals($this->Client, $this->Client->setServer(""));
+        $this->assertEquals("", $this->Client->getServer());
+        $this->assertEquals("", $this->Client->getAPIUrl());
         $this->assertEquals($this->Client, $this->Client->setServer($this->server));
         $this->assertEquals($this->server, $this->Client->getServer());
         $this->assertEquals($this->server, $this->Client->getAPIUrl());
@@ -194,14 +191,8 @@ class AbstractClientTest extends TestCase
      * @covers ::setVersion
      * @covers ::getVersion
      */
-    public function testSetVersion()
+    public function testSetVersion(): void
     {
-        $this->assertEquals($this->Client, $this->Client->setVersion(1));
-        $this->assertEquals(1, $this->Client->getVersion());
-        $this->assertEquals($this->Client, $this->Client->setVersion(null));
-        $this->assertEquals(null, $this->Client->getVersion());
-        $this->assertEquals($this->Client, $this->Client->setVersion([]));
-        $this->assertEquals([], $this->Client->getVersion());
         $this->assertEquals($this->Client, $this->Client->setVersion($this->version));
         $this->assertEquals($this->version, $this->Client->getVersion());
     }
@@ -209,13 +200,16 @@ class AbstractClientTest extends TestCase
     /**
      * @depends testSetEndpointProvider
      * @covers ::__call
+     * @covers ::hasEndpoint
+     * @covers ::getEndpoint
      * @covers ::last
      * @covers ::current
      * @covers ::setCurrentEndpoint
      */
-    public function testCall(Client $Client)
+    public function testCall(Client $Client): void
     {
         $this->Client = $Client;
+        $this->assertEquals(true, $this->Client->hasEndpoint('auth'));
         $AuthEP = $this->Client->auth();
         $this->assertNotEmpty($AuthEP);
         $this->assertEquals($AuthEP, $this->Client->current());
@@ -228,7 +222,7 @@ class AbstractClientTest extends TestCase
     /**
      * @throws EndpointProviderMissing
      */
-    public function testProviderMissingException()
+    public function testProviderMissingException(): void
     {
         $this->Client = new Client();
         $this->expectException(EndpointProviderMissing::class);

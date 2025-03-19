@@ -5,16 +5,21 @@ namespace MRussell\REST\Endpoint\Interfaces;
 interface ModelInterface extends EndpointInterface, ClearableInterface, GetInterface, SetInterface
 {
     /**
-     * Get or Set the Model ID Key used by the Model
+     * Get the Model Key (the unique identifying property)
      */
-    public static function modelIdKey($id = null): string;
+    public function getKeyProperty(): string;
+
+    /**
+     * Get the Model ID (the Models Key value)
+     */
+    public function getId(): string|int|null;
 
     /**
      * Retrieve a Model by ID using a GET Request
      * @param $id
      * @return $this
      */
-    public function retrieve($id = null): self;
+    public function retrieve($id = null): static;
 
     /**
      * Save the current Model
@@ -22,10 +27,10 @@ interface ModelInterface extends EndpointInterface, ClearableInterface, GetInter
      * - Uses a PUT request if Model ID is set
      * @return $this
      */
-    public function save(): self;
+    public function save(): static;
 
     /**
      * Delete the current Model using a DELETE Request
      */
-    public function delete(): self;
+    public function delete(): static;
 }

@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
 use MRussell\REST\Client\ClientAwareTrait;
@@ -57,57 +56,55 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     public const AUTH_REQUIRED = 2;
 
-    protected static $_DEFAULT_PROPERTIES = [self::PROPERTY_URL => '', self::PROPERTY_HTTP_METHOD => '', self::PROPERTY_AUTH => self::AUTH_EITHER];
+    public const URL_VAR_CHAR = '$';
 
-    private ?PromiseInterface $promise = null;
+    public const URL_OPTIONAL_VAR_CHAR = ':';
+
+    protected static array $_DEFAULT_PROPERTIES = [
+        self::PROPERTY_URL => '',
+        self::PROPERTY_HTTP_METHOD => '',
+        self::PROPERTY_AUTH => self::AUTH_EITHER,
+    ];
+
+    private PromiseInterface $promise;
 
     /**
      * The Variable Identifier to parse Endpoint URL
-     * @var string
      */
-    protected static $_URL_VAR_CHARACTER = '$';
-
-    /**
-     * The Endpoint Relative URL to the API
-     * @var string
-     */
-    protected static $_ENDPOINT_URL = '';
+    protected static string $_URL_VAR_CHARACTER = '$';
 
     /**
      * The initial URL passed into the Endpoint
-     * @var string
      */
-    protected $baseUrl = '';
+    protected string $_baseUrl = '';
 
     /**
      * The passed in Options for the Endpoint, mainly used for parsing URL Variables
-     * @var array
      */
-    protected $urlArgs = [];
+    protected array $_urlArgs = [];
 
     /**
      * The data being passed to the API Endpoint.
      * Defaults to Array, but can be mixed based on how you want to use Endpoint.
-     * @var mixed
      */
-    protected $data;
+    protected string|array|\ArrayAccess|null $_data;
 
     /**
      * The Request Object used by the Endpoint to submit the data
-     * @var Request
      */
-    protected $request;
+    protected Request $_request;
 
     /**
      * The Response Object used by the Endpoint
-     * @var Response
      */
-    protected $response;
+    protected Response $_response;
 
-    public function __construct(array $urlArgs = [], array $properties = [])
+    protected bool $_catchNon200Responses = false;
+
+    public function __construct(array $properties = [], array $urlArgs = [])
     {
-        $this->eventStack = new Stack();
-        $this->eventStack->setEndpoint($this);
+        $this->_eventStack = new Stack();
+        $this->_eventStack->setEndpoint($this);
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
         if (!empty($urlArgs)) {
             $this->setUrlArgs($urlArgs);
@@ -118,13 +115,53 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         }
     }
 
+    public function catchNon200Responses(bool $catch = true): static
+    {
+        $this->_catchNon200Responses = $catch;
+        return $this;
+    }
+
     /**
      * @inheritdoc
      */
-    public function setUrlArgs(array $args): EndpointInterface
+    public function setUrlArgs(array $args): static
     {
-        $this->urlArgs = $args;
+        if (!empty($args) && $this->needsUrlArgs()) {
+            $args = $this->normalizeUrlArgs($args);
+        }
+
+        $this->_urlArgs = $args;
         return $this;
+    }
+
+    protected function normalizeUrlArgs(array $urlArgs): array
+    {
+        $vars = $this->extractUrlVariables();
+        $argNum = 0;
+        $normalized = [];
+        foreach ($urlArgs as $key => $value) {
+            if (isset($vars[$key])) {
+                $normalized[$key] = $value;
+                if ($vars[$key]['index'] == $argNum) {
+                    $argNum++;
+                }
+            } elseif (is_numeric($key) && !empty($value)) {
+                foreach ($vars as $var => $varProps) {
+                    if (!isset($normalized[$var]) && !isset($urlArgs[$var])) {
+                        if ($varProps['index'] == $key) {
+                            $normalized[$var] = $value;
+                            break;
+                        } elseif ($varProps['index'] == $argNum) {
+                            $normalized[$var] = $value;
+                            break;
+                        }
+                    }
+                }
+                $argNum++;
+            }
+        }
+
+        return $normalized;
     }
 
     /**
@@ -132,15 +169,15 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function getUrlArgs(): array
     {
-        return $this->urlArgs;
+        return $this->_urlArgs;
     }
 
     /**
      * @inheritdoc
      */
-    public function setBaseUrl($url): EndpointInterface
+    public function setBaseUrl($url): static
     {
-        $this->baseUrl = $url;
+        $this->_baseUrl = $url;
         return $this;
     }
 
@@ -149,22 +186,19 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     public function getBaseUrl(): string
     {
-        if (empty($this->baseUrl) && $this->client) {
+        if (empty($this->_baseUrl) && isset($this->_client)) {
             return $this->getClient()->getAPIUrl();
         }
 
-        return $this->baseUrl;
+        return $this->_baseUrl;
     }
 
     /**
      * @inheritdoc
      */
-    public function getEndPointUrl($full = false): string
+    public function getEndPointUrl(bool $full = false): string
     {
-        $url = static::$_ENDPOINT_URL;
-        if (isset($this->_properties[self::PROPERTY_URL]) && $this->_properties[self::PROPERTY_URL] !== '') {
-            $url = $this->_properties[self::PROPERTY_URL];
-        }
+        $url = $this->getProperty(self::PROPERTY_URL) ?? "";
 
         if ($full) {
             $url = rtrim($this->getBaseUrl(), '/') . ('/' . $url);
@@ -176,64 +210,52 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setData($data)
+    public function setData(string|array|\ArrayAccess|null $data): static
     {
-        $this->data = $data;
+        $this->_data = $data;
         return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function getData()
+    public function getData(): string|array|\ArrayAccess|null
     {
-        return $this->data;
-    }
-
-    /**
-     * Due to how Guzzle Requests work, this may not return the actual Request object used
-     * - Use Middleware::history() if you need the request that was sent to server
-     *
-     * May deprecate in the future, just leaving it in right now to assess if its still needed
-     * TODO:Deprecate me
-     * @codeCoverageIgnore
-     */
-    protected function getRequest(): Request
-    {
-        return $this->request;
+        return $this->_data ?? null;
     }
 
     /**
      * @return $this|EndpointInterface
      */
-    protected function setResponse(Response $response)
+    protected function setResponse(Response $_response): static
     {
-        $this->response = $response;
-        $this->respContent = null;
-        $this->triggerEvent(self::EVENT_AFTER_RESPONSE, $response);
+        $this->_response = $_response;
+        $this->_respContent = null;
+        $this->triggerEvent(self::EVENT_AFTER_RESPONSE, $_response);
         return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function getResponse()
+    public function getResponse(): Response|null
     {
-        return $this->response;
+        return $this->_response ?? null;
     }
 
-    /**
-     * @return mixed|null
-     */
-    public function getResponseBody(bool $associative = true)
+    public function getResponseBody(bool $associative = true): mixed
     {
         $response = $this->getResponse();
-        return $response ? $this->getResponseContent($response, $associative) : null;
+        return $response instanceof Response ? $this->getResponseContent($response, $associative) : null;
     }
 
     public function getHttpClient(): Client
     {
-        return $this->client ? $this->getClient()->getHttpClient() : new Client();
+        if (isset($this->_client)) {
+            return $this->getClient()->getHttpClient();
+        }
+
+        return new Client();
     }
 
     /**
@@ -243,9 +265,22 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @return $this
      * @throws GuzzleException
      */
-    public function execute(array $options = []): EndpointInterface
+    public function execute(array $options = []): static
     {
-        $this->setResponse($this->getHttpClient()->send($this->buildRequest(), $options));
+        try {
+            $response = $this->getHttpClient()->send($this->buildRequest(), $options);
+            $this->setResponse($response);
+        } catch (RequestException $requestException) {
+            $response = $requestException->getResponse();
+            if ($response instanceof Response) {
+                $this->setResponse($requestException->getResponse());
+            }
+
+            if (!$this->_catchNon200Responses) {
+                throw $requestException;
+            }
+        }
+
         return $this;
     }
 
@@ -254,19 +289,23 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      * @param null $data - short form data for Endpoint, which is configure by configureData method
      * @return $this
      */
-    public function asyncExecute(array $options = []): EndpointInterface
+    public function asyncExecute(array $options = []): static
     {
         $request = $this->buildRequest();
         $this->promise = $this->getHttpClient()->sendAsync($request, $options);
-        $endpoint = $this;
         $this->promise->then(
-            function (Response $res) use ($endpoint, $options): void {
-                $endpoint->setResponse($res);
+            function (Response $res) use ($options): void {
+                $this->setResponse($res);
                 if (isset($options['success']) && is_callable($options['success'])) {
                     $options['success']($res);
                 }
             },
             function (RequestException $e) use ($options): void {
+                $response = $e->getResponse();
+                if ($response instanceof Response) {
+                    $this->setResponse($response);
+                }
+
                 if (isset($options['error']) && is_callable($options['error'])) {
                     $options['error']($e);
                 }
@@ -275,12 +314,9 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         return $this;
     }
 
-    /**
-     * @return Promise
-     */
-    public function getPromise()
+    public function getPromise(): ?PromiseInterface
     {
-        return $this->promise;
+        return $this->promise ?? null;
     }
 
     /**
@@ -323,15 +359,16 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
         $data = $this->configurePayload();
         $request = new Request($method, $url);
         $request = $this->configureJsonRequest($request);
-        $this->request = $this->configureRequest($request, $data);
-        return $this->request;
+
+        $this->_request = $this->configureRequest($request, $data);
+        return $this->_request;
     }
 
     /**
      * Configures Data on the Endpoint to be set on the Request.
      * @return string|array|DataInterface|null|Stream
      */
-    protected function configurePayload()
+    protected function configurePayload(): mixed
     {
         $data = $this->getData() ?? null;
         $this->triggerEvent(self::EVENT_CONFIGURE_PAYLOAD, $data);
@@ -384,53 +421,39 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     {
         $url = $this->getEndPointUrl();
         $this->triggerEvent(self::EVENT_CONFIGURE_URL, $urlArgs);
-        if ($this->hasUrlArgs()) {
-            $urlArr = explode("/", $url);
-            $optional = false;
-            $optionNum = 0;
-            $keys = array_keys($urlArgs);
-            sort($keys);
-            foreach ($keys as $key) {
-                if (is_numeric($key)) {
-                    $optionNum = $key;
-                    break;
-                }
-            }
-
-            foreach ($urlArr as $key => $urlPart) {
-                $replace = null;
-                if (strpos($urlPart, static::$_URL_VAR_CHARACTER) !== false) {
-                    if (strpos($urlPart, ':') !== false) {
-                        $optional = true;
-                        $replace = '';
-                    }
-
-                    $opt = str_replace([static::$_URL_VAR_CHARACTER, ':'], '', $urlPart);
-                    if (isset($urlArgs[$opt])) {
-                        $replace = $urlArgs[$opt];
-                    }
-
-                    if (isset($urlArgs[$optionNum]) && ($replace == '' || $replace == null)) {
-                        $replace = $urlArgs[$optionNum];
-                        $optionNum += 1;
-                    }
-
-                    if ($optional && $replace == '') {
-                        $urlArr = array_slice($urlArr, 0, $key);
-                        break;
-                    }
-
-                    if ($replace !== null) {
-                        $urlArr[$key] = $replace;
-                    }
-                }
-            }
-
-            $url = implode("/", $urlArr);
-            $url = rtrim($url, "/");
+        if ($this->needsUrlArgs()) {
+            $url = $this->populateUrlWithArgs($url, $urlArgs);
         }
 
         return $url;
+    }
+
+    protected function populateUrlWithArgs(string $url, array $urlArgs): string
+    {
+        $urlArgs = $this->normalizeUrlArgs($urlArgs);
+        $variables = $this->extractUrlVariables($url);
+        $urlArr = explode("/", trim($url, "/"));
+        foreach ($variables as $variable => $props) {
+            $index = $props['index'];
+            $replace = $urlArgs[$index] ?? "";
+            if (isset($urlArgs[$variable])) {
+                $replace = $urlArgs[$variable];
+            }
+
+            $pattern = preg_quote(static::URL_VAR_CHAR . static::URL_OPTIONAL_VAR_CHAR, "/") . "?" . preg_quote($variable, "/");
+            if (empty($replace) && $props['optional']) {
+                foreach ($urlArr as $i => $urlPart) {
+                    if (preg_match(sprintf('/%s/', $pattern), $urlPart)) {
+                        $urlArr = array_slice($urlArr, 0, $i);
+                        break;
+                    }
+                }
+            } elseif (!empty($replace)) {
+                $urlArr = preg_replace(sprintf('/%s/', $pattern), $replace, $urlArr);
+            }
+        }
+
+        return rtrim(implode("/", $urlArr), "/");
     }
 
     /**
@@ -439,8 +462,8 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
      */
     private function verifyUrl(string $url): bool
     {
-        if (strpos($url, static::$_URL_VAR_CHARACTER) !== false) {
-            throw new InvalidUrl([get_class($this), $url]);
+        if (str_contains($url, static::URL_VAR_CHAR)) {
+            throw new InvalidUrl([static::class, $url]);
         }
 
         return true;
@@ -449,7 +472,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * Checks if Endpoint URL requires Arguments
      */
-    protected function hasUrlArgs(): bool
+    protected function needsUrlArgs(): bool
     {
         $url = $this->getEndPointUrl();
         $variables = $this->extractUrlVariables($url);
@@ -458,15 +481,30 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
 
     /**
      * Helper method for extracting variables via Regex from a passed in URL
-     * @param $url
      */
-    protected function extractUrlVariables($url): array
+    protected function extractUrlVariables(string $url = null): array
     {
+        $url = $url ?? $this->getEndPointUrl();
         $variables = [];
-        $pattern = "/(\\" . static::$_URL_VAR_CHARACTER . ".*?[^\\/]*)/";
-        if (preg_match_all($pattern, $url, $matches)) {
-            foreach ($matches as $match) {
-                $variables[] = $match[0];
+        $varChar = preg_quote(static::URL_VAR_CHAR, "/");
+        $urlArr = explode("/", trim($url, "/"));
+        $varIndex = 0;
+        foreach ($urlArr as $pathPart) {
+            $pattern = "/(" . $varChar . sprintf('[^%s]+)/', $varChar);
+            if (preg_match_all($pattern, $pathPart, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $optional = str_contains($match[0], static::URL_OPTIONAL_VAR_CHAR);
+                    $var = str_replace([static::URL_VAR_CHAR, static::URL_OPTIONAL_VAR_CHAR], '', $match[0]);
+                    if (!isset($variables[$var])) {
+                        $variables[$var] = [
+                            'index' => $varIndex,
+                            'optional' => $optional,
+                        ];
+                        $varIndex++;
+                    } else {
+                        $variables[$var]['optional'] = $optional ? $variables[$var]['optional'] : $optional;
+                    }
+                }
             }
         }
 
@@ -476,11 +514,11 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @return $this
      */
-    public function reset()
+    public function reset(): static
     {
-        $this->request = null;
-        $this->response = null;
-        $this->urlArgs = [];
+        unset($this->_request);
+        unset($this->_response);
+        $this->_urlArgs = [];
         $this->setData(null);
         $this->setProperties([]);
         return $this;
@@ -489,7 +527,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * @inheritdoc
      */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): static
     {
         if (!isset($properties[self::PROPERTY_HTTP_METHOD])) {
             $properties[self::PROPERTY_HTTP_METHOD] = '';

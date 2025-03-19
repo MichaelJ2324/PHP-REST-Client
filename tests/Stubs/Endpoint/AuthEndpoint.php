@@ -6,7 +6,8 @@ use MRussell\REST\Endpoint\SmartEndpoint;
 
 class AuthEndpoint extends SmartEndpoint
 {
-    protected static $_ENDPOINT_URL = 'authenticate';
-
-    protected static $_DEFAULT_PROPERTIES = ['httpMethod' => "POST"];
+    protected static array $_DEFAULT_PROPERTIES = [
+        self::PROPERTY_HTTP_METHOD => "POST",
+        self::PROPERTY_URL => 'authenticate',
+    ];
 }

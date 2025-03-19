@@ -2,6 +2,8 @@
 
 namespace MRussell\REST\Auth\Abstracts;
 
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use MRussell\REST\Auth\AuthControllerInterface;
 use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
@@ -19,39 +21,34 @@ abstract class AbstractAuthController implements AuthControllerInterface
     public const ACTION_LOGOUT = 'logout';
 
     /**
+     * Configured Endpoints for configured actions
+     */
+    private array $endpoints = [];
+
+    /**
      * Auth Controller Actions, used to associate Endpoints
      */
     protected static array $_DEFAULT_AUTH_ACTIONS = [self::ACTION_AUTH, self::ACTION_LOGOUT];
 
     /**
      * Configured Actions on the Controlller
-     * @var array
      */
-    protected $actions = [];
-
-    /**
-     * Configured Endpoints for configured actions
-     * @var array
-     */
-    protected $endpoints = [];
+    protected array $actions = [];
 
     /**
      * The credentials used for authentication
-     * @var array
      */
-    protected $credentials = [];
+    protected array $credentials = [];
 
     /**
      * The authentication token
-     * @var mixed
      */
-    protected $token;
+    protected mixed $token;
 
     /**
      * The Cache Key to store the token
-     * @var string
      */
-    protected $cacheKey;
+    protected string $cacheKey;
 
     public function __construct()
     {
@@ -63,7 +60,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
     /**
      * @inheritdoc
      */
-    public function setCredentials(array $credentials)
+    public function setCredentials(array $credentials): static
     {
         $this->credentials = $credentials;
         $this->cacheKey = '';
@@ -87,7 +84,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
     /**
      * @inheritdoc
      */
-    public function updateCredentials(array $credentials): AuthControllerInterface
+    public function updateCredentials(array $credentials): static
     {
         return $this->setCredentials(array_replace($this->getCredentials(), $credentials));
     }
@@ -103,7 +100,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
     /**
      * @inheritDoc
      */
-    public function setToken($token)
+    public function setToken(mixed $token): static
     {
         $this->token = $token;
         $this->cacheToken();
@@ -113,25 +110,25 @@ abstract class AbstractAuthController implements AuthControllerInterface
     /**
      * @inheritdoc
      */
-    public function getToken()
+    public function getToken(): mixed
     {
-        return $this->token;
+        return $this->token ?? null;
     }
 
     /**
      * Clear the token property to null
      * @return $this
      */
-    public function clearToken()
+    public function clearToken(): static
     {
-        $this->token = null;
+        unset($this->token);
         return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function setActions(array $actions)
+    public function setActions(array $actions): static
     {
         $this->actions = $actions;
         return $this;
@@ -148,7 +145,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
     /**
      * @inheritdoc
      */
-    public function setActionEndpoint(string $action, EndpointInterface $Endpoint): AuthControllerInterface
+    public function setActionEndpoint(string $action, EndpointInterface $Endpoint): static
     {
         if (in_array($action, $this->actions)) {
             $this->endpoints[$action] = $Endpoint;
@@ -182,6 +179,7 @@ abstract class AbstractAuthController implements AuthControllerInterface
      */
     public function authenticate(): bool
     {
+        $ret = false;
         try {
             $Endpoint = $this->configureEndpoint($this->getActionEndpoint(self::ACTION_AUTH), self::ACTION_AUTH);
             $response = $Endpoint->execute()->getResponse();
@@ -190,11 +188,27 @@ abstract class AbstractAuthController implements AuthControllerInterface
                 $token = $this->parseResponseToToken(self::ACTION_AUTH, $response);
                 $this->setToken($token);
             }
+        } catch (RequestException $exception) {
+            $response = $exception->getResponse();
+            if ($response instanceof ResponseInterface) {
+                $statusCode = $response->getStatusCode();
+                $message = $exception->getMessage();
+                $content = $response->getBody()->getContents();
+                if (!empty($content)) {
+                    $message .= 'RESPONSE: ' . $content;
+                }
+
+                $this->getLogger()->error(sprintf('[REST] Authenticate Failed [%d] - ', $statusCode) . $message);
+            } else {
+                $this->getLogger()->error("[REST] Authenticate Request Exception - " . $exception->getMessage());
+            }
+
+            // @codeCoverageIgnoreStart
         } catch (\Exception $exception) {
             $this->getLogger()->error("[REST] Authenticate Exception - " . $exception->getMessage());
-            $ret = false;
         }
 
+        // @codeCoverageIgnoreEnd
         return $ret;
     }
 
@@ -212,19 +226,36 @@ abstract class AbstractAuthController implements AuthControllerInterface
                 $this->clearToken();
                 $this->removeCachedToken();
             }
-        } catch (InvalidAuthenticationAction $ex) {
-            $this->getLogger()->debug($ex->getMessage());
-        } catch (\Exception $ex) {
-            $this->getLogger()->error("[REST] Logout Exception - " . $ex->getMessage());
+        } catch (InvalidAuthenticationAction $exception) {
+            $this->getLogger()->debug($exception->getMessage());
+        } catch (RequestException $exception) {
+            $response = $exception->getResponse();
+            if ($response instanceof ResponseInterface) {
+                $statusCode = $response->getStatusCode();
+                $message = $exception->getMessage();
+                $content = $response->getBody()->getContents();
+                if (!empty($content)) {
+                    $message .= 'RESPONSE: ' . $content;
+                }
+
+                $this->getLogger()->error(sprintf('[REST] Logout Failed [%d] - ', $statusCode) . $message);
+            } else {
+                $this->getLogger()->error("[REST] Logout Request Exception - " . $exception->getMessage());
+            }
+
+            // @codeCoverageIgnoreStart
+        } catch (\Exception $exception) {
+            $this->getLogger()->error("[REST] Logout Exception - " . $exception->getMessage());
         }
 
+        // @codeCoverageIgnoreEnd
         return $ret;
     }
 
     /**
      * @inheritDoc
      **/
-    public function reset(): AuthControllerInterface
+    public function reset(): static
     {
         $this->credentials = [];
         return $this->clearToken();
@@ -240,9 +271,8 @@ abstract class AbstractAuthController implements AuthControllerInterface
 
     /**
      * Get the cached token for the Auth Controller
-     * @return mixed
      */
-    protected function getCachedToken()
+    protected function getCachedToken(): mixed
     {
         return $this->getCache()->get($this->getCacheKey(), null);
     }
@@ -261,16 +291,11 @@ abstract class AbstractAuthController implements AuthControllerInterface
      */
     protected function configureEndpoint(EndpointInterface $Endpoint, $action): EndpointInterface
     {
-        switch ($action) {
-            case self::ACTION_AUTH:
-                $Endpoint = $this->configureAuthenticationEndpoint($Endpoint);
-                break;
-            case self::ACTION_LOGOUT:
-                $Endpoint = $this->configureLogoutEndpoint($Endpoint);
-                break;
-        }
-
-        return $Endpoint;
+        return match ($action) {
+            self::ACTION_AUTH => $this->configureAuthenticationEndpoint($Endpoint),
+            self::ACTION_LOGOUT => $this->configureLogoutEndpoint($Endpoint),
+            default => $Endpoint,
+        };
     }
 
     /**
@@ -290,10 +315,9 @@ abstract class AbstractAuthController implements AuthControllerInterface
     /**
      * Given a response from Authentication endpoint, parse the response
      *
-     * @return mixed
      * @codeCoverageIgnore
      */
-    protected function parseResponseToToken(string $action, Response $response)
+    protected function parseResponseToToken(string $action, Response $response): mixed
     {
         return null;
     }

@@ -6,5 +6,5 @@ use MRussell\REST\Endpoint\Abstracts\AbstractCollectionEndpoint;
 
 class CollectionEndpoint extends AbstractCollectionEndpoint
 {
-    protected static $_MODEL_CLASS = ModelEndpoint::class;
+    protected string $_modelInterface = ModelEndpoint::class;
 }

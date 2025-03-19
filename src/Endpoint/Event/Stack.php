@@ -6,27 +6,21 @@ use MRussell\REST\Endpoint\Interfaces\EndpointInterface;
 
 class Stack implements StackInterface
 {
-    private static $IN_EVENT = [];
+    private static array $IN_EVENT = [];
 
-    /**
-     * @var array
-     */
-    private $events = [];
+    private array $events = [];
 
-    /**
-     * @var string
-     */
-    protected $currentEvent;
+    protected string $currentEvent;
 
     /**
      * @var
      */
-    protected $endpoint;
+    protected EndpointInterface $endpoint;
 
     /**
      * @return $this
      */
-    public function setEndpoint(EndpointInterface $endpoint): StackInterface
+    public function setEndpoint(EndpointInterface $endpoint): static
     {
         $this->endpoint = $endpoint;
         return $this;
@@ -40,7 +34,7 @@ class Stack implements StackInterface
     /**
      * @param $data
      */
-    public function trigger(string $event, &$data = null): StackInterface
+    public function trigger(string $event, &$data = null): static
     {
         if (array_key_exists($event, $this->events) && !array_key_exists($event, self::$IN_EVENT)) {
             $this->currentEvent = $event;
@@ -57,9 +51,8 @@ class Stack implements StackInterface
 
     /**
      * @param $data
-     * @return void
      */
-    private function runEventHandler(callable $handler, &$data = null)
+    private function runEventHandler(callable $handler, &$data = null): void
     {
         $handler($data, $this->getEndpoint());
     }
@@ -67,7 +60,7 @@ class Stack implements StackInterface
     /**
      * @inheritDoc
      */
-    public function register(string $event, callable $func, string $id = null)
+    public function register(string $event, callable $func, string $id = null): int|string
     {
         if (!isset($this->events[$event])) {
             $this->events[$event] = [];
@@ -84,9 +77,9 @@ class Stack implements StackInterface
     /**
      * @inheritDoc
      */
-    public function remove(string $event, $id): bool
+    public function remove(string $event, int|string $id): bool
     {
-        if (isset($this->events[$event]) && isset($this->events[$event][$id])) {
+        if (isset($this->events[$event][$id])) {
             unset($this->events[$event][$id]);
             if (empty($this->events[$event])) {
                 unset($this->events[$event]);

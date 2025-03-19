@@ -8,14 +8,14 @@ use MRussell\REST\Auth\Abstracts\AbstractAuthController;
 
 class AuthController extends AbstractAuthController
 {
-    protected $token = '12345';
+    protected mixed $token = '12345';
 
     public function configureRequest(Request $Request): Request
     {
         return $Request->withHeader('token', $this->token);
     }
 
-    protected function parseResponseToToken(string $action, Response $response)
+    protected function parseResponseToToken(string $action, Response $response): string
     {
         return $response->getBody()->getContents();
     }

@@ -4,11 +4,7 @@ namespace MRussell\REST\Endpoint\Traits;
 
 trait ArrayObjectAttributesTrait
 {
-    /**
-     * @var array
-     */
-    protected $_attributes = [];
-
+    use ProtectedAttributesTrait;
     //Object Access
     /**
      * Get a data by key
@@ -17,6 +13,11 @@ trait ArrayObjectAttributesTrait
      */
     public function &__get($key)
     {
+        //Due to use of unset on Class properties for certain scenarios, we need to accommodate
+        if (property_exists($this, $key)) {
+            return $this->{$key};
+        }
+
         return $this->_attributes[$key];
     }
 
@@ -25,9 +26,14 @@ trait ArrayObjectAttributesTrait
      * @param string $key - The data key to assign the value to
      * @param mixed $value - The value to set
      */
-    public function __set($key, $value)
+    public function __set($key, mixed $value)
     {
-        $this->_attributes[$key] = $value;
+        //Due to use of unset on Class properties for certain scenarios, we need to accommodate
+        if (property_exists($this, $key)) {
+            $this->{$key} = $value;
+        } else {
+            $this->_attributes[$key] = $value;
+        }
     }
 
     /**
@@ -56,7 +62,7 @@ trait ArrayObjectAttributesTrait
      * @param mixed $value - The value to set
      * @abstracting ArrayAccess
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet($offset, mixed $value): void
     {
         if (is_null($offset)) {
             $this->_attributes[] = $value;
