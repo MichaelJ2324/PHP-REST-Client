@@ -9,8 +9,9 @@ abstract class AbstractMultiVersionEndpointProvider extends AbstractEndpointProv
         if (isset($properties[self::ENDPOINT_NAME])) {
             $properties[self::ENDPOINT_NAME] = $name;
         }
+
         $next = count($this->registry);
-        parent::addEndpointRegistry("$next", $properties);
+        parent::addEndpointRegistry((string)$next, $properties);
     }
 
     protected function getEndpointDefinition(string $name, string $version = null): array
@@ -28,6 +29,7 @@ abstract class AbstractMultiVersionEndpointProvider extends AbstractEndpointProv
             return $valid;
         });
         rsort($eps);
-        return $eps[0];
+        
+        return $eps[0] ?? [];
     }
 }

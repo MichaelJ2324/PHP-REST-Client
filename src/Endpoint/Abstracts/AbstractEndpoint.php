@@ -157,6 +157,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
                         }
                     }
                 }
+
                 $argNum++;
             }
         }
