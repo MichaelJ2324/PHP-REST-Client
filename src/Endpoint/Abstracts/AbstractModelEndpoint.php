@@ -132,6 +132,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
             if ($id != $this->_urlArgs[static::MODEL_ID_VAR] && !empty($id)) {
                 $this->clear();
             }
+
             $prop = $this->getKeyProperty();
             $this->set($prop, $this->_urlArgs[static::MODEL_ID_VAR]);
             unset($this->_urlArgs[static::MODEL_ID_VAR]);
