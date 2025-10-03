@@ -2,14 +2,26 @@
 
 namespace MRussell\REST\Auth\Abstracts;
 
-use GuzzleHttp\Psr7\Request;
-
 /**
  * Class AbstractTokenController
  * 
  * A simple token-based authentication controller for APIs that use
  * pre-configured API tokens passed via Bearer Authorization header.
  * No authenticate/logout flow required.
+ * 
+ * Usage Example:
+ * ```php
+ * $auth = new TokenAuthController();
+ * $auth->setCredentials(['token' => 'your-api-token-here']);
+ * 
+ * // The token will be automatically added to requests as:
+ * // Authorization: Bearer your-api-token-here
+ * 
+ * // Check if authenticated
+ * if ($auth->isAuthenticated()) {
+ *     // Token is set and ready to use
+ * }
+ * ```
  * 
  * @package MRussell\REST\Auth\Abstracts
  */
