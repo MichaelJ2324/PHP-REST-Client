@@ -12,7 +12,12 @@ namespace MRussell\REST\Auth\Abstracts;
  * Usage Example:
  * ```php
  * $auth = new TokenAuthController();
+ * 
+ * // Use 'token' property (recommended)
  * $auth->setCredentials(['token' => 'your-api-token-here']);
+ * 
+ * // Or use 'api_token' property (backward compatibility)
+ * $auth->setCredentials(['api_token' => 'your-api-token-here']);
  * 
  * // The token will be automatically added to requests as:
  * // Authorization: Bearer your-api-token-here
@@ -44,8 +49,11 @@ abstract class AbstractTokenController extends AbstractBasicController
         parent::setCredentials($credentials);
         
         // If a token is provided in credentials, set it directly
+        // Support both 'token' and 'api_token' for backward compatibility
         if (isset($credentials['token'])) {
             $this->setToken($credentials['token']);
+        } elseif (isset($credentials['api_token'])) {
+            $this->setToken($credentials['api_token']);
         }
         
         return $this;
