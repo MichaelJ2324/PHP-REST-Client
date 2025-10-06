@@ -48,6 +48,38 @@ class AbstractTokenControllerTest extends TestCase
     }
 
     /**
+     * @covers ::setCredentials
+     * @covers ::isAuthenticated
+     */
+    public function testSetCredentialsWithApiToken(): void
+    {
+        $Auth = new TokenAuthController();
+        $this->assertEquals(false, $Auth->isAuthenticated());
+        
+        // Test backward compatibility with 'api_token' property
+        $Auth->setCredentials(['api_token' => 'my-api-token-67890']);
+        $this->assertEquals(true, $Auth->isAuthenticated());
+        $this->assertEquals('my-api-token-67890', $Auth->getToken());
+    }
+
+    /**
+     * @covers ::setCredentials
+     * @covers ::isAuthenticated
+     */
+    public function testSetCredentialsTokenTakesPrecedence(): void
+    {
+        $Auth = new TokenAuthController();
+        
+        // If both 'token' and 'api_token' are provided, 'token' should take precedence
+        $Auth->setCredentials([
+            'token' => 'token-value',
+            'api_token' => 'api-token-value'
+        ]);
+        $this->assertEquals(true, $Auth->isAuthenticated());
+        $this->assertEquals('token-value', $Auth->getToken());
+    }
+
+    /**
      * @covers ::authenticate
      */
     public function testAuthenticate(): void
