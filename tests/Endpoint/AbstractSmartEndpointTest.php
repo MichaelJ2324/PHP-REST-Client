@@ -162,7 +162,6 @@ class AbstractSmartEndpointTest extends TestCase
         $Endpoint = new SmartEndpointNoData();
         $reflection = new \ReflectionClass($Endpoint);
         $data = $reflection->getProperty('_data');
-        $data->setAccessible(true);
         $data->setValue($Endpoint, ['foo' => 'bar']);
         $this->assertInstanceOf(DataInterface::class, $Endpoint->getData());
     }
@@ -189,10 +188,8 @@ class AbstractSmartEndpointTest extends TestCase
         $Endpoint = new SmartEndpointNoData();
         $Reflected = new \ReflectionClass($Endpoint);
         $data = $Reflected->getProperty('_data');
-        $data->setAccessible(true);
 
         $DataClass = $Reflected->getProperty('_dataInterface');
-        $DataClass->setAccessible(true);
 
         $oldValue = $DataClass->getValue($Endpoint);
         $DataClass->setValue($Endpoint, PingEndpoint::class);

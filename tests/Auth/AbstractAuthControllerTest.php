@@ -92,12 +92,10 @@ class AbstractAuthControllerTest extends TestCase
         $this->assertEquals(true, $Auth->isAuthenticated());
         $Class = new \ReflectionClass(AuthController::class);
         $method = $Class->getMethod('setToken');
-        $method->setAccessible(true);
         $this->assertEquals($Auth, $method->invoke($Auth, 'test'));
         $this->assertEquals('test', $Auth->getToken());
         $this->assertEquals(true, $Auth->isAuthenticated());
         $method = $Class->getMethod('clearToken');
-        $method->setAccessible(true);
         $this->assertEquals($Auth, $method->invoke($Auth));
         $this->assertEquals(null, $Auth->getToken());
         $this->assertEmpty($Auth->getToken());
@@ -159,13 +157,10 @@ class AbstractAuthControllerTest extends TestCase
         $cache = MemoryCache::getInstance();
         $ReflectedAuth = new \ReflectionClass($Auth);
         $cacheTokenMethod = $ReflectedAuth->getMethod('cacheToken');
-        $cacheTokenMethod->setAccessible(true);
 
         $getCachedTokenMethod = $ReflectedAuth->getMethod('getCachedToken');
-        $getCachedTokenMethod->setAccessible(true);
 
         $removeCachedTokenMethod = $ReflectedAuth->getMethod('removeCachedToken');
-        $removeCachedTokenMethod->setAccessible(true);
 
         $this->assertEquals($cache, $Auth->getCache());
         $this->assertEquals($Auth, $Auth->setCache($cache));
@@ -214,7 +209,6 @@ class AbstractAuthControllerTest extends TestCase
 
         $Class = new \ReflectionClass(AuthController::class);
         $method = $Class->getMethod('configureEndpoint');
-        $method->setAccessible(true);
         $this->assertEquals($AuthEndpoint, $method->invoke($Auth, $AuthEndpoint, AbstractAuthController::ACTION_AUTH));
         $this->assertEquals($this->credentials, $AuthEndpoint->getData()->toArray());
         $this->assertEquals($LogoutEndpoint, $method->invoke($Auth, $LogoutEndpoint, AbstractAuthController::ACTION_LOGOUT));

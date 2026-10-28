@@ -11,10 +11,10 @@ abstract class AbstractMultiVersionEndpointProvider extends AbstractEndpointProv
         }
 
         $next = count($this->registry);
-        parent::addEndpointRegistry((string)$next, $properties);
+        parent::addEndpointRegistry((string) $next, $properties);
     }
 
-    protected function getEndpointDefinition(string $name, string $version = null): array
+    protected function getEndpointDefinition(string $name, ?string $version = null): array
     {
         $eps = array_filter($this->registry, function ($definition) use ($name, $version): bool {
             if (($valid = $definition[self::ENDPOINT_NAME] === $name) && !empty($definition[self::ENDPOINT_VERSIONS])) {
@@ -29,7 +29,7 @@ abstract class AbstractMultiVersionEndpointProvider extends AbstractEndpointProv
             return $valid;
         });
         rsort($eps);
-        
+
         return $eps[0] ?? [];
     }
 }

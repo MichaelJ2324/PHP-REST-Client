@@ -143,7 +143,6 @@ class AbstractTokenControllerTest extends TestCase
         // Use reflection to test protected method
         $class = new \ReflectionClass($Auth);
         $method = $class->getMethod('getAuthHeaderValue');
-        $method->setAccessible(true);
         
         $headerValue = $method->invoke($Auth);
         $this->assertEquals('Bearer my-api-token-12345', $headerValue);

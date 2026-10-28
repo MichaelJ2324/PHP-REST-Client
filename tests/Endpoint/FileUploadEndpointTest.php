@@ -22,7 +22,6 @@ class FileUploadEndpointTest extends TestCase
         $Endpoint = new FileUploadEndpoint();
         $Reflection = new \ReflectionClass($Endpoint);
         $buildMultiPartFileData = $Reflection->getMethod('buildMultiPartFileData');
-        $buildMultiPartFileData->setAccessible(true);
 
         $this->assertEquals([
             'name' => 'foobar',
@@ -68,11 +67,9 @@ class FileUploadEndpointTest extends TestCase
         $Endpoint = new FileUploadEndpoint();
         $Reflection = new \ReflectionClass($Endpoint);
         $upload = $Reflection->getProperty('_upload');
-        $upload->setAccessible(true);
         $upload->setValue($Endpoint, true);
 
         $configureFileUploadRequest = $Reflection->getMethod('configureFileUploadRequest');
-        $configureFileUploadRequest->setAccessible(true);
 
         $request = $configureFileUploadRequest->invoke($Endpoint, $Request, [
             [

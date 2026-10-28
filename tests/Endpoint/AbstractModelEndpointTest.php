@@ -70,7 +70,6 @@ class AbstractModelEndpointTest extends TestCase
         $Model = new ModelEndpoint();
         $Class = new \ReflectionClass($Model);
         $actions = $Class->getProperty('_actions');
-        $actions->setAccessible(true);
         $this->assertEquals(['create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
     }
 
@@ -102,7 +101,6 @@ class AbstractModelEndpointTest extends TestCase
         $Model = new ModelEndpointWithActions();
         $Class = new \ReflectionClass($Model);
         $actions = $Class->getProperty('_actions');
-        $actions->setAccessible(true);
         $this->assertEquals(['foo' => "HEAD", 'create' => "POST", 'retrieve' => "GET", 'update' => "PUT", 'delete' => "DELETE"], $actions->getValue($Model));
 
         $this->client->mockResponses->append(new Response(200));
@@ -122,7 +120,6 @@ class AbstractModelEndpointTest extends TestCase
         $Model = new ModelEndpoint();
         $Class = new \ReflectionClass($Model);
         $action = $Class->getProperty('_action');
-        $action->setAccessible(true);
         $this->assertEmpty($action->getValue($Model));
 
         $this->client->mockResponses->append(new Response(200));
@@ -299,7 +296,6 @@ class AbstractModelEndpointTest extends TestCase
         $this->client->mockResponses->append(new Response(200, [], json_encode(['id' => '1234'])));
         $Reflected = new \ReflectionClass($Model);
         $dataProp = $Reflected->getProperty('_data');
-        $dataProp->setAccessible(true);
         $dataProp->setValue($Model, null);
         $this->assertEquals($Model, $Model->save());
         $this->assertEquals('update', $Model->getCurrentAction());
@@ -400,7 +396,6 @@ class AbstractModelEndpointTest extends TestCase
 
         $Reflect = new \ReflectionClass($Model);
         $parseModelFromResponseBody = $Reflect->getMethod('parseResponseBodyToArray');
-        $parseModelFromResponseBody->setAccessible(true);
         $this->assertEquals([
             'id' => '1234',
             'name' => 'foo',

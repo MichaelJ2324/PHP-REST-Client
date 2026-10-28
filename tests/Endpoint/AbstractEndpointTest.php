@@ -92,7 +92,6 @@ class AbstractEndpointTest extends TestCase
         $Endpoint = new BasicEndpoint();
         $reflection = new ReflectionClass($Endpoint);
         $catchNon200Responses = $reflection->getProperty('_catchNon200Responses');
-        $catchNon200Responses->setAccessible(true);
         $this->assertFalse($catchNon200Responses->getValue($Endpoint));
         $this->assertEquals($Endpoint, $Endpoint->catchNon200Responses());
         $this->assertTrue($catchNon200Responses->getValue($Endpoint));
@@ -322,8 +321,6 @@ class AbstractEndpointTest extends TestCase
         $Class = new \ReflectionClass(BasicEndpoint::class);
         $needsUrlArgs = $Class->getMethod('needsUrlArgs');
         $extractUrlVariables = $Class->getMethod('extractUrlVariables');
-        $needsUrlArgs->setAccessible(true);
-        $extractUrlVariables->setAccessible(true);
 
         $Endpoint->setProperty('url', 'test/$module/$:id/action/$:actionArg');
         $this->assertEquals(true, $needsUrlArgs->invoke($Endpoint));
@@ -353,7 +350,6 @@ class AbstractEndpointTest extends TestCase
         $Endpoint = new BasicEndpoint();
         $Class = new \ReflectionClass(BasicEndpoint::class);
         $method = $Class->getMethod('configureURL');
-        $method->setAccessible(true);
         $this->assertEquals($Endpoint, $Endpoint->setProperty('url', '$foo'));
         $this->assertEquals('bar', $method->invoke($Endpoint, ['bar']));
 

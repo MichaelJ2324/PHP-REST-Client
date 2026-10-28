@@ -39,7 +39,7 @@ abstract class AbstractEndpointData implements DataInterface
     ];
 
     //Overloads
-    public function __construct(array $data = null, array $properties = [])
+    public function __construct(?array $data = null, array $properties = [])
     {
         $this->setProperties(static::$_DEFAULT_PROPERTIES);
         foreach ($properties as $key => $value) {
@@ -159,7 +159,7 @@ abstract class AbstractEndpointData implements DataInterface
         return $this;
     }
 
-    public function toArray(bool $validate = null): array
+    public function toArray(?bool $validate = null): array
     {
         return $this->_attributes;
     }

@@ -60,7 +60,7 @@ class Stack implements StackInterface
     /**
      * @inheritDoc
      */
-    public function register(string $event, callable $func, string $id = null): int|string
+    public function register(string $event, callable $func, ?string $id = null): int|string
     {
         if (!isset($this->events[$event])) {
             $this->events[$event] = [];

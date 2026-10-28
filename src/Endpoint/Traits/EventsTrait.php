@@ -21,7 +21,7 @@ trait EventsTrait
      * @abstracting EventTriggerInterface
      * @codeCoverageIgnore
      */
-    public function onEvent(string $event, callable $func, string $id = null): int|string
+    public function onEvent(string $event, callable $func, ?string $id = null): int|string
     {
         return $this->_eventStack->register($event, $func, $id);
     }

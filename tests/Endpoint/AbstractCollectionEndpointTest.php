@@ -139,7 +139,6 @@ class AbstractCollectionEndpointTest extends TestCase
         $this->client->getEndpointProvider()->registerEndpoint('model', ModelEndpoint::class);
         $reflection = new \ReflectionClass($Collection);
         $method = $reflection->getMethod('generateEndpoint');
-        $method->setAccessible(true);
 
         $endpoint = $method->invoke($Collection, 'model');
         $this->assertInstanceOf(ModelEndpoint::class, $endpoint);
@@ -304,7 +303,6 @@ class AbstractCollectionEndpointTest extends TestCase
 
         $Reflect = new \ReflectionClass($Collection);
         $parseFromResponseBody = $Reflect->getMethod('parseResponseBodyToArray');
-        $parseFromResponseBody->setAccessible(true);
         $this->assertEquals(json_decode(json_encode(array_values($this->collection)), false), $parseFromResponseBody->invoke($Collection, $Collection->getResponseContent($Collection->getResponse(), false), $Collection->getCollectionResponseProp()));
         $this->assertEquals(array_values($this->collection), $parseFromResponseBody->invoke($Collection, $Collection->getResponseContent($Collection->getResponse(), true), $Collection->getCollectionResponseProp()));
 

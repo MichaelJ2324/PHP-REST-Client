@@ -29,7 +29,6 @@ class MemoryCacheTest extends TestCase
         $cache = MemoryCache::getInstance();
         $reflected = new \ReflectionClass($cache);
         $arrCache = $reflected->getProperty('cache');
-        $arrCache->setAccessible(true);
         $this->assertEquals([], $arrCache->getValue($cache));
 
         $cache2 = MemoryCache::getInstance();

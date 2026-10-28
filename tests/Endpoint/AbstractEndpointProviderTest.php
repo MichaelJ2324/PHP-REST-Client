@@ -49,12 +49,10 @@ class AbstractEndpointProviderTest extends TestCase
         $Provider = new EndpointProvider();
         $Class = new \ReflectionClass(EndpointProvider::class);
         $property = $Class->getProperty('registry');
-        $property->setAccessible(true);
         $this->assertEquals([], $property->getValue($Provider));
 
         $Class = new \ReflectionClass(EndpointProviderWithDefaults::class);
         $property = $Class->getProperty('registry');
-        $property->setAccessible(true);
 
         $Provider = new EndpointProviderWithDefaults();
         $this->assertNotEmpty($property->getValue($Provider));
@@ -77,12 +75,10 @@ class AbstractEndpointProviderTest extends TestCase
         ));
         $Class = new \ReflectionClass(EndpointProvider::class);
         $addEndpointRegistry = $Class->getMethod('addEndpointRegistry');
-        $addEndpointRegistry->setAccessible(true);
 
         $addEndpointRegistry->invoke($Provider, 'bulk', ['url' => 'bulk', 'httpMethod' => "POST", 'class' => Endpoint::class]);
 
         $property = $Class->getProperty('registry');
-        $property->setAccessible(true);
 
         $register = $property->getValue($Provider);
         $this->assertNotEmpty($register);
@@ -121,7 +117,6 @@ class AbstractEndpointProviderTest extends TestCase
         $this->expectExceptionMessage("Endpoint Object [bulk] must extend MRussell\REST\Endpoint\Interfaces\EndpointInterface");
         $Class = new \ReflectionClass(EndpointProvider::class);
         $addEndpointRegistry = $Class->getMethod('addEndpointRegistry');
-        $addEndpointRegistry->setAccessible(true);
 
         $addEndpointRegistry->invoke($Provider, 'bulk', ['url' => 'bulk', 'httpMethod' => "POST"]);
     }
@@ -168,7 +163,6 @@ class AbstractEndpointProviderTest extends TestCase
         $Provider = new EndpointProvider();
         $reflection = new \ReflectionClass(EndpointProvider::class);
         $isInVersionRange = $reflection->getMethod('isInVersionRange');
-        $isInVersionRange->setAccessible(true);
 
         $this->assertTrue($isInVersionRange->invoke($Provider, '1.0', ['1.0']));
         $this->assertTrue($isInVersionRange->invoke($Provider, '1.1', [ '>=' => '1.0' ]));

@@ -73,7 +73,7 @@ abstract class AbstractOAuth2Controller extends AbstractBasicController
      * Get/Set the OAuth Authorization header
      * @param $header
      */
-    public function oauthHeader(string $header = null): string
+    public function oauthHeader(?string $header = null): string
     {
         if (!empty($header)) {
             $this->authHeader = $header;

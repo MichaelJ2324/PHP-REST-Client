@@ -86,7 +86,6 @@ class AbstractClientTest extends TestCase
         $handlerStack = $this->Client->getHandlerStack();
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
-        $stack->setAccessible(true);
 
         $value = $stack->getValue($handlerStack);
         $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');
@@ -111,7 +110,6 @@ class AbstractClientTest extends TestCase
         $handlerStack = $this->Client->getHandlerStack();
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
-        $stack->setAccessible(true);
 
         $value = $stack->getValue($handlerStack);
         $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');
@@ -124,7 +122,6 @@ class AbstractClientTest extends TestCase
 
         $reflectedHandler = new \ReflectionClass($handlerStack);
         $stack = $reflectedHandler->getProperty('stack');
-        $stack->setAccessible(true);
 
         $value = $stack->getValue($handlerStack);
         $middleware = array_filter($value, fn($item): bool => $item[1] == 'configureAuth');

@@ -78,7 +78,6 @@ class AbstractOAuth2ControllerTest extends TestCase
         $Auth = new OAuth2Controller();
         $Class = new \ReflectionClass(OAuth2Controller::class);
         $isTokenExpired = $Class->getMethod('isTokenExpired');
-        $isTokenExpired->setAccessible(true);
         $this->assertEquals($Auth, $Auth->setToken($this->token));
         $newToken = $Auth->getToken();
         $this->assertNotEmpty($newToken['expiration']);
@@ -193,7 +192,6 @@ class AbstractOAuth2ControllerTest extends TestCase
 
         $Class = new \ReflectionClass(OAuth2Controller::class);
         $method = $Class->getMethod('configureEndpoint');
-        $method->setAccessible(true);
 
         $AuthEndpoint = $method->invoke($Auth, $AuthEndpoint, OAuth2Controller::ACTION_AUTH);
         $data = $AuthEndpoint->getData();
