@@ -13,7 +13,7 @@ return RectorConfig::configure()
         DisallowedEmptyRuleFixerRector::class,
         IssetOnPropertyObjectToPropertyExistsRector::class,
         SimplifyEmptyCheckOnEmptyArrayRector::class,
-        EncapsedStringsToSprintfRector::class
+        EncapsedStringsToSprintfRector::class,
     ])
     ->withSets([
         SetList::PHP_80,
