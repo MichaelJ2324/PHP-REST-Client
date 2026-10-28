@@ -272,9 +272,11 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
             $response = $this->getHttpClient()->send($this->buildRequest(), $options);
             $this->setResponse($response);
         } catch (RequestException $requestException) {
-            $response = $requestException->getResponse();
-            if ($response instanceof Response) {
-                $this->setResponse($requestException->getResponse());
+            if (method_exists($requestException, 'getResponse')) {
+                $response = $requestException->getResponse();
+                if ($response instanceof Response) {
+                    $this->setResponse($requestException->getResponse());
+                }
             }
 
             if (!$this->_catchNon200Responses) {
@@ -483,7 +485,7 @@ abstract class AbstractEndpoint implements EndpointInterface, EventTriggerInterf
     /**
      * Helper method for extracting variables via Regex from a passed in URL
      */
-    protected function extractUrlVariables(string $url = null): array
+    protected function extractUrlVariables(?string $url = null): array
     {
         $url = $url ?? $this->getEndPointUrl();
         $variables = [];

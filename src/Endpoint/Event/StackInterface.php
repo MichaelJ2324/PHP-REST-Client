@@ -26,9 +26,8 @@ interface StackInterface
 
     /**
      * Register a new event handler
-     * @param string|null $id
      */
-    public function register(string $event, callable $func, string $id = null): int|string;
+    public function register(string $event, callable $func, ?string $id = null): int|string;
 
     /**
      * Remove an event handler

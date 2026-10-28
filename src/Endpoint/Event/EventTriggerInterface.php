@@ -11,9 +11,8 @@ interface EventTriggerInterface
 
     /**
      * Register a function to run when event is triggered
-     * @param string|null $id
      */
-    public function onEvent(string $event, callable $func, string $id = null): int|string;
+    public function onEvent(string $event, callable $func, ?string $id = null): int|string;
 
     /**
      * Remove a registered function from the Event Stack

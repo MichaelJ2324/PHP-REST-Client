@@ -47,7 +47,6 @@ class StackTest extends TestCase
 
         $reflected = new \ReflectionClass($stack);
         $eventsProp = $reflected->getProperty('events');
-        $eventsProp->setAccessible(true);
 
         $this->assertArrayHasKey('foobar', $eventsProp->getValue($stack));
         $this->assertEquals($stack, $stack->trigger('foobar', $data));

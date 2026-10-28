@@ -14,7 +14,7 @@ abstract class AbstractMultiVersionEndpointProvider extends AbstractEndpointProv
         parent::addEndpointRegistry((string) $next, $properties);
     }
 
-    protected function getEndpointDefinition(string $name, string $version = null): array
+    protected function getEndpointDefinition(string $name, ?string $version = null): array
     {
         $eps = array_filter($this->registry, function ($definition) use ($name, $version): bool {
             if (($valid = $definition[self::ENDPOINT_NAME] === $name) && !empty($definition[self::ENDPOINT_VERSIONS])) {

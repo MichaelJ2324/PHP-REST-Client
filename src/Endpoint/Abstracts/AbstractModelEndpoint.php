@@ -81,7 +81,7 @@ abstract class AbstractModelEndpoint extends AbstractSmartEndpoint implements Mo
      */
     protected string $_action = '';
 
-    public static function defaultModelKey(string $key = null): string
+    public static function defaultModelKey(?string $key = null): string
     {
         if (!empty($key)) {
             static::$_DEFAULT_MODEL_KEY = $key;

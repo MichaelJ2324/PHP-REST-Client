@@ -39,7 +39,7 @@ class ValidatedEndpointData extends EndpointData implements ValidatedInterface
      * Verify data requirements when converting to Array
      * @throws InvalidData
      */
-    public function toArray(bool $validate = null): array
+    public function toArray(?bool $validate = null): array
     {
         $validate = is_null($validate) ? $this->getProperty(self::DATA_PROPERTY_AUTO_VALIDATE) : $validate;
         if ((bool) $validate && !$this->validate()) {

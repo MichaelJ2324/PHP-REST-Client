@@ -63,13 +63,13 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
     /**
      * @inheritdoc
      */
-    public function hasEndpoint(string $name, string $version = null): bool
+    public function hasEndpoint(string $name, ?string $version = null): bool
     {
         $definition = $this->getEndpointDefinition($name, $version);
         return !empty($definition);
     }
 
-    protected function getEndpointDefinition(string $name, string $version = null): array
+    protected function getEndpointDefinition(string $name, ?string $version = null): array
     {
         $definition = $this->registry[$name] ?? [];
         if (!empty($definition) && $version !== null && !empty($definition[self::ENDPOINT_VERSIONS])) {
@@ -90,7 +90,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
      * @inheritdoc
      * @throws UnknownEndpoint
      */
-    public function getEndpoint(string $name, string $version = null): EndpointInterface
+    public function getEndpoint(string $name, ?string $version = null): EndpointInterface
     {
         if ($this->hasEndpoint($name, $version)) {
             return $this->buildEndpoint($name, $version);
@@ -99,7 +99,7 @@ abstract class AbstractEndpointProvider implements EndpointProviderInterface
         }
     }
 
-    protected function buildEndpoint(string $name, string $version = null): EndpointInterface
+    protected function buildEndpoint(string $name, ?string $version = null): EndpointInterface
     {
         $endPointDef = $this->getEndpointDefinition($name, $version);
         $Class = $endPointDef[self::ENDPOINT_CLASS];
